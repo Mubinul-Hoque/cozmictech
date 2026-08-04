@@ -2,7 +2,7 @@
   <div class="font-sans">
     <div class="mb-6 flex flex-col gap-1">
       <NuxtLink to="/admin/messages" class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors inline-flex items-center gap-1 mb-1">
-        <i class="bi bi-arrow-left"></i> Back to Messages
+        <Icon name="lucide:arrow-left" /> Back to Messages
       </NuxtLink>
     </div>
 
@@ -35,7 +35,7 @@
       
       <div class="bg-slate-50/50 px-6 py-4 flex justify-end">
         <button @click="deleteMessage" class="inline-flex items-center px-4 py-2 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 rounded-full text-xs font-bold transition-colors">
-          <i class="bi bi-trash mr-1.5"></i> Delete Message
+          <Icon name="lucide:trash-2" class="mr-1.5" /> Delete Message
         </button>
       </div>
     </div>
@@ -55,10 +55,13 @@ const { data: message, pending } = useFetch(`/api/admin/messages/${route.params.
 const deleteMessage = async () => {
   if (confirm('Are you sure you want to delete this message?')) {
     try {
-      await $fetch(`/api/admin/messages/${route.params.id}`, { method: 'DELETE' });
-      router.push('/admin/messages');
+      await useNuxtApp().$fetch(`/api/admin/messages/${route.params.id}`, { method: 'DELETE' });
+      clearNuxtData();
+    useToast().success('Saved successfully');
+    await refreshNuxtData('admin-messages-list');
+    router.push('/admin/messages');
     } catch (error) {
-      alert('Failed to delete message.');
+      useToast().error('Failed to delete message.');
     }
   }
 };

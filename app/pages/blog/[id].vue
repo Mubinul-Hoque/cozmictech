@@ -30,11 +30,11 @@
             <h2 class="text-3xl font-bold text-[#2e3135] mt-6">{{ data?.post?.title }}</h2>
 
             <div class="flex items-center gap-4 text-xs text-gray-500 border-b border-gray-100 pb-4">
-              <span class="flex items-center gap-1"><i class="bi bi-person text-[#feb900]"></i> {{ data?.post?.author || 'Admin' }}</span>
+              <span class="flex items-center gap-1"><Icon name="lucide:person" class="text-[#feb900]" /> {{ data?.post?.author || 'Admin' }}</span>
               <span>/</span>
-              <span class="flex items-center gap-1"><i class="bi bi-calendar-event text-[#feb900]"></i> {{ data?.post?.sdate || 'Recent' }}</span>
+              <span class="flex items-center gap-1"><Icon name="lucide:calendar-event" class="text-[#feb900]" /> {{ data?.post?.sdate || 'Recent' }}</span>
               <span>/</span>
-              <span class="flex items-center gap-1"><i class="bi bi-folder2 text-[#feb900]"></i> {{ data?.category?.name || 'Engineering' }}</span>
+              <span class="flex items-center gap-1"><Icon name="lucide:folder2" class="text-[#feb900]" /> {{ data?.category?.name || 'Engineering' }}</span>
             </div>
 
             <div 

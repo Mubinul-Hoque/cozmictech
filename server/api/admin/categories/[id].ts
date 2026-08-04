@@ -20,12 +20,13 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Category name exceeds limit of 50 characters' })
       }
 
-      const updated = await prisma.category.update({
+      const updated = await prisma.categories.update({
         where: { id },
         data: {
           name: sanitizePlainText(catName)
         }
       })
+      await clearPublicCache();
       return { success: true, data: updated }
     } catch (error: any) {
       console.error('Error updating category:', error)
@@ -35,9 +36,10 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'DELETE') {
     try {
-      await prisma.category.delete({
+      await prisma.categories.delete({
         where: { id }
       })
+      await clearPublicCache();
       return { success: true, message: 'Category deleted successfully' }
     } catch (error: any) {
       console.error('Error deleting category:', error)

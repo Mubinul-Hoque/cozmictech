@@ -11,7 +11,7 @@
           to="/admin/team/new" 
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95"
         >
-          <i class="bi bi-plus-lg text-sm"></i> Add Member
+          <Icon name="lucide:plus" class="text-sm" /> Add Member
         </NuxtLink>
       </div>
     </div>
@@ -19,7 +19,7 @@
     <!-- Success Feedback Banner -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
@@ -30,7 +30,7 @@
     </div>
 
     <div v-else-if="!team.length" class="text-center py-20 text-slate-400 bg-white border border-slate-200 rounded-3xl">
-      <i class="bi bi-people text-4xl mb-4 block"></i>
+      <Icon name="lucide:users" class="text-4xl mb-4 block" />
       <p class="font-semibold">No team members defined. Add a profile to get started.</p>
     </div>
 
@@ -73,13 +73,13 @@
               :to="'/admin/team/' + member.id" 
               class="w-8 h-8 rounded-lg bg-white text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors"
             >
-              <i class="bi bi-pencil"></i>
+              <Icon name="lucide:pencil" />
             </NuxtLink>
             <button 
               @click="confirmDelete(member.id)" 
               class="w-8 h-8 rounded-lg bg-white text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors"
             >
-              <i class="bi bi-trash"></i>
+              <Icon name="lucide:trash-2" />
             </button>
           </div>
         </div>
@@ -96,18 +96,19 @@ definePageMeta({
 });
 
 const successMsg = ref('');
-const { data: team, pending, refresh } = useFetch('/api/admin/team');
+const { data: team, pending, refresh } = useFetch('/api/admin/team', { key: 'admin-team-list' });
 
 const confirmDelete = async (id) => {
   if (confirm('Are you sure you want to delete this team member?')) {
     try {
-      await $fetch(`/api/admin/team/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/team/${id}`, { method: 'DELETE' });
       successMsg.value = 'Team member deleted successfully.';
       setTimeout(() => successMsg.value = '', 4000);
+      clearNuxtData();
       refresh();
     } catch (err) {
       console.error(err);
-      alert('Delete operation failed.');
+      useToast().error('Delete operation failed.');
     }
   }
 };

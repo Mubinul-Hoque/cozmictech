@@ -18,9 +18,9 @@
         <!-- Info Boxes Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <!-- Box 1 -->
-          <div class="bg-gray-50 border border-gray-100 p-8 rounded-lg flex flex-col justify-center items-center text-center shadow-sm" data-aos="fade-up" data-aos-delay="100">
+          <div class="bg-gray-50 border border-gray-100 p-8 rounded-lg flex flex-col justify-center items-center text-center shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-[#feb900] text-2xl mb-4">
-              <i class="bi bi-map"></i>
+              <Icon name="lucide:map" />
             </div>
             <h3 class="font-bold text-lg text-[#2e3135] mb-2">Our Address</h3>
             <p class="text-gray-600 text-sm leading-relaxed max-w-xs">
@@ -29,9 +29,9 @@
           </div>
 
           <!-- Box 2 -->
-          <div class="bg-gray-50 border border-gray-100 p-8 rounded-lg flex flex-col justify-center items-center text-center shadow-sm" data-aos="fade-up" data-aos-delay="200">
+          <div class="bg-gray-50 border border-gray-100 p-8 rounded-lg flex flex-col justify-center items-center text-center shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-[#feb900] text-2xl mb-4">
-              <i class="bi bi-envelope"></i>
+              <Icon name="lucide:mail" />
             </div>
             <h3 class="font-bold text-lg text-[#2e3135] mb-2">Email Us</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
@@ -43,9 +43,9 @@
           </div>
 
           <!-- Box 3 -->
-          <div class="bg-gray-50 border border-gray-100 p-8 rounded-lg flex flex-col justify-center items-center text-center shadow-sm" data-aos="fade-up" data-aos-delay="300">
+          <div class="bg-gray-50 border border-gray-100 p-8 rounded-lg flex flex-col justify-center items-center text-center shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-[#feb900] text-2xl mb-4">
-              <i class="bi bi-telephone"></i>
+              <Icon name="lucide:phone" />
             </div>
             <h3 class="font-bold text-lg text-[#2e3135] mb-2">Call Us</h3>
             <p class="text-gray-600 text-sm leading-relaxed">
@@ -105,7 +105,7 @@
                   :class="{ 'border-[#feb900] ring-1 ring-[#feb900] text-gray-800': selectedCategoryName }"
                 >
                   <span>{{ selectedCategoryName || 'Select Message Category *' }}</span>
-                  <i class="bi" :class="isDropdownOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  <Icon :name="isDropdownOpen ? 'lucide:chevron-up' : 'lucide:chevron-down'" />
                 </button>
 
                 <!-- Dropdown Card -->
@@ -115,7 +115,7 @@
                 >
                   <!-- Search Bar -->
                   <div class="p-2.5 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-                    <i class="bi bi-search text-gray-400 text-sm"></i>
+                    <Icon name="lucide:search" class="text-gray-400 text-sm" />
                     <input 
                       type="text" 
                       v-model="catSearch" 
@@ -134,7 +134,7 @@
                       class="w-full text-left px-4 py-2.5 hover:bg-amber-500/10 text-sm text-gray-700 hover:text-slate-900 transition-colors flex items-center justify-between"
                     >
                       <span>{{ cat.name }}</span>
-                      <i v-if="form.message_cat_id === cat.id" class="bi bi-check-lg text-[#feb900]"></i>
+                      <Icon v-if="form.message_cat_id === cat.id" name="lucide:check" class="text-[#feb900]" />
                     </button>
                     <div v-if="filteredCategories.length === 0" class="p-4 text-center text-xs text-gray-450 font-bold uppercase tracking-wider">
                       No categories found
@@ -208,26 +208,35 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 
-const { data } = await useFetch('/api/contact')
+// P15 — Page-specific SEO meta
+useHead({
+  title: 'Contact Us | Cozmic Technology - Engineering Consultancy',
+  meta: [
+    { name: 'description', content: 'Get in touch with Cozmic Technology. Visit our office at Mohammadpur, Dhaka or send us a message about your engineering project.' },
+    { property: 'og:title', content: 'Contact Cozmic Technology' },
+    { property: 'og:description', content: 'Reach out to our expert engineering consultancy team in Dhaka, Bangladesh.' },
+  ]
+})
+
+// P11 — Reuse already-fetched common data (available from layout) instead of a duplicate GET
+const { data: commonData } = useNuxtData('$d3bQNlw0Ly') // fallback to direct fetch if key unavailable
+const { data: contactPageData } = await useFetch('/api/contact', { key: 'contact-page' })
+const data = computed(() => ({
+  contact: contactPageData.value?.contact ?? commonData.value?.contact ?? null
+}))
+
 const { data: categoriesRes } = await useFetch('/api/messages/categories')
 const categories = computed(() => categoriesRes.value?.data || [])
 
 const mapUrl = computed(() => {
   const mapPath = data.value?.contact?.map || '';
-  if (mapPath) {
-    return mapPath;
-  }
-  // Final fallback to default pin
-  return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d912.8900124888902!2d90.36874588803688!3d23.76306319903172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c0a9e3d1b953%3A0x25258dde0e7de0ff!2sMRDI%20Bangladesh!5e0!3m2!1sen!2sbd!4v1674397548469!5m2!1sen!2sbd';
+  if (mapPath) return mapPath
+  return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d912.8900124888902!2d90.36874588803688!3d23.76306319903172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c0a9e3d1b953%3A0x25258dde0e7de0ff!2sMRDI%20Bangladesh!5e0!3m2!1sen!2sbd!4v1674397548469!5m2!1sen!2sbd'
 })
 
 const form = reactive({
-  name: '',
-  email: '',
-  company: '',
-  subject: '',
-  message: '',
-  message_cat_id: null
+  name: '', email: '', company: '',
+  subject: '', message: '', message_cat_id: null
 })
 
 const loading = ref(false)
@@ -250,6 +259,7 @@ const selectCategory = (cat) => {
   catSearch.value = ''
 }
 
+// P12 — Use $fetch (imperative) instead of useFetch inside an event handler
 const submitForm = async () => {
   if (!form.message_cat_id) {
     errorMsg.value = 'Please select a message category.'
@@ -260,25 +270,17 @@ const submitForm = async () => {
   errorMsg.value = ''
 
   try {
-    const { data: res, error } = await useFetch('/api/contact', {
-      method: 'POST',
-      body: form
-    })
-
-    if (error.value || !res.value?.success) {
-      errorMsg.value = res.value?.message || error.value?.message || 'Failed to send message. Please try again.'
-    } else {
-      successMsg.value = res.value.message
-      form.name = ''
-      form.email = ''
-      form.company = ''
-      form.subject = ''
-      form.message = ''
+    const res = await $fetch('/api/contact', { method: 'POST', body: form })
+    if (res?.success) {
+      successMsg.value = res.message
+      form.name = form.email = form.company = form.subject = form.message = ''
       form.message_cat_id = null
       selectedCategoryName.value = ''
+    } else {
+      errorMsg.value = res?.message || 'Failed to send message. Please try again.'
     }
   } catch (err) {
-    errorMsg.value = 'An unexpected error occurred. Please try again.'
+    errorMsg.value = err?.data?.statusMessage || err?.message || 'An unexpected error occurred. Please try again.'
   } finally {
     loading.value = false
   }

@@ -8,7 +8,12 @@ export default defineEventHandler(async (event) => {
       const sectors = await prisma.sectors.findMany({
         orderBy: { id: 'asc' }
       })
-      return { success: true, data: sectors }
+      const mappedSectors = sectors.map(s => ({
+        ...s,
+        sector: s.name // Map 'name' to 'sector' for frontend compatibility
+      }))
+      await clearPublicCache();
+      return { success: true, data: mappedSectors }
     } catch (error: any) {
       console.error('Error fetching sectors:', error)
       throw createError({ statusCode: 500, statusMessage: 'Failed to fetch sectors' })
@@ -29,9 +34,10 @@ export default defineEventHandler(async (event) => {
 
       const newSector = await prisma.sectors.create({
         data: {
-          sector: sanitizePlainText(sectorName)
+          name: sanitizePlainText(sectorName)
         }
       })
+      await clearPublicCache();
       return { success: true, data: newSector }
     } catch (error: any) {
       console.error('Error creating sector:', error)

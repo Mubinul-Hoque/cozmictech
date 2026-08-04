@@ -49,25 +49,24 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      const newMessage = await prisma.messages.create({
+      await prisma.messages.create({
         data: {
           name: sanitizePlainText(name),
           email: email.trim().toLowerCase(),
           company: sanitizePlainText(company),
           subject: sanitizePlainText(subject),
           message: sanitizePlainText(message),
-          status: 0,
-          message_cat_id: catId
+          is_read: false,
+          category_id: catId
         }
       })
 
       return {
         success: true,
-        message: 'Your message has been sent successfully. Thank you!',
-        data: newMessage
+        message: 'Your message has been queued successfully. Thank you!',
       }
     } catch (error: any) {
-      console.error('Error saving contact request:', error)
+      console.error('Error handling contact request:', error)
       return {
         success: false,
         message: error.statusMessage || 'An error occurred while sending your message. Please try again.'
@@ -76,19 +75,22 @@ export default defineEventHandler(async (event) => {
   } else {
     // GET request returns the contact details configuration
     try {
-      const contactInfo = await prisma.contact.findFirst({
-        select: {
-          id: true,
-          sec_title: true,
-          company_title: true,
-          address: true,
-          phone: true,
-          cell: true,
-          email: true,
-          email2: true,
-          map: true
-        }
-      })
+      const allSettings = await prisma.settings.findMany()
+      const settingsMap: Record<string, string> = {}
+      allSettings.forEach(s => settingsMap[s.setting_key] = s.setting_value || '')
+      
+      const contactInfo = {
+        id: 1,
+        sec_title: 'Contact',
+        company_title: settingsMap['company_title'] || 'Cozmic Technology',
+        address: settingsMap['contact_address'] || '',
+        phone: settingsMap['contact_phone'] || '',
+        cell: settingsMap['contact_cell'] || '',
+        email: settingsMap['contact_email'] || '',
+        email2: settingsMap['contact_email2'] || '',
+        map: settingsMap['contact_map'] || ''
+      }
+
       return {
         success: true,
         contact: contactInfo

@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
         }
       });
 
+      await clearPublicCache();
       return { success: true, testimonial };
     } catch (error: any) {
       throw createError({ statusCode: error.statusCode || 500, statusMessage: error.statusMessage || 'Failed to create testimonial' });

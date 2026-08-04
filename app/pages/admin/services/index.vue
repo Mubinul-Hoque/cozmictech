@@ -11,7 +11,7 @@
           to="/admin/services/new" 
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95"
         >
-          <i class="bi bi-plus-lg text-sm"></i> Add Service
+          <Icon name="lucide:plus" class="text-sm" /> Add Service
         </NuxtLink>
       </div>
     </div>
@@ -19,7 +19,7 @@
     <!-- Success Feedback Banner -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
@@ -31,7 +31,7 @@
       </div>
 
       <div v-else-if="!sectors || !sectors.length" class="text-center py-20 text-slate-400">
-        <i class="bi bi-hdd-network text-4xl mb-4 block"></i>
+        <Icon name="lucide:server" class="text-4xl mb-4 block" />
         <p class="font-semibold">No services defined. Add a service to get started.</p>
       </div>
 
@@ -61,7 +61,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl">
-                  <i :class="'bi ' + (s.icon || 'bi-activity') + ' text-slate-500'"></i>
+                  <Icon :name="s.icon || 'lucide:activity'" mode="svg" class="text-slate-500" />
                   {{ s.icon }}
                 </span>
               </td>
@@ -72,13 +72,13 @@
                     :to="'/admin/services/' + s.id" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors"
                   >
-                    <i class="bi bi-pencil"></i>
+                    <Icon name="lucide:pencil" />
                   </NuxtLink>
                   <button 
                     @click="confirmDelete(s.id)" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors"
                   >
-                    <i class="bi bi-trash"></i>
+                    <Icon name="lucide:trash-2" />
                   </button>
                 </div>
               </td>
@@ -99,18 +99,19 @@ definePageMeta({
 
 const successMsg = ref('');
 const headers = useRequestHeaders(['cookie']);
-const { data: sectors, pending, refresh } = useFetch('/api/admin/services', { headers });
+const { data: sectors, pending, refresh } = useFetch('/api/admin/services', { headers, key: 'admin-services-list' });
 
 const confirmDelete = async (id) => {
   if (confirm('Are you sure you want to delete this service?')) {
     try {
-      await $fetch(`/api/admin/services/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/services/${id}`, { method: 'DELETE' });
       successMsg.value = 'Service deleted successfully.';
       setTimeout(() => successMsg.value = '', 4000);
+      clearNuxtData();
       refresh();
     } catch (err) {
       console.error(err);
-      alert('Delete operation failed.');
+      useToast().error('Delete operation failed.');
     }
   }
 };

@@ -23,9 +23,10 @@ export default defineEventHandler(async (event) => {
       const updated = await prisma.sectors.update({
         where: { id },
         data: {
-          sector: sanitizePlainText(sectorName)
+          name: sanitizePlainText(sectorName)
         }
       })
+      await clearPublicCache();
       return { success: true, data: updated }
     } catch (error: any) {
       console.error('Error updating sector:', error)
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
       await prisma.sectors.delete({
         where: { id }
       })
+      await clearPublicCache();
       return { success: true, message: 'Sector deleted successfully' }
     } catch (error: any) {
       console.error('Error deleting sector:', error)

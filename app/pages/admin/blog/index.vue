@@ -11,7 +11,7 @@
           to="/admin/blog/new" 
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95"
         >
-          <i class="bi bi-plus-lg text-sm"></i> Write Article
+          <Icon name="lucide:plus" class="text-sm" /> Write Article
         </NuxtLink>
       </div>
     </div>
@@ -19,7 +19,7 @@
     <!-- Success Feedback Banner -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm mb-6">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
@@ -28,7 +28,7 @@
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
       <div class="relative max-w-sm w-full">
         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-          <i class="bi bi-search text-slate-400"></i>
+          <Icon name="lucide:search" class="text-slate-400" />
         </div>
         <input 
           v-model="searchQuery" 
@@ -61,7 +61,7 @@
 
       <!-- Empty State -->
       <div v-else-if="!postsData?.data?.length" class="text-center py-20 text-slate-400">
-        <i class="bi bi-journal-text text-4xl mb-4 block"></i>
+        <Icon name="lucide:book-open-text" class="text-4xl mb-4 block" />
         <p class="font-semibold">No blog articles found. Write your first article or reset filters.</p>
       </div>
 
@@ -106,13 +106,13 @@
                     :to="'/admin/blog/' + post.id" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors"
                   >
-                    <i class="bi bi-pencil"></i>
+                    <Icon name="lucide:pencil" />
                   </NuxtLink>
                   <button 
                     @click="confirmDelete(post.id)" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors"
                   >
-                    <i class="bi bi-trash"></i>
+                    <Icon name="lucide:trash-2" />
                   </button>
                 </div>
               </td>
@@ -174,6 +174,7 @@ const { data: postsData, pending, refresh } = useFetch('/api/admin/blog', {
     search: debouncedSearch,
     catId: selectedCategory
   },
+  key: 'admin-blog-list',
   watch: [currentPage, debouncedSearch, selectedCategory]
 });
 
@@ -205,13 +206,14 @@ const getCategoryLabel = (catId) => {
 const confirmDelete = async (id) => {
   if (confirm('Are you sure you want to delete this article?')) {
     try {
-      await $fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/blog/${id}`, { method: 'DELETE' });
       successMsg.value = 'Article deleted successfully.';
       setTimeout(() => successMsg.value = '', 4000);
+      clearNuxtData();
       refresh();
     } catch (err) {
       console.error(err);
-      alert('Delete operation failed.');
+      useToast().error('Delete operation failed.');
     }
   }
 };

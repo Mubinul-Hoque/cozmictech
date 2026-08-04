@@ -11,7 +11,7 @@
           to="/admin/testimonials/new" 
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95"
         >
-          <i class="bi bi-plus-lg text-sm"></i> Add Testimonial
+          <Icon name="lucide:plus" class="text-sm" /> Add Testimonial
         </NuxtLink>
       </div>
     </div>
@@ -19,7 +19,7 @@
     <!-- Feedback Banner -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
@@ -31,7 +31,7 @@
       </div>
 
       <div v-else-if="!testimonials.length" class="text-center py-20 text-slate-400">
-        <i class="bi bi-chat-left-quote text-4xl mb-4 block"></i>
+        <Icon name="lucide:chat-left-quote" class="text-4xl mb-4 block" />
         <p class="font-semibold">No testimonials found. Add a review to get started.</p>
       </div>
 
@@ -66,7 +66,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-semibold">{{ t.company || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center text-amber-400 gap-0.5">
-                  <i v-for="n in t.stars" :key="n" class="bi bi-star-fill text-xs"></i>
+                  <Icon v-for="n in t.stars" :key="n" name="lucide:star" class="text-xs text-amber-400" />
                 </div>
               </td>
               <td class="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">{{ t.story }}</td>
@@ -76,13 +76,13 @@
                     :to="'/admin/testimonials/' + t.id" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors"
                   >
-                    <i class="bi bi-pencil"></i>
+                    <Icon name="lucide:pencil" />
                   </NuxtLink>
                   <button 
                     @click="confirmDelete(t.id)" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors"
                   >
-                    <i class="bi bi-trash"></i>
+                    <Icon name="lucide:trash-2" />
                   </button>
                 </div>
               </td>
@@ -102,18 +102,19 @@ definePageMeta({
 });
 
 const successMsg = ref('');
-const { data: testimonials, pending, refresh } = useFetch('/api/admin/testimonials');
+const { data: testimonials, pending, refresh } = useFetch('/api/admin/testimonials', { key: 'admin-testimonials-list' });
 
 const confirmDelete = async (id) => {
   if (confirm('Are you sure you want to delete this testimonial?')) {
     try {
-      await $fetch(`/api/admin/testimonials/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/testimonials/${id}`, { method: 'DELETE' });
       successMsg.value = 'Testimonial deleted successfully.';
       setTimeout(() => successMsg.value = '', 4000);
+      clearNuxtData();
       refresh();
     } catch (err) {
       console.error(err);
-      alert('Delete operation failed.');
+      useToast().error('Delete operation failed.');
     }
   }
 };

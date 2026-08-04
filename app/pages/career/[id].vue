@@ -21,7 +21,7 @@
         </div>
 
         <div v-else-if="!job?.data" class="text-center py-20 text-gray-400">
-          <i class="bi bi-exclamation-octagon text-5xl mb-4 block text-rose-500"></i>
+          <Icon name="lucide:alert-octagon" class="text-5xl mb-4 block text-rose-500" />
           <p class="font-bold text-lg text-gray-700">Job Posting Not Found</p>
           <NuxtLink to="/career" class="mt-4 px-5 py-2.5 bg-[#feb900] text-slate-950 rounded-full text-xs font-bold transition-all">
             Back to Careers
@@ -40,7 +40,7 @@
                 <span class="text-xs text-gray-400 font-semibold">Published: {{ new Date(job.data.published).toLocaleDateString() }}</span>
               </div>
               <h2 class="text-3xl font-extrabold text-slate-800 leading-tight mb-2">{{ job.data.post }}</h2>
-              <p class="text-gray-500 text-sm font-semibold flex items-center gap-1.5"><i class="bi bi-geo-alt text-[#feb900]"></i> {{ job.data.location }}</p>
+              <p class="text-gray-500 text-sm font-semibold flex items-center gap-1.5"><Icon name="lucide:map-pin" class="text-[#feb900]" /> {{ job.data.location }}</p>
             </div>
 
             <div class="border-t border-gray-100 pt-8 space-y-4">
@@ -67,7 +67,7 @@
             <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
               <h3 class="text-base font-bold text-slate-800">How to Apply</h3>
               <p class="text-sm text-gray-600 leading-relaxed">
-                If you are a passionate engineer/architect who meets these qualifications, please send your updated CV, portfolio (if applicable), and cover letter to <a href="mailto:career@cozmictech.com" class="text-[#feb900] font-bold hover:underline">career@cozmictech.com</a>. Mention the job position title in your email subject line.
+                If you are a passionate engineer/architect who meets these qualifications, please send your updated CV, portfolio (if applicable), and cover letter to <a :href="'mailto:' + (job.contactEmail || 'career@cozmictech.com')" class="text-[#feb900] font-bold hover:underline">{{ job.contactEmail || 'career@cozmictech.com' }}</a>. Mention the job position title in your email subject line.
               </p>
             </div>
           </div>

@@ -50,6 +50,7 @@ export default defineEventHandler(async (event) => {
         }
       });
 
+      await clearPublicCache();
       return { success: true, testimonial };
     } catch (error: any) {
       throw createError({ statusCode: error.statusCode || 500, statusMessage: error.statusMessage || 'Failed to update testimonial' });
@@ -59,6 +60,7 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     try {
       await prisma.testimonials.delete({ where: { id } });
+      await clearPublicCache();
       return { success: true };
     } catch (error) {
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete testimonial' });

@@ -23,13 +23,13 @@
     <!-- Alert Messages -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
     <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-exclamation-triangle-fill text-rose-500 text-lg"></i>
+        <Icon name="lucide:exclamation-triangle-fill" class="text-rose-500 text-lg" />
         <span class="font-bold text-slate-700">{{ errorMsg }}</span>
       </div>
     </div>
@@ -141,7 +141,7 @@
         <!-- Description Areas -->
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Job Description *</label>
-          <RichTextEditor 
+          <LazyRichTextEditor 
             v-model="form.description" 
             placeholder="Describe the job vacancy role..." 
           />
@@ -149,7 +149,7 @@
 
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Job Responsibilities *</label>
-          <RichTextEditor 
+          <LazyRichTextEditor 
             v-model="form.responsibilities" 
             placeholder="List primary duties and responsibilities..." 
           />
@@ -168,7 +168,7 @@
 
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Other Benefits</label>
-          <RichTextEditor 
+          <LazyRichTextEditor 
             v-model="form.other_beninifs" 
             placeholder="e.g. Two festival bonuses, mobile allowance, friendly workspace." 
           />
@@ -225,7 +225,7 @@ const form = reactive({
 onMounted(async () => {
   if (!isNew) {
     try {
-      const res = await $fetch(`/api/admin/career/${route.params.id}`)
+      const res = await useNuxtApp().$fetch(`/api/admin/career/${route.params.id}`)
       if (res.success && res.data) {
         Object.assign(form, res.data)
         // Format deadline date for date input (YYYY-MM-DD)
@@ -249,16 +249,14 @@ const submitForm = async () => {
   const method = isNew ? 'POST' : 'PUT'
 
   try {
-    const res = await $fetch(url, {
+    const res = await useNuxtApp().$fetch(url, {
       method,
       body: form
     })
 
     if (res.success) {
       successMsg.value = isNew ? 'Job opening successfully created.' : 'Job details successfully saved.'
-      setTimeout(() => {
-        router.push('/admin/career')
-      }, 1500)
+      router.push('/admin/career');
     } else {
       errorMsg.value = res.message || 'Operation failed.'
     }

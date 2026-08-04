@@ -197,7 +197,7 @@ section {
   transition: all 0.4s;
 }
 
-.scroll-top i {
+.scroll-top span {
   font-size: 24px;
   color: var(--color-secondary);
   line-height: 0;
@@ -1036,7 +1036,9 @@ section {
 
 .testimonials .testimonial-item .testimonial-img {
   width: 90px;
-  border-radius: 10px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 50%;
   border: 6px solid #fff;
   position: absolute;
   left: -45px;

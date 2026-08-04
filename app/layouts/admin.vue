@@ -1,5 +1,8 @@
 <template>
   <div class="flex h-screen bg-[#f8f9fa] font-sans antialiased text-slate-800 overflow-hidden">
+    <!-- Global Admin Notifications -->
+    <AdminToast />
+    
     <!-- Backdrop Overlay for Mobile Sidebar -->
     <div 
       v-if="sidebarOpen" 
@@ -19,7 +22,7 @@
       <div class="h-20 flex items-center justify-between px-6 z-10 border-b border-[#ffffff]/10">
         <NuxtLink to="/" class="flex items-center group" @click="sidebarOpen = false">
           <div class="w-9 h-9 bg-[#feb900] rounded-full flex items-center justify-center mr-3 shadow-md group-hover:scale-105 transition-transform duration-200">
-            <i class="bi bi-shield-lock-fill text-[#364d59] text-lg"></i>
+            <Icon name="lucide:shield-check" class="text-[#364d59] text-lg" />
           </div>
           <span class="text-xl font-bold tracking-tight text-white group-hover:text-[#feb900] transition-colors duration-200">
             Cozmic<span class="text-[#feb900]">.</span>Admin
@@ -31,7 +34,7 @@
           @click="sidebarOpen = false" 
           class="md:hidden text-slate-300 hover:text-white p-1 hover:bg-white/10 rounded-full transition-colors"
         >
-          <i class="bi bi-x text-2xl"></i>
+          <Icon name="lucide:x" class="text-2xl" />
         </button>
       </div>
       
@@ -40,13 +43,13 @@
         <ul class="space-y-1.5">
           <li>
             <NuxtLink to="/admin" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-speedometer2 mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:gauge" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Overview
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/messages" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-envelope mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:mail" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Inbox Messages
             </NuxtLink>
           </li>
@@ -56,49 +59,49 @@
           </li>
           <li>
             <NuxtLink to="/admin/blog" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-journal-text mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:book-open-text" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Blog Articles
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/projects" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-briefcase mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:briefcase" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Portfolio Projects
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/testimonials" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-chat-quote mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:message-square-quote" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Testimonials
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/team" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-people mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:users" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Team Members
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/services" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-hdd-network mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:server" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Services
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/settings" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-gear mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:settings" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Global Settings
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/about" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-file-earmark-person mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:file-user" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               About Us Page
             </NuxtLink>
           </li>
           <li>
             <NuxtLink to="/admin/career" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-briefcase mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:briefcase" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Career Openings
             </NuxtLink>
           </li>
@@ -108,7 +111,7 @@
           </li>
           <li>
             <NuxtLink to="/admin/users" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <i class="bi bi-person-lock mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200"></i>
+              <Icon name="lucide:user-cog" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Administrators
             </NuxtLink>
           </li>
@@ -118,7 +121,7 @@
       <!-- Bottom Logout Section -->
       <div class="p-4 border-t border-[#ffffff]/10 z-10 bg-[#364d59]/50">
         <button @click="logout" class="group w-full flex items-center justify-center px-4 py-2.5 bg-white/5 hover:bg-red-500/15 text-slate-300 hover:text-red-300 rounded-full border border-transparent hover:border-red-500/30 transition-all duration-200 text-sm font-semibold">
-          <i class="bi bi-box-arrow-right mr-2.5 group-hover:-translate-x-0.5 transition-transform duration-200 text-lg"></i> 
+          <Icon name="lucide:log-out" class="mr-2.5 group-hover:-translate-x-0.5 transition-transform duration-200 text-lg" /> 
           Logout
         </button>
       </div>
@@ -137,7 +140,7 @@
             @click="sidebarOpen = !sidebarOpen" 
             class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors md:hidden mr-2"
           >
-            <i class="bi bi-list text-2xl"></i>
+            <Icon name="lucide:menu" class="text-2xl" />
           </button>
           <div>
             <h2 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight">{{ route?.meta?.title || 'Overview' }}</h2>
@@ -145,7 +148,7 @@
         </div>
         <div class="flex items-center space-x-3 sm:space-x-6">
           <button class="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-[#364d59] hover:bg-slate-100 rounded-full transition-all duration-200">
-            <i class="bi bi-bell text-lg"></i>
+            <Icon name="lucide:bell" class="text-lg" />
             <span class="absolute top-2 right-2 w-2 h-2 bg-[#feb900] rounded-full border-2 border-white animate-pulse"></span>
           </button>
           <div class="h-8 w-px bg-slate-200"></div>
@@ -157,7 +160,7 @@
               <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider leading-none mt-0.5">{{ authUser?.role || 'Administrator' }}</span>
             </div>
             <div class="w-9 h-9 rounded-full bg-[#feb900] text-slate-900 font-bold flex items-center justify-center shadow-sm group-hover:shadow transition-all duration-200">
-              <i class="bi bi-person-fill text-lg"></i>
+              <Icon name="lucide:user" class="text-lg" />
             </div>
           </div>
         </div>

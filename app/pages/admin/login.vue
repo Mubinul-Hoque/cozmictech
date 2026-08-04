@@ -14,7 +14,7 @@
         <div class="text-center mb-8">
           <!-- Shield Key Icon -->
           <div class="mx-auto w-16 h-16 bg-[#feb900] rounded-2xl shadow-lg shadow-amber-500/10 flex items-center justify-center transform hover:scale-105 transition-all duration-300 border border-amber-300/25">
-            <i class="bi bi-shield-lock-fill text-slate-950 text-2xl"></i>
+            <Icon name="lucide:shield-check" class="text-slate-950 text-2xl" />
           </div>
           
           <h2 class="mt-6 text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -29,7 +29,7 @@
           <!-- Failure Notification Banner -->
           <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 animate-shake text-sm">
             <div class="flex items-start">
-              <i class="bi bi-x-circle text-rose-400 text-lg leading-none mt-0.5"></i>
+              <Icon name="lucide:x-circle" class="text-rose-400 text-lg leading-none mt-0.5" />
               <div class="ml-3">
                 <h4 class="font-bold text-rose-300">Access Denied</h4>
                 <p class="mt-1 text-slate-300 text-xs leading-relaxed">{{ errorMsg }}</p>
@@ -43,7 +43,7 @@
               <label for="email" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <i class="bi bi-envelope text-slate-500 text-base"></i>
+                  <Icon name="lucide:mail" class="text-slate-500 text-base" />
                 </div>
                 <input 
                   id="email" 
@@ -63,7 +63,7 @@
               <label for="password" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <i class="bi bi-lock text-slate-500 text-base"></i>
+                  <Icon name="lucide:lock" class="text-slate-500 text-base" />
                 </div>
                 <input 
                   id="password" 
@@ -80,7 +80,7 @@
                   @click="showPassword = !showPassword" 
                   class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-white transition-colors focus:outline-none cursor-pointer z-10"
                 >
-                  <i class="bi text-lg" :class="showPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+                  <Icon :name="showPassword ? 'lucide:eye' : 'lucide:eye-off'" class="text-lg" />
                 </button>
               </div>
             </div>
@@ -94,8 +94,8 @@
               class="group relative w-full flex justify-center py-3.5 px-4 bg-gradient-to-r from-amber-400 to-[#feb900] hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold text-sm rounded-full transition-all duration-300 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/25 active:scale-[0.98] disabled:opacity-75 disabled:cursor-not-allowed"
             >
               <span class="absolute left-0 inset-y-0 flex items-center pl-4">
-                <i v-if="!loading" class="bi bi-box-arrow-in-right text-base transition-transform duration-300 group-hover:translate-x-0.5"></i>
-                <i v-else class="bi bi-arrow-repeat animate-spin text-base"></i>
+                <Icon v-if="!loading" name="lucide:log-in" class="text-base transition-transform duration-300 group-hover:translate-x-0.5" />
+                <Icon v-else name="lucide:loader-2" class="animate-spin text-base" />
               </span>
               {{ loading ? 'Securing Session...' : 'Authenticate' }}
             </button>
@@ -108,7 +108,7 @@
             to="/" 
             class="flex items-center justify-center text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider gap-2"
           >
-            <i class="bi bi-arrow-left text-sm"></i> Return to Site
+            <Icon name="lucide:arrow-left" class="text-sm" /> Return to Site
           </NuxtLink>
         </div>
       </div>
@@ -135,7 +135,7 @@ const handleLogin = async () => {
   loading.value = true;
   
   try {
-    const response = await $fetch('/api/auth/login', {
+    const response = await useNuxtApp().$fetch('/api/auth/login', {
       method: 'POST',
       body: {
         email: email.value,

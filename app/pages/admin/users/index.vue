@@ -6,7 +6,7 @@
         <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-0.5">Manage administrators and permissions</p>
       </div>
       <NuxtLink to="/admin/users/new" class="group relative inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold transition-all duration-200 bg-[#feb900] hover:bg-[#e5a600] border border-transparent rounded-full shadow-sm hover:shadow-md focus:outline-none" style="color: #1e293b;">
-        <i class="bi bi-plus-lg mr-2 group-hover:rotate-90 transition-transform duration-200" style="color: #1e293b;"></i>
+        <Icon name="lucide:plus" class="mr-2 group-hover:rotate-90 transition-transform duration-200" style="color: #1e293b;" />
         Add User
       </NuxtLink>
     </div>
@@ -47,7 +47,7 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              {{ new Date(user.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
+              {{ new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-bold">
               <NuxtLink :to="`/admin/users/${user.id}`" class="inline-flex items-center px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition-all duration-150 mr-2 border border-slate-250">Edit</NuxtLink>
@@ -57,7 +57,7 @@
           <tr v-if="users?.length === 0">
             <td colspan="5" class="px-6 py-12 text-center">
               <div class="flex flex-col items-center justify-center text-slate-400">
-                <i class="bi bi-inbox text-5xl mb-4 text-slate-350"></i>
+                <Icon name="lucide:inbox" class="text-5xl mb-4 text-slate-350" />
                 <p class="text-base font-bold text-slate-700">No users found</p>
                 <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">Get started by creating your first administrator.</p>
               </div>
@@ -75,15 +75,16 @@ definePageMeta({
   middleware: ['auth']
 });
 
-const { data: users, pending, refresh } = useFetch('/api/admin/users');
+const { data: users, pending, refresh } = useFetch('/api/admin/users', { key: 'admin-users-list' });
 
 const deleteUser = async (id) => {
   if (confirm('Are you sure you want to delete this user?')) {
     try {
-      await $fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+      clearNuxtData();
       refresh();
     } catch (error) {
-      alert('Failed to delete user.');
+      useToast().error('Failed to delete user.');
     }
   }
 };

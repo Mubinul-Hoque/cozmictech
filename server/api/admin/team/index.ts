@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     try {
-      const team = await prisma.team.findMany({
+      const team = await prisma.team_members.findMany({
         orderBy: { id: 'desc' }
       });
       return team;
@@ -28,27 +28,30 @@ export default defineEventHandler(async (event) => {
       const fb = String(body.fb || '').trim();
       const insta = String(body.insta || '').trim();
       const linkedin = String(body.linkedin || '').trim();
+      const twitter = String(body.twitter || '').trim();
 
       // Enforce database limits
       if (
-        name.length > 50 || designation.length > 50 || message.length > 500 ||
-        image.length > 100 || fb.length > 255 || insta.length > 255 || linkedin.length > 255
+        name.length > 100 || designation.length > 100 || message.length > 1000 ||
+        image.length > 255 || fb.length > 255 || insta.length > 255 || linkedin.length > 255 || twitter.length > 255
       ) {
         throw createError({ statusCode: 400, statusMessage: 'Input exceeds database length limit' });
       }
 
-      const member = await prisma.team.create({
+      const member = await prisma.team_members.create({
         data: {
           name: sanitizePlainText(name),
           designation: sanitizePlainText(designation),
           message: sanitizePlainText(message),
           image: sanitizePlainText(image),
-          fb: sanitizePlainText(fb),
-          insta: sanitizePlainText(insta),
-          linkedin: sanitizePlainText(linkedin)
+          facebook_url: fb ? sanitizePlainText(fb) : null,
+          instagram_url: insta ? sanitizePlainText(insta) : null,
+          linkedin_url: linkedin ? sanitizePlainText(linkedin) : null,
+          twitter_url: twitter ? sanitizePlainText(twitter) : null
         }
       });
 
+      await clearPublicCache();
       return { success: true, member };
     } catch (error: any) {
       throw createError({ statusCode: error.statusCode || 500, statusMessage: error.statusMessage || 'Failed to create team member' });

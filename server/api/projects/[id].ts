@@ -6,10 +6,18 @@ export default defineEventHandler(async (event) => {
     const project = await prisma.projects.findUnique({
       where: { id },
       include: {
-        project_categories: {
-          select: {
-            category_id: true
+        project_categories_link: {
+          include: {
+            categories: {
+              select: { id: true, name: true }
+            }
           }
+        },
+        sectors: {
+          select: { id: true, name: true }
+        },
+        client: {
+          select: { id: true, client_name: true }
         }
       }
     });
@@ -17,24 +25,22 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, statusMessage: 'Project not found' });
     }
 
-    const categoryIds = project.project_categories.map(pc => pc.category_id);
+    const categoryIds = project.project_categories_link.map(pc => pc.category_id);
+    const categories = project.project_categories_link.map(pc => pc.categories).filter(Boolean);
+    const sector = { ...project.sectors, sector: project.sectors?.name };
+    const client = project.client;
 
-    const [categories, sector, client, relatedProjects, prevProject, nextProject] = await Promise.all([
-      prisma.category.findMany({
-        where: { id: { in: categoryIds } },
-        select: { id: true, name: true }
-      }),
-      prisma.sectors.findUnique({
-        where: { id: project.sector_id },
-        select: { id: true, sector: true }
-      }),
-      project.client_id ? prisma.clients.findUnique({
-        where: { id: project.client_id },
-        select: { id: true, client_name: true }
-      }) : Promise.resolve(null),
+    const mappedProject = {
+      ...project,
+      images: project.images_json ? JSON.parse(project.images_json) : [],
+      services: project.services_rendered || '',
+      project_categories: project.project_categories_link.map(link => ({ category_id: link.category_id }))
+    };
+
+    const [relatedProjects, prevProject, nextProject] = await Promise.all([
       prisma.projects.findMany({
         where: {
-          project_categories: {
+          project_categories_link: {
             some: {
               category_id: { in: categoryIds }
             }
@@ -45,7 +51,7 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           title: true,
-          images: true,
+          images_json: true,
           location: true
         }
       }),
@@ -61,12 +67,17 @@ export default defineEventHandler(async (event) => {
       })
     ]);
 
+    const mappedRelatedProjects = relatedProjects.map(p => ({
+      ...p,
+      images: p.images_json ? JSON.parse(p.images_json) : []
+    }));
+
     return {
-      project,
+      project: mappedProject,
       categories,
       sector,
       client,
-      relatedProjects,
+      relatedProjects: mappedRelatedProjects,
       prevProjectId: prevProject?.id || null,
       nextProjectId: nextProject?.id || null
     };

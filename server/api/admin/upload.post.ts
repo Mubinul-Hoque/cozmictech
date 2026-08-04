@@ -1,6 +1,6 @@
-import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
+import sharp from 'sharp';
 
 export default defineEventHandler(async (event) => {
   const formData = await readMultipartFormData(event);
@@ -23,20 +23,57 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Only images are allowed' });
   }
 
-  const originalName = file.filename || 'upload.jpg';
-  const ext = originalName.split('.').pop()?.toLowerCase();
-  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  const folderData = formData.find(f => f.name === 'folder');
+  let folder = folderData ? folderData.data.toString() : '';
+  const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
 
-  if (!ext || !allowedExtensions.includes(ext)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid file extension. Only jpg, jpeg, png, gif, webp, and svg are allowed.' });
+  let maxSize = 5 * 1024 * 1024; // Default 5MB
+  let maxSizeKb = 5120;
+
+  if (safeFolder === 'projects' || safeFolder === 'page_sections' || safeFolder === 'page_section') {
+    maxSize = 500 * 1024;
+    maxSizeKb = 500;
+  } else if (safeFolder === 'team') {
+    maxSize = 200 * 1024;
+    maxSizeKb = 200;
   }
 
-  const newName = `${randomUUID()}.${ext}`;
+  if (file.data.length > maxSize) {
+    throw createError({ statusCode: 400, statusMessage: `File size exceeds the ${maxSizeKb}KB limit for this category` });
+  }
 
-  // Save to public/assets/img/projects (or similar). The DB stores comma-separated names.
-  const uploadPath = join(process.cwd(), 'public', 'assets', 'img', newName);
 
-  await writeFile(uploadPath, file.data);
+  const newName = `${randomUUID()}.webp`;
 
-  return { success: true, filename: newName, url: `/assets/img/${newName}` };
+  // Save to public/assets/img/{folder}
+  const uploadPath = join(process.cwd(), 'public', 'assets', 'img', safeFolder, newName);
+
+  try {
+    // Process image with sharp: resize (max 1920x1080), compress, and convert to WebP
+    await sharp(file.data)
+      .resize({ width: 1920, height: 1080, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 80, effort: 6 })
+      .toFile(uploadPath);
+
+    await clearPublicCache();
+    return { success: true, filename: newName, url: `/assets/img/${safeFolder ? safeFolder + '/' : ''}${newName}` };
+  } catch (error: any) {
+    // If filesystem is read-only (such as Vercel serverless environment), fall back to base64 Data URL
+    if (error.code === 'EROFS' || error.code === 'ENOENT' || error.message?.includes('read-only') || error.message?.includes('permission denied')) {
+      try {
+        const buffer = await sharp(file.data)
+          .resize({ width: 1920, height: 1080, fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 80, effort: 6 })
+          .toBuffer();
+        const base64 = buffer.toString('base64');
+        const dataUrl = `data:image/webp;base64,${base64}`;
+        await clearPublicCache();
+        return { success: true, filename: newName, url: dataUrl };
+      } catch (fallbackError) {
+        console.error('Image processing fallback failed:', fallbackError);
+      }
+    }
+    console.error('Image processing failed:', error);
+    throw createError({ statusCode: 500, statusMessage: 'Failed to process and save image' });
+  }
 });

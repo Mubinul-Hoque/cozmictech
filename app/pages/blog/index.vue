@@ -16,7 +16,7 @@
       <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="(post, index) in data?.posts || []" :key="post.id" class="group border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all" data-aos="fade-up" :data-aos-delay="100 * (index % 3 + 1)">
+          <div v-for="(post, index) in data?.posts || []" :key="post.id" v-memo="[post.id]" class="group border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all" data-aos="fade-up" :data-aos-delay="100 * (index % 3 + 1)">
             
             <div class="relative overflow-hidden h-52 bg-gray-100">
               <img 
@@ -35,18 +35,18 @@
               </h3>
 
               <div class="flex items-center gap-4 text-xs text-gray-500">
-                <span class="flex items-center gap-1"><i class="bi bi-person text-[#feb900]"></i> {{ post.author || 'Admin' }}</span>
+                <span class="flex items-center gap-1"><Icon name="lucide:person" class="text-[#feb900]" /> {{ post.author || 'Admin' }}</span>
                 <span>/</span>
-                <span class="flex items-center gap-1"><i class="bi bi-folder2 text-[#feb900]"></i> {{ getCategoryName(post.post_catid) }}</span>
+                <span class="flex items-center gap-1"><Icon name="lucide:folder2" class="text-[#feb900]" /> {{ getCategoryName(post.post_catid) }}</span>
               </div>
 
               <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">
-                {{ post.content?.replace(/<[^>]*>/g, '') }}
+                {{ post.content ? post.content.replace(/<[^>]*>/g, '') : 'Click to read the full article...' }}
               </p>
 
               <div class="border-t border-gray-100 pt-4 flex items-center justify-between text-xs font-bold text-[#feb900] uppercase tracking-wider">
                 <NuxtLink :to="'/blog/' + post.id" class="hover:text-[#ffc732] flex items-center gap-1">
-                  Read More <i class="bi bi-arrow-right"></i>
+                  Read More <Icon name="lucide:arrow-right" />
                 </NuxtLink>
               </div>
             </div>
@@ -60,7 +60,16 @@
 </template>
 
 <script setup>
-const { data } = await useFetch('/api/blog')
+// P15 — Page-specific SEO meta
+useHead({
+  title: 'Blog | Cozmic Technology - News & Engineering Insights',
+  meta: [
+    { name: 'description', content: 'Stay updated with the latest news, engineering insights, project milestones, and company announcements from Cozmic Technology.' },
+    { property: 'og:title', content: 'Cozmic Technology Blog' },
+  ]
+})
+
+const { data } = await useFetch('/api/blog', { deep: false })
 
 const getCategoryName = (catId) => {
   const cat = data.value?.categories?.find(c => c.id === catId)

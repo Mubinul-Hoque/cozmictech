@@ -15,7 +15,7 @@
           to="/admin/testimonials" 
           class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 border border-slate-200 active:scale-95"
         >
-          <i class="bi bi-arrow-left"></i> Cancel
+          <Icon name="lucide:arrow-left" /> Cancel
         </NuxtLink>
       </div>
     </div>
@@ -23,7 +23,7 @@
     <!-- Error Banner -->
     <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-x-circle-fill text-rose-400 text-lg"></i>
+        <Icon name="lucide:x-circle" class="text-rose-400 text-lg" />
         <span class="font-bold text-rose-300">{{ errorMsg }}</span>
       </div>
     </div>
@@ -102,7 +102,7 @@
                 class="w-full h-full object-cover" 
                 @error="$event.target.src='/assets/img/testimonials/testimonials-1.jpg'"
               />
-              <i v-else class="bi bi-person text-3xl text-slate-300"></i>
+              <Icon v-else name="lucide:user" class="text-3xl text-slate-300" />
             </div>
             
             <div class="space-y-1">
@@ -190,7 +190,7 @@ onMounted(async () => {
   if (!isNew.value) {
     loadingData.value = true;
     try {
-      const data = await $fetch(`/api/admin/testimonials/${id}`);
+      const data = await useNuxtApp().$fetch(`/api/admin/testimonials/${id}`);
       form.value = {
         name: data.name || '',
         designation: data.designation || '',
@@ -219,12 +219,13 @@ const handleFileUpload = async (event) => {
 
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('folder', 'testimonials');
 
   uploading.value = true;
   errorMsg.value = '';
 
   try {
-    const data = await $fetch('/api/admin/upload', {
+    const data = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     });
@@ -247,10 +248,13 @@ const handleSave = async () => {
   const method = isNew.value ? 'POST' : 'PUT';
 
   try {
-    await $fetch(url, {
+    await useNuxtApp().$fetch(url, {
       method,
       body: form.value
     });
+    clearNuxtData();
+    useToast().success('Saved successfully');
+    await refreshNuxtData('admin-testimonials-list');
     router.push('/admin/testimonials');
   } catch (err) {
     console.error(err);

@@ -13,15 +13,15 @@ export default defineEventHandler(async (event) => {
       whereClause.role = { not: 'SuperAdmin' };
     }
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       where: whereClause,
-      orderBy: { date: 'desc' },
+      orderBy: { created_at: 'desc' },
       select: {
         id: true,
         username: true,
         email: true,
         role: true,
-        date: true,
+        created_at: true,
         image: true
       }
     });
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
     const bcrypt = await import('bcrypt');
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
+    const newUser = await prisma.users.create({
       data: {
         username: sanitizePlainText(username),
         email: email.trim().toLowerCase(),

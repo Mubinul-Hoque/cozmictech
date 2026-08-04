@@ -3,7 +3,6 @@ import { prisma } from '../../../utils/prisma'
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
   const idStr = getRouterParam(event, 'id')
-  
   if (!idStr) {
     throw createError({ statusCode: 400, statusMessage: 'Missing career ID' })
   }
@@ -11,18 +10,22 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     try {
-      const career = await prisma.career.findUnique({
+      const career = await prisma.careers.findUnique({
         where: { id }
       })
       if (!career) {
         throw createError({ statusCode: 404, statusMessage: 'Career opening not found' })
       }
       return {
-        success: true,
-        data: career
+        ...career,
+        emp_status: career.employment_status,
+        status: career.is_active ? 'Active' : 'Inactive',
+        published: career.created_at,
+        Edu_Qlty: career.education_quality,
+        other_beninifs: career.other_benefits
       }
     } catch (error: any) {
-      console.error('Error fetching career opening:', error)
+      console.error('Error fetching career details:', error)
       throw createError({ statusCode: 500, statusMessage: 'Failed to fetch career details' })
     }
   }
@@ -31,10 +34,9 @@ export default defineEventHandler(async (event) => {
     try {
       const body = await readBody(event)
       if (!body.post) {
-        throw createError({ statusCode: 400, statusMessage: 'Post title is required' });
+        throw createError({ statusCode: 400, statusMessage: 'Post title is required' })
       }
 
-      // Input validations matching the database schema limits
       const post = String(body.post).trim();
       const location = String(body.location || 'Dhaka').trim();
       const image = String(body.image || 'default.jpg').trim();
@@ -45,38 +47,36 @@ export default defineEventHandler(async (event) => {
       const Edu_Qlty = String(body.Edu_Qlty || '').trim();
       const status = String(body.status || 'Active').trim();
 
-      if (
-        post.length > 100 || location.length > 100 || image.length > 100 ||
-        emp_status.length > 50 || experience.length > 100 || salary.length > 25 ||
-        gender.length > 10 || Edu_Qlty.length > 255 || status.length > 15
-      ) {
-        throw createError({ statusCode: 400, statusMessage: 'Input exceeds maximum allowed length' });
-      }
-
-      const updated = await prisma.career.update({
+      const updated = await prisma.careers.update({
         where: { id },
         data: {
           post: sanitizePlainText(post),
           location: sanitizePlainText(location),
           image: sanitizePlainText(image),
           vacancy: body.vacancy ? parseInt(body.vacancy) : 1,
-          emp_status: sanitizePlainText(emp_status),
+          employment_status: sanitizePlainText(emp_status),
           experience: sanitizePlainText(experience),
           salary: sanitizePlainText(salary),
           gender: sanitizePlainText(gender),
           deadline: body.deadline ? new Date(body.deadline) : null,
           description: sanitizeHtmlContent(body.description || ''),
           responsibilities: sanitizeHtmlContent(body.responsibilities || ''),
-          Edu_Qlty: sanitizePlainText(Edu_Qlty),
-          other_beninifs: sanitizeHtmlContent(body.other_beninifs || ''),
-          status: sanitizePlainText(status)
+          education_quality: sanitizePlainText(Edu_Qlty),
+          other_benefits: sanitizeHtmlContent(body.other_beninifs || ''),
+          is_active: status.toLowerCase() === 'active'
         }
       })
 
+      await clearPublicCache();
       return {
         success: true,
         message: 'Career opening updated successfully',
-        data: updated
+        data: {
+          ...updated,
+          emp_status: updated.employment_status,
+          status: updated.is_active ? 'Active' : 'Inactive',
+          published: updated.created_at
+        }
       }
     } catch (error: any) {
       console.error('Error updating career opening:', error)
@@ -86,13 +86,11 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'DELETE') {
     try {
-      await prisma.career.delete({
+      await prisma.careers.delete({
         where: { id }
       })
-      return {
-        success: true,
-        message: 'Career opening deleted successfully'
-      }
+      await clearPublicCache();
+      return { success: true, message: 'Career opening deleted successfully' }
     } catch (error: any) {
       console.error('Error deleting career opening:', error)
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete career opening' })

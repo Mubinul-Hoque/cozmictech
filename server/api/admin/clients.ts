@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
       const clients = await prisma.clients.findMany({
         orderBy: { id: 'desc' }
       })
+      await clearPublicCache();
       return {
         success: true,
         data: clients
@@ -37,6 +38,7 @@ export default defineEventHandler(async (event) => {
         }
       })
 
+      await clearPublicCache();
       return {
         success: true,
         message: 'Client logo added successfully',
@@ -70,6 +72,7 @@ export default defineEventHandler(async (event) => {
         }
       })
 
+      await clearPublicCache();
       return {
         success: true,
         message: 'Client logo updated successfully',
@@ -95,6 +98,7 @@ export default defineEventHandler(async (event) => {
         where: { id }
       })
 
+      await clearPublicCache();
       return {
         success: true,
         message: 'Client logo deleted successfully'

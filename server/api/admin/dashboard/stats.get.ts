@@ -5,9 +5,9 @@ export default defineEventHandler(async (event) => {
     const [projectsCount, messagesCount, usersCount, testimonialsCount, teamCount, postsCount, servicesCount] = await Promise.all([
       prisma.projects.count(),
       prisma.messages.count(),
-      prisma.user.count(),
+      prisma.users.count(),
       prisma.testimonials.count(),
-      prisma.team.count(),
+      prisma.team_members.count(),
       prisma.posts.count(),
       prisma.services.count()
     ]);

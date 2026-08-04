@@ -11,10 +11,12 @@ export default defineEventHandler(async (event) => {
       const project = await prisma.projects.findUnique({
         where: { id },
         include: {
-          project_categories: {
+          sectors: { select: { id: true, name: true } },
+          client: { select: { id: true, client_name: true } },
+          project_categories_link: {
             select: {
               category_id: true,
-              category: {
+              categories: {
                 select: {
                   id: true,
                   name: true
@@ -25,7 +27,18 @@ export default defineEventHandler(async (event) => {
         }
       });
       if (!project) throw createError({ statusCode: 404, statusMessage: 'Project not found' });
-      return project;
+      
+      const mappedProject = {
+        ...project,
+        images: project.images_json ? JSON.parse(project.images_json) : [],
+        services: project.services_rendered || '',
+        project_categories: project.project_categories_link.map(pcl => ({
+          category_id: pcl.category_id,
+          category: pcl.categories
+        }))
+      };
+      
+      return mappedProject;
     } catch (error: any) {
       throw createError({ statusCode: error.statusCode || 550, statusMessage: error.statusMessage || 'Failed to fetch project' });
     }
@@ -51,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
       // Verify that the categories exist
       if (category_ids.length > 0) {
-        const dbCats = await prisma.category.findMany({
+        const dbCats = await prisma.categories.findMany({
           where: { id: { in: category_ids } }
         });
         if (dbCats.length !== category_ids.length) {
@@ -67,17 +80,36 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Invalid sector ID: sector does not exist' });
       }
 
+      // Verify that the client exists
+      if (client_id) {
+        const clientExists = await prisma.clients.findUnique({
+          where: { id: client_id }
+        });
+        if (!clientExists) {
+          throw createError({ statusCode: 400, statusMessage: 'Invalid client ID: client does not exist' });
+        }
+      }
+
       const updatedProject = await prisma.$transaction(async (tx) => {
         // Delete all old associations
-        await tx.project_categories.deleteMany({
+        await tx.project_categories_link.deleteMany({
           where: { project_id: id }
         });
 
         // String values with safety fallback and trimming
         const title = String(body.title || '').trim();
-        const images = String(body.images || '').trim();
-        const status = String(body.status || 'Completed').trim();
-        const show_status = String(body.show_status || '').trim();
+        let images: any = [];
+        if (Array.isArray(body.images)) {
+          images = body.images.map((img: any) => String(img).trim()).filter(Boolean);
+        } else if (body.images) {
+          images = [String(body.images).trim()].filter(Boolean);
+        }
+        const statusInput = String(body.status || '').trim();
+        const status: 'Ongoing' | 'Completed' = statusInput === 'Ongoing' ? 'Ongoing' : 'Completed';
+        
+        const start_date = body.start_date ? new Date(body.start_date) : null;
+        const end_date = body.end_date ? new Date(body.end_date) : null;
+
         const project_cost = String(body.project_cost || '').trim();
         const service_cost = String(body.service_cost || '').trim();
         const location = String(body.location || '').trim();
@@ -88,8 +120,8 @@ export default defineEventHandler(async (event) => {
 
         // Enforce database limits
         if (
-          title.length > 255 || images.length > 100 || status.length > 10 ||
-          show_status.length > 100 || project_cost.length > 20 || service_cost.length > 20 ||
+          title.length > 255 ||
+          project_cost.length > 20 || service_cost.length > 20 ||
           location.length > 100 || feature.length > 255 || story.length > 20 ||
           area.length > 50 || height.length > 25
         ) {
@@ -103,11 +135,12 @@ export default defineEventHandler(async (event) => {
             sector_id,
             client_id,
             title: sanitizePlainText(title),
-            images: sanitizePlainText(images),
+            images_json: JSON.stringify(images),
             description: sanitizeHtmlContent(body.description || ''),
-            status: sanitizePlainText(status),
-            show_status: sanitizePlainText(show_status),
-            services: sanitizeHtmlContent(body.services || ''),
+            status: status,
+            start_date: start_date,
+            end_date: end_date,
+            services_rendered: sanitizeHtmlContent(body.services || ''),
             project_cost: sanitizePlainText(project_cost),
             service_cost: sanitizePlainText(service_cost),
             location: sanitizePlainText(location),
@@ -115,14 +148,17 @@ export default defineEventHandler(async (event) => {
             story: sanitizePlainText(story),
             area: sanitizePlainText(area),
             height: sanitizePlainText(height),
-            project_categories: {
+            project_categories_link: {
               create: category_ids.map(catId => ({
-                category: { connect: { id: catId } }
+                categories: { connect: { id: catId } }
               }))
             }
           }
         });
       });
+      
+      // Invalidate the public projects cache
+      await useStorage('cache').removeItem('nitro:handlers:projects-page:projects-v3.json');
       
       return updatedProject;
     } catch (error: any) {
@@ -134,6 +170,11 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     try {
       await prisma.projects.delete({ where: { id } });
+      
+      // Invalidate the public projects cache
+      await useStorage('cache').removeItem('nitro:handlers:projects-page:projects-v3.json');
+      
+      await clearPublicCache();
       return { success: true };
     } catch (error) {
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete project' });

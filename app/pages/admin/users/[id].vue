@@ -2,7 +2,7 @@
   <div class="font-sans">
     <div class="mb-6 flex flex-col gap-1">
       <NuxtLink to="/admin/users" class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors inline-flex items-center gap-1 mb-1">
-        <i class="bi bi-arrow-left"></i> Back to Users
+        <Icon name="lucide:arrow-left" /> Back to Users
       </NuxtLink>
       <h2 class="text-2xl font-bold text-slate-800 tracking-tight">{{ isNew ? 'Add New User' : 'Edit User' }}</h2>
     </div>
@@ -42,7 +42,7 @@
               @click="showPassword = !showPassword" 
               class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-700 transition-colors focus:outline-none cursor-pointer"
             >
-              <i class="bi text-base" :class="showPassword ? 'bi-eye' : 'bi-eye-slash'"></i>
+              <Icon :name="showPassword ? 'lucide:eye' : 'lucide:eye-off'" class="text-base" />
             </button>
           </div>
         </div>
@@ -101,10 +101,13 @@ const saveUser = async () => {
       delete body.password;
     }
     
-    await $fetch(url, { method, body });
+    await useNuxtApp().$fetch(url, { method, body });
+    clearNuxtData();
+    useToast().success('Saved successfully');
+    await refreshNuxtData('admin-users-list');
     router.push('/admin/users');
   } catch (error) {
-    alert(error.data?.statusMessage || 'Failed to save user');
+    useToast().error(error.data?.statusMessage || 'Failed to save user');
   } finally {
     saving.value = false;
   }

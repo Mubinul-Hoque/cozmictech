@@ -13,7 +13,7 @@
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 px-6 py-3 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer"
         >
           <span v-if="saving" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent mr-1"></span>
-          <i v-else class="bi bi-check-lg text-sm"></i>
+          <Icon v-else name="lucide:check" class="text-sm" />
           {{ saving ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
@@ -22,13 +22,13 @@
     <!-- Alert Messages -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
     <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-exclamation-triangle-fill text-rose-500 text-lg"></i>
+        <Icon name="lucide:exclamation-triangle-fill" class="text-rose-500 text-lg" />
         <span class="font-bold text-slate-700">{{ errorMsg }}</span>
       </div>
     </div>
@@ -47,7 +47,7 @@
       <div class="lg:col-span-2 space-y-6">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-6">
           <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
-            <i class="bi bi-card-text text-[#feb900]"></i> Core Story Blocks
+            <Icon name="lucide:card-text" class="text-[#feb900]" /> Core Story Blocks
           </h3>
 
           <div class="space-y-2">
@@ -129,7 +129,7 @@
         <!-- Team section configs -->
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-6">
           <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
-            <i class="bi bi-people text-[#feb900]"></i> Team Section Settings
+            <Icon name="lucide:users" class="text-[#feb900]" /> Team Section Settings
           </h3>
 
           <div class="space-y-2">
@@ -156,14 +156,14 @@
       <div class="space-y-6">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-6">
           <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
-            <i class="bi bi-bar-chart-line text-[#feb900]"></i> Metrics Counters
+            <Icon name="lucide:bar-chart-line" class="text-[#feb900]" /> Metrics Counters
           </h3>
 
           <!-- Stat 1 -->
           <div class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 space-y-3">
             <div class="flex justify-between items-center">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Happy Clients</label>
-              <i class="bi bi-emoji-smile text-slate-400"></i>
+              <Icon name="lucide:emoji-smile" class="text-slate-400" />
             </div>
             <div class="grid grid-cols-3 gap-2">
               <input type="text" v-model="form.happy_icon" placeholder="Icon class" class="col-span-2 px-3 py-1.5 border border-slate-200 rounded-lg text-xs" />
@@ -175,7 +175,7 @@
           <div class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 space-y-3">
             <div class="flex justify-between items-center">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Completed Projects</label>
-              <i class="bi bi-journal-richtext text-slate-400"></i>
+              <Icon name="lucide:journal-richtext" class="text-slate-400" />
             </div>
             <div class="grid grid-cols-3 gap-2">
               <input type="text" v-model="form.projects_icon" placeholder="Icon class" class="col-span-2 px-3 py-1.5 border border-slate-200 rounded-lg text-xs" />
@@ -187,7 +187,7 @@
           <div class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 space-y-3">
             <div class="flex justify-between items-center">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Hours Of Support</label>
-              <i class="bi bi-headset text-slate-400"></i>
+              <Icon name="lucide:headset" class="text-slate-400" />
             </div>
             <div class="grid grid-cols-3 gap-2">
               <input type="text" v-model="form.support_icon" placeholder="Icon class" class="col-span-2 px-3 py-1.5 border border-slate-200 rounded-lg text-xs" />
@@ -199,7 +199,7 @@
           <div class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 space-y-3">
             <div class="flex justify-between items-center">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Employees</label>
-              <i class="bi bi-people text-slate-400"></i>
+              <Icon name="lucide:users" class="text-slate-400" />
             </div>
             <div class="grid grid-cols-3 gap-2">
               <input type="text" v-model="form.emp_icon" placeholder="Icon class" class="col-span-2 px-3 py-1.5 border border-slate-200 rounded-lg text-xs" />
@@ -230,13 +230,13 @@ const errorMsg = ref('')
 const form = reactive({
   tagline: '',
   est: '',
-  happy_icon: 'bi bi-emoji-smile',
+  happy_icon: 'lucide:smile',
   happy_client: 0,
-  projects_icon: 'bi bi-journal-richtext',
+  projects_icon: 'lucide:briefcase',
   project_nos: 0,
-  support_icon: 'bi bi-headset',
+  support_icon: 'lucide:headset',
   hrs_support: 0,
-  emp_icon: 'bi bi-people',
+  emp_icon: 'lucide:hard-hat',
   emp_nos: 0,
   story_title: '',
   story_body: '',
@@ -274,7 +274,7 @@ const saveSettings = async () => {
   errorMsg.value = ''
 
   try {
-    const res = await $fetch('/api/admin/about', {
+    const res = await useNuxtApp().$fetch('/api/admin/about', {
       method: 'POST',
       body: form
     })

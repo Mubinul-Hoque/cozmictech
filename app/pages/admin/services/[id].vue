@@ -15,7 +15,7 @@
           to="/admin/services" 
           class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 border border-slate-200 active:scale-95"
         >
-          <i class="bi bi-arrow-left"></i> Cancel
+          <Icon name="lucide:arrow-left" /> Cancel
         </NuxtLink>
       </div>
     </div>
@@ -23,7 +23,7 @@
     <!-- Error Banner -->
     <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-x-circle-fill text-rose-400 text-lg"></i>
+        <Icon name="lucide:x-circle" class="text-rose-400 text-lg" />
         <span class="font-bold text-rose-300">{{ errorMsg }}</span>
       </div>
     </div>
@@ -49,35 +49,48 @@
             />
           </div>
 
-          <!-- Icon Class (Bootstrap Icons) -->
-          <div>
-            <label for="icon" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Bootstrap Icon Class</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <i :class="'bi ' + (form.icon || 'bi-activity')"></i>
-              </div>
-              <input 
-                id="icon" 
-                v-model="form.icon" 
-                type="text" 
-                required 
-                class="block w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm" 
-                placeholder="e.g. bi-building-gear" 
-              />
-            </div>
-            <p class="text-[10px] text-slate-400 mt-1">Provide class name like: `bi-building`, `bi-shield-check`, `bi-tools`</p>
-          </div>
-
-          <!-- Content Title -->
+          <!-- Icon Picker (Lucide) -->
           <div class="sm:col-span-2">
-            <label for="cont_title" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Details Headline / Content Title</label>
-            <input 
-              id="cont_title" 
-              v-model="form.cont_title" 
-              type="text" 
-              class="block w-full px-4 py-3 bg-white border border-slate-300 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm" 
-              placeholder="e.g. Professional Geotechnical Engineering Solutions" 
-            />
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Service Icon</label>
+            <div class="flex flex-col sm:flex-row gap-6">
+              
+              <!-- Live Preview & Input -->
+              <div class="flex-shrink-0 sm:w-64 space-y-3">
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#feb900]">
+                    <Icon :name="form.icon || 'lucide:activity'" mode="svg" class="text-xl" />
+                  </div>
+                  <input 
+                    id="icon" 
+                    v-model="form.icon" 
+                    type="text" 
+                    required 
+                    class="block w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-2xl text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm font-medium" 
+                    placeholder="e.g. lucide:building" 
+                  />
+                </div>
+                <p class="text-[10px] text-slate-500 leading-tight">
+                  Select an icon from the grid or enter any valid <a href="https://icones.js.org/collection/lucide" target="_blank" class="text-blue-500 hover:underline">Lucide icon name</a> (e.g. `lucide:hard-hat`).
+                </p>
+              </div>
+
+              <!-- Icon Grid (Curated) -->
+              <div class="flex-1 bg-slate-50 rounded-2xl border border-slate-200 p-4 h-48 overflow-y-auto">
+                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                  <button 
+                    v-for="icon in popularIcons" 
+                    :key="icon"
+                    type="button"
+                    @click="form.icon = 'lucide:' + icon"
+                    class="p-2.5 rounded-xl border flex items-center justify-center transition-all hover:scale-110"
+                    :class="form.icon === 'lucide:' + icon ? 'bg-[#feb900] text-slate-900 border-[#feb900] shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'"
+                    :title="'lucide:' + icon"
+                  >
+                    <Icon :name="'lucide:' + icon" mode="svg" class="text-xl" />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -131,7 +144,7 @@
         <!-- Long Description -->
         <div>
           <label for="description" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Service Description</label>
-          <RichTextEditor 
+          <LazyRichTextEditor 
             id="description" 
             v-model="form.description" 
             placeholder="Write detailed info about the engineering sector and services provided. Formatting options are supported."
@@ -178,8 +191,7 @@ const errorMsg = ref('');
 
 const form = ref({
   name: '',
-  icon: 'bi-activity',
-  cont_title: '',
+  icon: 'lucide:activity',
   image: '',
   short_description: '',
   description: ''
@@ -189,11 +201,10 @@ onMounted(async () => {
   if (!isNew.value) {
     loadingData.value = true;
     try {
-      const data = await $fetch(`/api/admin/services/${id}`);
+      const data = await useNuxtApp().$fetch(`/api/admin/services/${id}`);
       form.value = {
         name: data.name || '',
-        icon: data.icon || 'bi-activity',
-        cont_title: data.cont_title || '',
+        icon: data.icon || 'lucide:activity',
         image: data.image || '',
         short_description: data.short_description || '',
         description: data.description || ''
@@ -213,12 +224,13 @@ const handleFileUpload = async (event) => {
 
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('folder', 'services');
 
   uploading.value = true;
   errorMsg.value = '';
 
   try {
-    const data = await $fetch('/api/admin/upload', {
+    const data = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     });
@@ -239,16 +251,29 @@ const handleSave = async () => {
   const method = isNew.value ? 'POST' : 'PUT';
 
   try {
-    await $fetch(url, {
+    await useNuxtApp().$fetch(url, {
       method,
       body: form.value
     });
+    clearNuxtData();
+    useToast().success('Saved successfully');
+    await refreshNuxtData('admin-services-list'); // Force Nuxt to fetch fresh list data
     router.push('/admin/services');
   } catch (err) {
     console.error(err);
-    errorMsg.value = 'Failed to save sector details. Please try again.';
+    errorMsg.value = 'Failed to save service details. Please try again.';
   } finally {
     saving.value = false;
   }
 };
+const popularIcons = [
+  'building-2', 'building', 'hard-hat', 'wrench', 'hammer', 'map-pin',
+  'map', 'ruler', 'compass', 'truck', 'shield-check', 'users',
+  'file-text', 'clipboard-check', 'check-circle', 'activity',
+  'briefcase', 'lightbulb', 'globe', 'home', 'factory', 'landmark',
+  'settings', 'cog', 'zap', 'flame', 'droplets', 'leaf', 'mountain',
+  'waves', 'wind', 'scale', 'book-open', 'calculator', 'bar-chart',
+  'network', 'cpu', 'database', 'cloud', 'layout-grid', 'list',
+  'alert-circle', 'info', 'check', 'x', 'star', 'pen-tool', 'user'
+];
 </script>

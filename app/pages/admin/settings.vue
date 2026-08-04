@@ -13,7 +13,7 @@
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 px-6 py-3 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer"
         >
           <span v-if="saving" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent mr-1"></span>
-          <i v-else class="bi bi-check-lg text-sm"></i>
+          <Icon v-else name="lucide:check" class="text-sm" />
           {{ saving ? 'Saving...' : 'Save Settings' }}
         </button>
       </div>
@@ -22,13 +22,13 @@
     <!-- Alert Messages -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
     <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-exclamation-triangle-fill text-rose-500 text-lg"></i>
+        <Icon name="lucide:exclamation-triangle-fill" class="text-rose-500 text-lg" />
         <span class="font-bold text-slate-700">{{ errorMsg }}</span>
       </div>
     </div>
@@ -91,12 +91,12 @@
                   <div v-if="form.homepage.logo" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-1">
                     <img :src="`/assets/img/${form.homepage.logo}`" class="max-w-full max-h-full object-contain" />
                     <button @click.prevent="removeField('logo')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all active:scale-90">
-                      <i class="bi bi-x text-xs"></i>
+                      <Icon name="lucide:x" class="text-xs" />
                     </button>
                   </div>
                   <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
                     <span v-if="uploading.logo" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><i class="bi bi-upload"></i> Upload Logo</span>
+                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Logo</span>
                     <input type="file" @change="onFileUpload($event, 'logo')" class="hidden" accept="image/*" />
                   </label>
                 </div>
@@ -110,12 +110,12 @@
                   <div v-if="form.homepage.favicon" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-1">
                     <img :src="`/assets/img/${form.homepage.favicon}`" class="max-w-full max-h-full object-contain" />
                     <button @click.prevent="removeField('favicon')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all active:scale-90">
-                      <i class="bi bi-x text-xs"></i>
+                      <Icon name="lucide:x" class="text-xs" />
                     </button>
                   </div>
                   <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
                     <span v-if="uploading.favicon" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><i class="bi bi-upload"></i> Upload Favicon</span>
+                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Favicon</span>
                     <input type="file" @change="onFileUpload($event, 'favicon')" class="hidden" accept="image/*" />
                   </label>
                 </div>
@@ -140,7 +140,7 @@
               >
                 <!-- Selection Indicator -->
                 <div class="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border" :class="form.homepage.theme === 'theme-default' ? 'bg-[#feb900] text-slate-900 border-[#feb900]' : 'bg-slate-50 text-slate-350 border-slate-200'">
-                  <i class="bi" :class="form.homepage.theme === 'theme-default' ? 'bi-check-lg' : 'bi-circle'"></i>
+                  <Icon :name="form.homepage.theme === 'theme-default' ? 'lucide:check' : 'lucide:circle'" />
                 </div>
 
                 <div class="space-y-4">
@@ -173,7 +173,7 @@
                 :class="form.homepage.theme === 'theme-ocean' ? 'border-[#0284c7] ring-4 ring-[#0284c7]/10 bg-sky-50/5' : 'border-slate-200'"
               >
                 <div class="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border" :class="form.homepage.theme === 'theme-ocean' ? 'bg-[#0284c7] text-white border-[#0284c7]' : 'bg-slate-50 text-slate-350 border-slate-200'">
-                  <i class="bi" :class="form.homepage.theme === 'theme-ocean' ? 'bi-check-lg' : 'bi-circle'"></i>
+                  <Icon :name="form.homepage.theme === 'theme-ocean' ? 'lucide:check' : 'lucide:circle'" />
                 </div>
 
                 <div class="space-y-4">
@@ -205,7 +205,7 @@
                 :class="form.homepage.theme === 'theme-forest' ? 'border-[#059669] ring-4 ring-[#059669]/10 bg-emerald-50/5' : 'border-slate-200'"
               >
                 <div class="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border" :class="form.homepage.theme === 'theme-forest' ? 'bg-[#059669] text-white border-[#059669]' : 'bg-slate-50 text-slate-350 border-slate-200'">
-                  <i class="bi" :class="form.homepage.theme === 'theme-forest' ? 'bi-check-lg' : 'bi-circle'"></i>
+                  <Icon :name="form.homepage.theme === 'theme-forest' ? 'lucide:check' : 'lucide:circle'" />
                 </div>
 
                 <div class="space-y-4">
@@ -237,7 +237,7 @@
                 :class="form.homepage.theme === 'theme-crimson' ? 'border-[#dc2626] ring-4 ring-[#dc2626]/10 bg-red-50/5' : 'border-slate-200'"
               >
                 <div class="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border" :class="form.homepage.theme === 'theme-crimson' ? 'bg-[#dc2626] text-white border-[#dc2626]' : 'bg-slate-50 text-slate-350 border-slate-200'">
-                  <i class="bi" :class="form.homepage.theme === 'theme-crimson' ? 'bi-check-lg' : 'bi-circle'"></i>
+                  <Icon :name="form.homepage.theme === 'theme-crimson' ? 'lucide:check' : 'lucide:circle'" />
                 </div>
 
                 <div class="space-y-4">
@@ -269,7 +269,7 @@
                 :class="form.homepage.theme === 'theme-luxury' ? 'border-[#c5a880] ring-4 ring-[#c5a880]/10 bg-amber-50/5' : 'border-slate-200'"
               >
                 <div class="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center border" :class="form.homepage.theme === 'theme-luxury' ? 'bg-[#c5a880] text-slate-900 border-[#c5a880]' : 'bg-slate-50 text-slate-350 border-slate-200'">
-                  <i class="bi" :class="form.homepage.theme === 'theme-luxury' ? 'bi-check-lg' : 'bi-circle'"></i>
+                  <Icon :name="form.homepage.theme === 'theme-luxury' ? 'lucide:check' : 'lucide:circle'" />
                 </div>
 
                 <div class="space-y-4">
@@ -302,65 +302,47 @@
             <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Hero Carousel & Background Slides</h3>
             
             <div class="space-y-6">
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Hero Background Slides (Exactly 3 slots)</label>
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Hero Background Slides</label>
               
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <!-- Slide 1 -->
-                <div class="space-y-2">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Slide Image 1</span>
-                  <div class="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex items-center justify-center animate-fade-in-up">
-                    <img v-if="slides[0]" :src="slides[0]" class="w-full h-full object-cover" />
-                    <label v-else class="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-amber-500/5 transition-all">
-                      <span v-if="uploading.slide1" class="animate-spin rounded-full h-5 w-5 border-2 border-[#feb900] border-t-transparent"></span>
-                      <template v-else>
-                        <i class="bi bi-plus-circle text-xl text-slate-400"></i>
-                        <span class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Upload Slide 1</span>
-                      </template>
-                      <input type="file" @change="onSlideUpload($event, 0)" class="hidden" accept="image/*" />
-                    </label>
-                    <button v-if="slides[0]" @click.prevent="removeSlide(0)" class="absolute top-2 right-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 leading-none shadow transition-all hover:scale-105 active:scale-95">
-                      <i class="bi bi-trash text-xs"></i>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" @dragover.prevent>
+                
+                <!-- Existing Slides -->
+                <div 
+                  v-for="(slide, index) in slides" 
+                  :key="'slide-' + index"
+                  draggable="true"
+                  @dragstart="onDragStart(index)"
+                  @dragover.prevent
+                  @drop="onDrop(index)"
+                  class="space-y-2 cursor-move"
+                >
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between">
+                    <span>Slide {{ index + 1 }}</span>
+                    <Icon name="lucide:grip-horizontal" class="text-slate-400 hover:text-slate-600 transition-colors" title="Drag to reorder" />
+                  </span>
+                  <div class="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex items-center justify-center animate-fade-in-up group">
+                    <img :src="slide.includes('/') ? slide : `/assets/img/${slide}`" class="w-full h-full object-cover" />
+                    <button @click.prevent="removeSlide(index)" class="absolute top-2 right-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 leading-none shadow transition-all hover:scale-105 active:scale-95 opacity-0 group-hover:opacity-100">
+                      <Icon name="lucide:trash-2" class="text-xs" />
                     </button>
                   </div>
                 </div>
 
-                <!-- Slide 2 -->
-                <div class="space-y-2">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Slide Image 2</span>
-                  <div class="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex items-center justify-center animate-fade-in-up">
-                    <img v-if="slides[1]" :src="slides[1]" class="w-full h-full object-cover" />
-                    <label v-else class="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-amber-500/5 transition-all">
-                      <span v-if="uploading.slide2" class="animate-spin rounded-full h-5 w-5 border-2 border-[#feb900] border-t-transparent"></span>
+                <!-- Add New Slide -->
+                <div class="space-y-2 order-last">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add New Slide</span>
+                  <div class="relative aspect-video rounded-2xl overflow-hidden border border-dashed border-slate-300 shadow-sm bg-slate-50 flex items-center justify-center">
+                    <label class="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-amber-500/5 transition-all">
+                      <span v-if="uploading.slide" class="animate-spin rounded-full h-5 w-5 border-2 border-[#feb900] border-t-transparent"></span>
                       <template v-else>
-                        <i class="bi bi-plus-circle text-xl text-slate-400"></i>
-                        <span class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Upload Slide 2</span>
+                        <Icon name="lucide:plus-circle" class="text-xl text-slate-400" />
+                        <span class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Upload Image</span>
                       </template>
-                      <input type="file" @change="onSlideUpload($event, 1)" class="hidden" accept="image/*" />
+                      <input type="file" @change="onSlideUpload" class="hidden" accept="image/*" />
                     </label>
-                    <button v-if="slides[1]" @click.prevent="removeSlide(1)" class="absolute top-2 right-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 leading-none shadow transition-all hover:scale-105 active:scale-95">
-                      <i class="bi bi-trash text-xs"></i>
-                    </button>
                   </div>
                 </div>
 
-                <!-- Slide 3 -->
-                <div class="space-y-2">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Slide Image 3</span>
-                  <div class="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex items-center justify-center animate-fade-in-up">
-                    <img v-if="slides[2]" :src="slides[2]" class="w-full h-full object-cover" />
-                    <label v-else class="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-amber-500/5 transition-all">
-                      <span v-if="uploading.slide3" class="animate-spin rounded-full h-5 w-5 border-2 border-[#feb900] border-t-transparent"></span>
-                      <template v-else>
-                        <i class="bi bi-plus-circle text-xl text-slate-400"></i>
-                        <span class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Upload Slide 3</span>
-                      </template>
-                      <input type="file" @change="onSlideUpload($event, 2)" class="hidden" accept="image/*" />
-                    </label>
-                    <button v-if="slides[2]" @click.prevent="removeSlide(2)" class="absolute top-2 right-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 leading-none shadow transition-all hover:scale-105 active:scale-95">
-                      <i class="bi bi-trash text-xs"></i>
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -396,12 +378,12 @@
                   <div v-if="form.homepage.glance_img" class="relative w-32 h-20 rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
                     <img :src="form.homepage.glance_img.includes('/') ? form.homepage.glance_img : `/assets/img/${form.homepage.glance_img}`" class="w-full h-full object-cover" />
                     <button @click.prevent="removeField('glance_img')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 leading-none shadow transition-all active:scale-90">
-                      <i class="bi bi-trash text-xs"></i>
+                      <Icon name="lucide:trash-2" class="text-xs" />
                     </button>
                   </div>
                   <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-4 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
                     <span v-if="uploading.glance_img" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><i class="bi bi-upload"></i> Upload Image</span>
+                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Image</span>
                     <input type="file" @change="onFileUpload($event, 'glance_img')" class="hidden" accept="image/*" />
                   </label>
                 </div>
@@ -413,7 +395,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <!-- Counter 1: Experience -->
                   <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
-                    <h5 class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><i class="bi bi-award text-[#feb900]"></i> Counter 1 (Experience)</h5>
+                    <h5 class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><Icon name="lucide:award" class="text-[#feb900]" /> Counter 1 (Experience)</h5>
                     <div class="space-y-3">
                       <div class="space-y-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Number / Value</label>
@@ -428,7 +410,7 @@
 
                   <!-- Counter 2: Projects -->
                   <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
-                    <h5 class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><i class="bi bi-card-checklist text-[#feb900]"></i> Counter 2 (Projects)</h5>
+                    <h5 class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><Icon name="lucide:card-checklist" class="text-[#feb900]" /> Counter 2 (Projects)</h5>
                     <div class="space-y-3">
                       <div class="space-y-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Number / Value</label>
@@ -453,7 +435,7 @@
             <div class="space-y-6">
               <!-- Services Header -->
               <div class="p-6 rounded-2xl border border-slate-150 bg-slate-50/50 space-y-4">
-                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><i class="bi bi-hdd-network text-amber-500"></i> Our Services Section</h4>
+                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><Icon name="lucide:server" class="text-amber-500" /> Our Services Section</h4>
                 <div class="grid grid-cols-1 gap-4">
                   <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Title</label>
@@ -468,7 +450,7 @@
 
               <!-- Strengths Header -->
               <div class="p-6 rounded-2xl border border-slate-150 bg-slate-50/50 space-y-4">
-                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><i class="bi bi-lightning-charge text-amber-500"></i> Our Strengths Section</h4>
+                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><Icon name="lucide:lightning-charge" class="text-amber-500" /> Our Strengths Section</h4>
                 <div class="grid grid-cols-1 gap-4">
                   <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Title</label>
@@ -483,7 +465,7 @@
 
               <!-- Testimonials Header -->
               <div class="p-6 rounded-2xl border border-slate-150 bg-slate-50/50 space-y-4">
-                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><i class="bi bi-chat-quote text-amber-500"></i> Testimonials Section</h4>
+                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><Icon name="lucide:message-square-quote" class="text-amber-500" /> Testimonials Section</h4>
                 <div class="grid grid-cols-1 gap-4">
                   <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Title</label>
@@ -498,7 +480,7 @@
 
               <!-- Blog Header -->
               <div class="p-6 rounded-2xl border border-slate-150 bg-slate-50/50 space-y-4">
-                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><i class="bi bi-journal-text text-amber-500"></i> News & Insights Section</h4>
+                <h4 class="text-sm font-bold text-slate-600 uppercase tracking-wide flex items-center gap-2"><Icon name="lucide:book-open-text" class="text-amber-500" /> News & Insights Section</h4>
                 <div class="grid grid-cols-1 gap-4">
                   <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Title</label>
@@ -538,12 +520,12 @@
                       <div v-if="form.homepage.image7" class="relative w-24 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
                         <img :src="form.homepage.image7.includes('/') ? form.homepage.image7 : `/assets/img/${form.homepage.image7}`" class="w-full h-full object-cover" />
                         <button @click.prevent="removeField('image7')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all">
-                          <i class="bi bi-x text-xs"></i>
+                          <Icon name="lucide:x" class="text-xs" />
                         </button>
                       </div>
                       <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] cursor-pointer transition-all">
                         <span v-if="uploading.image7" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                        <span v-else class="text-xs font-semibold uppercase tracking-wide"><i class="bi bi-upload"></i> Upload Image</span>
+                        <span v-else class="text-xs font-semibold uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Image</span>
                         <input type="file" @change="onFileUpload($event, 'image7')" class="hidden" accept="image/*" />
                       </label>
                     </div>
@@ -570,12 +552,12 @@
                       <div v-if="form.homepage.image8" class="relative w-24 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
                         <img :src="form.homepage.image8.includes('/') ? form.homepage.image8 : `/assets/img/${form.homepage.image8}`" class="w-full h-full object-cover" />
                         <button @click.prevent="removeField('image8')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all">
-                          <i class="bi bi-x text-xs"></i>
+                          <Icon name="lucide:x" class="text-xs" />
                         </button>
                       </div>
                       <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] cursor-pointer transition-all">
                         <span v-if="uploading.image8" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                        <span v-else class="text-xs font-semibold uppercase tracking-wide"><i class="bi bi-upload"></i> Upload Image</span>
+                        <span v-else class="text-xs font-semibold uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Image</span>
                         <input type="file" @change="onFileUpload($event, 'image8')" class="hidden" accept="image/*" />
                       </label>
                     </div>
@@ -602,12 +584,12 @@
                       <div v-if="form.homepage.image9" class="relative w-24 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
                         <img :src="form.homepage.image9.includes('/') ? form.homepage.image9 : `/assets/img/${form.homepage.image9}`" class="w-full h-full object-cover" />
                         <button @click.prevent="removeField('image9')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all">
-                          <i class="bi bi-x text-xs"></i>
+                          <Icon name="lucide:x" class="text-xs" />
                         </button>
                       </div>
                       <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] cursor-pointer transition-all">
                         <span v-if="uploading.image9" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                        <span v-else class="text-xs font-semibold uppercase tracking-wide"><i class="bi bi-upload"></i> Upload Image</span>
+                        <span v-else class="text-xs font-semibold uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Image</span>
                         <input type="file" @change="onFileUpload($event, 'image9')" class="hidden" accept="image/*" />
                       </label>
                     </div>
@@ -625,7 +607,7 @@
               <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Facebook Page URL</label>
                 <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-facebook"></i></span>
+                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:facebook" /></span>
                   <input 
                     type="text" 
                     v-model="form.social.fb" 
@@ -638,7 +620,7 @@
               <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Instagram URL</label>
                 <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-instagram"></i></span>
+                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:instagram" /></span>
                   <input 
                     type="text" 
                     v-model="form.social.insta" 
@@ -651,7 +633,7 @@
               <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">LinkedIn Company URL</label>
                 <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-linkedin"></i></span>
+                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:linkedin" /></span>
                   <input 
                     type="text" 
                     v-model="form.social.linkedin" 
@@ -664,7 +646,7 @@
               <div class="space-y-2">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Twitter URL</label>
                 <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-twitter"></i></span>
+                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:twitter" /></span>
                   <input 
                     type="text" 
                     v-model="form.social.twitter" 
@@ -802,7 +784,7 @@
                         class="inline-flex items-center justify-center p-1.5 text-xs text-slate-500 hover:text-[#feb900] bg-white rounded-lg border border-slate-200 transition-colors shadow-sm cursor-pointer"
                         title="Edit Client"
                       >
-                        <i class="bi bi-pencil"></i>
+                        <Icon name="lucide:pencil" />
                       </button>
                       <button 
                         type="button" 
@@ -810,7 +792,7 @@
                         class="inline-flex items-center justify-center p-1.5 text-xs text-slate-500 hover:text-rose-600 bg-white rounded-lg border border-slate-200 transition-colors shadow-sm cursor-pointer"
                         title="Delete Client"
                       >
-                        <i class="bi bi-trash"></i>
+                        <Icon name="lucide:trash-2" />
                       </button>
                     </div>
                   </div>
@@ -860,14 +842,14 @@
                           @click="clientForm.logo = ''" 
                           class="absolute -top-1 -right-1 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-0.5 leading-none shadow transition-all hover:scale-105 active:scale-95 cursor-pointer"
                         >
-                          <i class="bi bi-x text-xs"></i>
+                          <Icon name="lucide:x" class="text-xs" />
                         </button>
                       </div>
                       <!-- Upload label button -->
                       <label class="flex-1 flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
                         <span v-if="clientUploading" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
                         <span v-else class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-wide">
-                          <i class="bi bi-upload"></i> {{ clientForm.logo ? 'Change Image' : 'Upload Logo' }}
+                          <Icon name="lucide:upload" /> {{ clientForm.logo ? 'Change Image' : 'Upload Logo' }}
                         </span>
                         <input type="file" @change="onClientLogoUpload" class="hidden" accept="image/*" />
                       </label>
@@ -929,14 +911,15 @@ const tabs = [
   { id: 'custom', name: 'Custom Blocks', icon: 'bi bi-grid-3x3-gap' },
   { id: 'footer', name: 'Footer & Socials', icon: 'bi bi-share' },
   { id: 'contact', name: 'Contact Details', icon: 'bi bi-telephone' },
-  { id: 'clients', name: 'Client Logos', icon: 'bi bi-briefcase' }
+  { id: 'clients', name: 'Client Logos', icon: 'bi bi-briefcase' },
+    { id: 'strengths', name: 'Our Strengths', icon: 'lucide:lightning-charge' }
 ]
 
 const form = reactive({
   homepage: {
     company_title: '',
     slogan: '',
-    bgslide_img: '',
+    hero_images: [],
     logo: '',
     favicon: '',
     theme: 'theme-default',
@@ -982,13 +965,11 @@ const uploading = reactive({
   image7: false,
   image8: false,
   image9: false,
-  slide1: false,
-  slide2: false,
-  slide3: false
+  slide: false
 })
 
 // Slides list reactive storage
-const slides = ref(['', '', ''])
+const slides = ref([])
 
 // Fetch current configurations
 const { data: settingsRes, pending, refresh } = await useFetch('/api/admin/settings')
@@ -997,13 +978,11 @@ const loadSettings = () => {
   if (settingsRes.value && settingsRes.value.success) {
     if (settingsRes.value.homepage) {
       Object.assign(form.homepage, settingsRes.value.homepage)
-      // Parse bgslide_img
-      const currentSlides = (form.homepage.bgslide_img || '').split(',').map(s => s.trim()).filter(Boolean)
-      slides.value = [
-        currentSlides[0] || '',
-        currentSlides[1] || '',
-        currentSlides[2] || ''
-      ]
+      if (Array.isArray(form.homepage.hero_images)) {
+        slides.value = [...form.homepage.hero_images]
+      } else {
+        slides.value = []
+      }
     }
     if (settingsRes.value.contact) {
       Object.assign(form.contact, settingsRes.value.contact)
@@ -1027,31 +1006,46 @@ const removeField = (fieldName) => {
 }
 
 const removeSlide = (index) => {
-  slides.value[index] = ''
+  slides.value.splice(index, 1)
 }
 
-const onSlideUpload = async (event, index) => {
+const draggedIndex = ref(null)
+
+const onDragStart = (index) => {
+  draggedIndex.value = index
+}
+
+const onDrop = (dropIndex) => {
+  if (draggedIndex.value !== null && draggedIndex.value !== dropIndex) {
+    const movedSlide = slides.value.splice(draggedIndex.value, 1)[0]
+    slides.value.splice(dropIndex, 0, movedSlide)
+  }
+  draggedIndex.value = null
+}
+
+const onSlideUpload = async (event) => {
   const file = event.target.files[0]
   if (!file) return
 
   const formData = new FormData()
   formData.append('file', file)
+  formData.append('folder', 'hero-carousel')
 
-  uploading[`slide${index + 1}`] = true
+  uploading.slide = true
   errorMsg.value = ''
   successMsg.value = ''
 
   try {
-    const data = await $fetch('/api/admin/upload', {
+    const data = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     })
-    slides.value[index] = data.url
+    slides.value.push(data.url)
   } catch (err) {
     console.error(err)
     errorMsg.value = 'Failed to upload slide image. Ensure it is a valid image under 2MB.'
   } finally {
-    uploading[`slide${index + 1}`] = false
+    uploading.slide = false
   }
 }
 
@@ -1067,7 +1061,7 @@ const onFileUpload = async (event, fieldName) => {
   successMsg.value = ''
 
   try {
-    const data = await $fetch('/api/admin/upload', {
+    const data = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     })
@@ -1087,10 +1081,10 @@ const saveSettings = async () => {
   errorMsg.value = ''
 
   // Serialize slide images back to database column
-  form.homepage.bgslide_img = slides.value.map(s => s.trim()).filter(Boolean).join(',')
+  form.homepage.hero_images = [...slides.value]
 
   try {
-    const res = await $fetch('/api/admin/settings', {
+    const res = await useNuxtApp().$fetch('/api/admin/settings', {
       method: 'POST',
       body: form
     })
@@ -1100,10 +1094,7 @@ const saveSettings = async () => {
       refresh()
       setTimeout(() => {
         successMsg.value = ''
-        if (process.client) {
-          window.location.reload()
-        }
-      }, 1500)
+      }, 3000)
     } else {
       errorMsg.value = res.message || 'Failed to save settings configurations.'
     }
@@ -1134,13 +1125,14 @@ const onClientLogoUpload = async (event) => {
 
   const formData = new FormData()
   formData.append('file', file)
+  formData.append('folder', 'clients')
 
   clientUploading.value = true
   errorMsg.value = ''
   successMsg.value = ''
 
   try {
-    const data = await $fetch('/api/admin/upload', {
+    const data = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     })
@@ -1167,7 +1159,7 @@ const saveClient = async () => {
   const method = isEdit ? 'PUT' : 'POST'
 
   try {
-    const res = await $fetch('/api/admin/clients', {
+    const res = await useNuxtApp().$fetch('/api/admin/clients', {
       method,
       body: clientForm
     })
@@ -1207,7 +1199,7 @@ const deleteClient = async (id) => {
   successMsg.value = ''
 
   try {
-    const res = await $fetch(`/api/admin/clients?id=${id}`, {
+    const res = await useNuxtApp().$fetch(`/api/admin/clients?id=${id}`, {
       method: 'DELETE'
     })
 

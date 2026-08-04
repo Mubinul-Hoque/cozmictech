@@ -9,13 +9,16 @@ export default defineEventHandler(async (event) => {
     try {
       const body = await readBody(event)
       const updateData: any = {}
-      if (body.name !== undefined) updateData.name = body.name
-      if (body.active !== undefined) updateData.active = body.active
+      if (body.name !== undefined) {
+        updateData.name = body.name
+        updateData.slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      }
 
-      const updated = await prisma.message_category.update({
+      const updated = await prisma.categories.update({
         where: { id },
         data: updateData
       })
+      await clearPublicCache();
       return { success: true, data: updated }
     } catch (error: any) {
       console.error('Error updating admin message category:', error)
@@ -25,9 +28,10 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'DELETE') {
     try {
-      await prisma.message_category.delete({
+      await prisma.categories.delete({
         where: { id }
       })
+      await clearPublicCache();
       return { success: true }
     } catch (error: any) {
       console.error('Error deleting admin message category:', error)

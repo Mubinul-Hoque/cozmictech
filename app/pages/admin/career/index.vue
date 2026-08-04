@@ -11,7 +11,7 @@
           to="/admin/career/new" 
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer"
         >
-          <i class="bi bi-plus-lg text-sm"></i> Add Job Opening
+          <Icon name="lucide:plus" class="text-sm" /> Add Job Opening
         </NuxtLink>
       </div>
     </div>
@@ -19,7 +19,7 @@
     <!-- Success Feedback Banner -->
     <div v-if="successMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm mb-6">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
@@ -33,7 +33,7 @@
 
       <!-- Empty State -->
       <div v-else-if="!careersData?.data?.length" class="text-center py-20 text-slate-400">
-        <i class="bi bi-briefcase text-4xl mb-4 block text-slate-350"></i>
+        <Icon name="lucide:briefcase" class="text-4xl mb-4 block text-slate-350" />
         <p class="font-semibold text-slate-700">No career openings found</p>
         <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">Get started by creating your first job opening.</p>
         <NuxtLink to="/admin/career/new" class="mt-4 px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-full text-xs font-bold transition-all duration-150 inline-block">
@@ -80,14 +80,14 @@
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors"
                     title="Edit Job"
                   >
-                    <i class="bi bi-pencil"></i>
+                    <Icon name="lucide:pencil" />
                   </NuxtLink>
                   <button 
                     @click="confirmDelete(job.id)" 
                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors"
                     title="Delete Job"
                   >
-                    <i class="bi bi-trash"></i>
+                    <Icon name="lucide:trash-2" />
                   </button>
                 </div>
               </td>
@@ -110,18 +110,18 @@ definePageMeta({
 
 const successMsg = ref('')
 
-const { data: careersData, pending, refresh } = await useFetch('/api/admin/career')
+const { data: careersData, pending, refresh } = await useFetch('/api/admin/career', { key: 'admin-career-list' })
 
 const confirmDelete = async (id) => {
   if (confirm('Are you sure you want to delete this job opening?')) {
     try {
-      await $fetch(`/api/admin/career/${id}`, { method: 'DELETE' })
+      await useNuxtApp().$fetch(`/api/admin/career/${id}`, { method: 'DELETE' })
       successMsg.value = 'Job opening successfully deleted.'
       setTimeout(() => successMsg.value = '', 4000)
       refresh()
     } catch (err) {
       console.error(err)
-      alert('Delete operation failed.')
+      useToast().error('Delete operation failed.')
     }
   }
 }

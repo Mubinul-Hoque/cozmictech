@@ -8,25 +8,31 @@ export default defineEventHandler(async (event) => {
     const message = await prisma.messages.findUnique({
       where: { id },
       include: {
-        category: true
+        categories: true
       }
     });
     if (!message) throw createError({ statusCode: 404, statusMessage: 'Message not found' });
     
-    // Mark as read (status = 1) if it's currently 0
-    if (message.status === 0) {
+    // Mark as read (is_read = true) if it's currently false
+    if (message.is_read === false) {
       await prisma.messages.update({
         where: { id },
-        data: { status: 1 }
+        data: { is_read: true }
       });
-      message.status = 1;
+      message.is_read = true;
     }
     
-    return message;
+    // Map for frontend
+    return {
+      ...message,
+      status: message.is_read ? 1 : 0,
+      category: message.categories
+    };
   }
 
   if (event.node.req.method === 'DELETE') {
     await prisma.messages.delete({ where: { id } });
-    return { success: true };
+    await clearPublicCache();
+      return { success: true };
   }
 });

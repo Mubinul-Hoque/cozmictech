@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function test() { try { const p = await prisma.projects.update({ where: { id: 1 }, data: { images: ['test1.jpg', 'test2.jpg'] } }); console.log('success', p.images); } catch(e) { console.error(e.message); } finally { await prisma.$disconnect(); } } test();

@@ -5,31 +5,50 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     try {
-      const about = await prisma.about_us.findFirst()
+      const [aboutSections, allSettings] = await Promise.all([
+        prisma.page_sections.findMany({ where: { page_slug: 'about' } }),
+        prisma.settings.findMany()
+      ])
+
+      const getSec = (key: string) => aboutSections.find(s => s.section_key === key) || {} as any
+      const settingsMap: Record<string, string> = {}
+      allSettings.forEach(s => settingsMap[s.setting_key] = s.setting_value || '')
+
+      const story = getSec('our_story')
+      const mission = getSec('mission')
+      const vision = getSec('vision')
+      const team = getSec('our_team_intro')
+
+      await clearPublicCache();
       return {
         success: true,
-        about: about || {
-          tagline: 'Cozmic Technology - About Us',
-          est: '2015',
-          happy_icon: 'bi bi-emoji-smile',
-          happy_client: 120,
-          projects_icon: 'bi bi-journal-richtext',
-          project_nos: 250,
-          support_icon: 'bi bi-headset',
-          hrs_support: 1740,
-          emp_icon: 'bi bi-people',
-          emp_nos: 35,
-          story_title: 'Our Story',
-          story_body: '',
-          story_body2: '',
-          mission_title: 'OUR MISSION',
-          mission_body: '',
-          vision_title: 'OUR VISION',
-          vision_body: '',
-          values_title: 'OUR VALUES',
-          values_body: 0,
-          team_title: 'Our Team',
-          team_description: ''
+        about: {
+          tagline: settingsMap['about_tagline'] || 'Cozmic Technology - About Us',
+          est: settingsMap['about_est'] || '2015',
+          happy_icon: settingsMap['about_happy_icon'] || 'lucide:smile',
+          happy_client: parseInt(settingsMap['about_happy_client'] || '120'),
+          projects_icon: settingsMap['about_projects_icon'] || 'lucide:briefcase',
+          project_nos: parseInt(settingsMap['about_project_nos'] || '250'),
+          support_icon: settingsMap['about_support_icon'] || 'lucide:headset',
+          hrs_support: parseInt(settingsMap['about_hrs_support'] || '1740'),
+          emp_icon: settingsMap['about_emp_icon'] || 'lucide:hard-hat',
+          emp_nos: parseInt(settingsMap['about_emp_nos'] || '35'),
+          
+          story_title: story.title || 'Our Story',
+          story_body: story.content || '',
+          story_body2: story.subtitle_or_tag || '',
+          
+          mission_title: mission.title || 'OUR MISSION',
+          mission_body: mission.content || '',
+          
+          vision_title: vision.title || 'OUR VISION',
+          vision_body: vision.content || '',
+          
+          values_title: settingsMap['about_values_title'] || 'OUR VALUES',
+          values_body: parseInt(settingsMap['about_values_body'] || '0'),
+          
+          team_title: team.title || 'Our Team',
+          team_description: team.content || ''
         }
       }
     } catch (error: any) {
@@ -41,73 +60,54 @@ export default defineEventHandler(async (event) => {
   if (method === 'POST') {
     try {
       const body = await readBody(event)
-      const existing = await prisma.about_us.findFirst()
       
       const safeSanitize = (val: any) => {
         if (val === undefined || val === null) return '';
-        return sanitizePlainText(String(val));
+        return String(val);
       }
 
-      const tagline = safeSanitize(body.tagline);
-      const est = safeSanitize(body.est);
-      const happy_icon = safeSanitize(body.happy_icon || 'bi-emoji-smile');
-      const projects_icon = safeSanitize(body.projects_icon || 'bi-journal-richtext');
-      const support_icon = safeSanitize(body.support_icon || 'bi-headset');
-      const emp_icon = safeSanitize(body.emp_icon || 'bi-people');
-      const story_title = safeSanitize(body.story_title);
-      const story_body2 = safeSanitize(body.story_body2);
-      const mission_title = safeSanitize(body.mission_title);
-      const vision_title = safeSanitize(body.vision_title);
-      const values_title = safeSanitize(body.values_title);
-      const team_title = safeSanitize(body.team_title);
-      const team_description = safeSanitize(body.team_description);
-
-      // Validate lengths matching the database schema
-      if (
-        tagline.length > 255 || est.length > 15 || happy_icon.length > 30 ||
-        projects_icon.length > 30 || support_icon.length > 30 || emp_icon.length > 30 ||
-        story_title.length > 50 || story_body2.length > 255 || mission_title.length > 50 ||
-        vision_title.length > 50 || values_title.length > 50 || team_title.length > 50 ||
-        team_description.length > 500
-      ) {
-        throw createError({ statusCode: 400, statusMessage: 'Input exceeds database length limit' });
+      // 1. Update Global Settings for about variables
+      const settingsToUpdate = {
+        'about_tagline': safeSanitize(body.tagline),
+        'about_est': safeSanitize(body.est),
+        'about_happy_icon': safeSanitize(body.happy_icon || 'lucide:smile'),
+        'about_happy_client': String(body.happy_client || 0),
+        'about_projects_icon': safeSanitize(body.projects_icon || 'lucide:briefcase'),
+        'about_project_nos': String(body.project_nos || 0),
+        'about_support_icon': safeSanitize(body.support_icon || 'lucide:headset'),
+        'about_hrs_support': String(body.hrs_support || 0),
+        'about_emp_icon': safeSanitize(body.emp_icon || 'lucide:hard-hat'),
+        'about_emp_nos': String(body.emp_nos || 0),
+        'about_values_title': safeSanitize(body.values_title),
+        'about_values_body': String(body.values_body || 0),
       }
 
-      const data = {
-        tagline,
-        est,
-        happy_icon,
-        happy_client: body.happy_client ? parseInt(body.happy_client) : 0,
-        projects_icon,
-        project_nos: body.project_nos ? parseInt(body.project_nos) : 0,
-        support_icon,
-        hrs_support: body.hrs_support ? parseInt(body.hrs_support) : 0,
-        emp_icon,
-        emp_nos: body.emp_nos ? parseInt(body.emp_nos) : 0,
-        story_title,
-        story_body: sanitizeHtmlContent(body.story_body || ''),
-        story_body2,
-        mission_title,
-        mission_body: sanitizeHtmlContent(body.mission_body || ''),
-        vision_title,
-        vision_body: sanitizeHtmlContent(body.vision_body || ''),
-        values_title,
-        values_body: body.values_body ? parseInt(body.values_body) : 0,
-        team_title,
-        team_description
-      }
-
-      if (existing) {
-        await prisma.about_us.update({
-          where: { id: existing.id },
-          data
-        })
-      } else {
-        await prisma.about_us.create({
-          data
+      for (const [key, val] of Object.entries(settingsToUpdate)) {
+        await prisma.settings.upsert({
+          where: { setting_key: key },
+          update: { setting_value: val },
+          create: { setting_key: key, setting_value: val }
         })
       }
 
+      // 2. Update Page Sections (About)
+      const aboutSections = await prisma.page_sections.findMany({ where: { page_slug: 'about' } })
+      
+      const upsertSection = async (key: string, data: any) => {
+        const existing = aboutSections.find(s => s.section_key === key)
+        if (existing) {
+          await prisma.page_sections.update({ where: { id: existing.id }, data })
+        } else {
+          await prisma.page_sections.create({ data: { page_slug: 'about', section_key: key, ...data } })
+        }
+      }
+
+      await upsertSection('our_story', { title: safeSanitize(body.story_title), content: safeSanitize(body.story_body), subtitle_or_tag: safeSanitize(body.story_body2) })
+      await upsertSection('mission', { title: safeSanitize(body.mission_title), content: safeSanitize(body.mission_body) })
+      await upsertSection('vision', { title: safeSanitize(body.vision_title), content: safeSanitize(body.vision_body) })
+      await upsertSection('our_team_intro', { title: safeSanitize(body.team_title), content: safeSanitize(body.team_description) })
+
+      await clearPublicCache();
       return {
         success: true,
         message: 'About Us page saved successfully'

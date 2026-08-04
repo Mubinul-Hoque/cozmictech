@@ -24,13 +24,12 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Missing required field: name' });
       }
 
-      const icon = String(body.icon || 'bi-activity').trim();
+      const icon = String(body.icon || 'lucide:activity').trim();
       const short_description = String(body.short_description || '').trim();
       const image = String(body.image || '').trim();
-      const cont_title = String(body.cont_title || '').trim();
 
       // Enforce database limits
-      if (name.length > 255 || icon.length > 100 || image.length > 255 || cont_title.length > 255) {
+      if (name.length > 255 || icon.length > 100 || image.length > 255) {
         throw createError({ statusCode: 400, statusMessage: 'Input exceeds database length limit' });
       }
 
@@ -41,11 +40,11 @@ export default defineEventHandler(async (event) => {
           icon: sanitizePlainText(icon),
           short_description: sanitizePlainText(short_description),
           image: sanitizePlainText(image),
-          cont_title: sanitizePlainText(cont_title),
           description: sanitizeHtmlContent(body.description || '')
         }
       });
 
+      await clearPublicCache();
       return { success: true, service };
     } catch (error: any) {
       throw createError({ statusCode: error.statusCode || 500, statusMessage: error.statusMessage || 'Failed to update service' });
@@ -55,6 +54,7 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     try {
       await prisma.services.delete({ where: { id } });
+      await clearPublicCache();
       return { success: true };
     } catch (error) {
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete service' });

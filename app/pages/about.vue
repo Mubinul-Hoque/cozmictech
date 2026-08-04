@@ -16,7 +16,7 @@
       <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 relative">
           
-          <div class="lg:col-span-6 bg-cover bg-center rounded-lg min-h-[400px] shadow-lg" style="background-image: url('/assets/img/about.jpg');"></div>
+      <div class="lg:col-span-6 bg-cover bg-center rounded-lg min-h-[400px] shadow-lg" style="background-image: url('/assets/img/about.jpg');"></div>
 
           <div class="lg:col-span-6 space-y-6">
             <h2 class="text-3xl font-bold text-[#2e3135]">
@@ -31,12 +31,9 @@
               </p>
               
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-medium text-gray-700">
-                <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#feb900]"></i> Geotechnical Investigation</li>
-                <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#feb900]"></i> Detail Engineering Consultancy</li>
-                <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#feb900]"></i> Procurement & Supply</li>
-                <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#feb900]"></i> Construction Supervision</li>
-                <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#feb900]"></i> Project Management</li>
-                <li class="flex items-center gap-2"><i class="bi bi-check-circle text-[#feb900]"></i> Structural Integrity</li>
+                <li v-for="service in data?.services || []" :key="service.id" class="flex items-center gap-2">
+                  <Icon name="lucide:check-circle-2" class="text-[#feb900]" /> <span v-html="service.name"></span>
+                </li>
               </ul>
 
               <p class="text-gray-600 text-justify leading-relaxed mt-4">
@@ -55,9 +52,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           <!-- Stat 1 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-blue-50 text-blue-600 flex items-center justify-center text-3xl rounded-full">
-              <i :class="data?.aboutUs?.happy_icon || 'bi bi-emoji-smile'"></i>
+              <Icon :name="data?.aboutUs?.happy_icon?.startsWith('bi') ? 'lucide:smile' : (data?.aboutUs?.happy_icon || 'lucide:smile')" />
             </div>
             <div>
               <span class="block text-3xl font-extrabold text-[#0f172a]">
@@ -68,9 +65,9 @@
           </div>
 
           <!-- Stat 2 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-amber-50 text-amber-600 flex items-center justify-center text-3xl rounded-full">
-              <i :class="data?.aboutUs?.projects_icon || 'bi bi-journal-richtext'"></i>
+              <Icon :name="data?.aboutUs?.projects_icon?.startsWith('bi') ? 'lucide:briefcase' : (data?.aboutUs?.projects_icon || 'lucide:briefcase')" />
             </div>
             <div>
               <span class="block text-3xl font-extrabold text-[#0f172a]">
@@ -81,9 +78,9 @@
           </div>
 
           <!-- Stat 3 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up" data-aos-delay="300">
+          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl rounded-full">
-              <i :class="data?.aboutUs?.support_icon || 'bi bi-headset'"></i>
+              <Icon :name="data?.aboutUs?.support_icon?.startsWith('bi') ? 'lucide:headset' : (data?.aboutUs?.support_icon || 'lucide:headset')" />
             </div>
             <div>
               <span class="block text-3xl font-extrabold text-[#0f172a]">
@@ -94,9 +91,9 @@
           </div>
 
           <!-- Stat 4 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up" data-aos-delay="400">
+          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
             <div class="w-14 h-14 bg-rose-50 text-rose-600 flex items-center justify-center text-3xl rounded-full">
-              <i :class="data?.aboutUs?.emp_icon || 'bi bi-people'"></i>
+              <Icon :name="data?.aboutUs?.emp_icon?.startsWith('bi') ? 'lucide:hard-hat' : (data?.aboutUs?.emp_icon || 'lucide:hard-hat')" />
             </div>
             <div>
               <span class="block text-3xl font-extrabold text-[#0f172a]">
@@ -115,8 +112,8 @@
       <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
-          <div class="relative overflow-hidden rounded-lg shadow-lg" data-aos="zoom-in" data-aos-delay="100">
-            <img src="/assets/img/alt-services.jpg" alt="Services Detail" class="w-full h-[450px] object-cover" />
+          <div class="relative overflow-hidden rounded-lg shadow-lg" data-aos="zoom-in">
+            <img src="/assets/img/alt-services.jpg" alt="Services Detail" width="600" height="450" loading="lazy" class="w-full h-[450px] object-cover" />
           </div>
 
           <div class="space-y-6">
@@ -127,7 +124,7 @@
               {{ data?.aboutUs?.mission_body || 'Our mission is to establish Cozmic Technology as a trusted, reliable and top-tier provider of engineering consultancy and geotechnical investigation services in the region. We strive to help our clients execute their projects safely and efficiently.' }}
             </p>
             <div class="border-l-4 border-[#feb900] pl-6 py-2 italic text-gray-500 text-sm">
-              "Providing solutions that are secure, stable, and economically sound."
+              "{{ data?.aboutUs?.tagline || 'Providing solutions that are secure, stable, and economically sound.' }}"
             </div>
           </div>
 
@@ -149,8 +146,8 @@
             </p>
           </div>
 
-          <div class="relative overflow-hidden rounded-lg shadow-lg order-1 lg:order-2" data-aos="zoom-in" data-aos-delay="100">
-            <img src="/assets/img/alt-services-2.jpg" alt="Services Detail" class="w-full h-[450px] object-cover" />
+          <div class="relative overflow-hidden rounded-lg shadow-lg order-1 lg:order-2" data-aos="zoom-in">
+            <img src="/assets/img/alt-services-2.jpg" alt="Services Detail" width="600" height="450" loading="lazy" class="w-full h-[450px] object-cover" />
           </div>
 
         </div>
@@ -172,13 +169,14 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-8 md:gap-12">
-          <div v-for="(member, index) in data?.team || []" :key="member.id" class="team-member group w-full max-w-[280px]" data-aos="fade-up" :data-aos-delay="100 * (index + 1)">
+          <div v-for="(member, index) in data?.team || []" :key="member.id" v-memo="[member.id]" class="team-member group w-full max-w-[280px]" data-aos="fade-up" :data-aos-delay="100 * (index + 1)">
             <div class="member-img relative overflow-hidden w-64 h-64 rounded-full mx-auto shadow-md border-4 border-slate-100">
-              <img :src="member.image ? '/assets/img/team/' + member.image : '/assets/img/team/team-1.jpg'" :alt="member.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <!-- P10 — lazy load team photos; explicit dimensions prevent CLS -->
+              <img :src="member.image ? '/assets/img/team/' + member.image : '/assets/img/team/team-1.jpg'" :alt="member.name" width="256" height="256" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="social absolute inset-x-0 bottom-[-40px] h-10 bg-black/60 flex items-center justify-center gap-4 transition-all duration-300 opacity-0 group-hover:bottom-0 group-hover:opacity-100">
-                <a :href="member.fb || '#'" target="_blank"><i class="bi bi-facebook"></i></a>
-                <a :href="member.insta || '#'" target="_blank"><i class="bi bi-instagram"></i></a>
-                <a :href="member.linkedin || '#'" target="_blank"><i class="bi bi-linkedin"></i></a>
+                <a :href="member.fb || '#'" target="_blank"><Icon name="lucide:facebook" /></a>
+                <a :href="member.insta || '#'" target="_blank"><Icon name="lucide:instagram" /></a>
+                <a :href="member.linkedin || '#'" target="_blank"><Icon name="lucide:linkedin" /></a>
               </div>
             </div>
             <div class="p-6 text-center">
@@ -198,5 +196,15 @@
 </template>
 
 <script setup>
-const { data } = await useFetch('/api/about')
+// P15 — Page-specific SEO meta for About page
+useHead({
+  title: 'About Us | Cozmic Technology - Engineering Consultancy',
+  meta: [
+    { name: 'description', content: 'Learn about Cozmic Technology — our story, mission, vision, and the expert team behind Bangladesh\'s trusted geotechnical and engineering consultancy firm.' },
+    { property: 'og:title', content: 'About Cozmic Technology' },
+    { property: 'og:description', content: 'Our mission, vision, and the expert team behind Bangladesh\'s trusted engineering consultancy.' },
+  ]
+})
+
+const { data } = await useFetch('/api/about', { deep: false })
 </script>

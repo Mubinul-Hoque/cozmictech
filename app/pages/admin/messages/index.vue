@@ -11,7 +11,7 @@
           to="/admin/messages/categories" 
           class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm active:scale-95 cursor-pointer"
         >
-          <i class="bi bi-tags-fill"></i>
+          <Icon name="lucide:tags-fill" />
           Manage Categories
         </NuxtLink>
       </div>
@@ -21,7 +21,7 @@
     <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
       <!-- Search Input -->
       <div class="relative w-full md:max-w-md">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="bi bi-search"></i></span>
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><Icon name="lucide:search" /></span>
         <input 
           type="text" 
           v-model="searchTerm" 
@@ -38,7 +38,7 @@
           <option value="">All Categories</option>
           <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
         </select>
-        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 pointer-events-none"><i class="bi bi-chevron-down text-xs"></i></span>
+        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 pointer-events-none"><Icon name="lucide:chevron-down" class="text-xs" /></span>
       </div>
     </div>
 
@@ -95,7 +95,7 @@
           <tr v-if="messages?.length === 0">
             <td colspan="6" class="px-6 py-12 text-center">
               <div class="flex flex-col items-center justify-center text-slate-400">
-                <i class="bi bi-inbox text-5xl mb-4 text-slate-350"></i>
+                <Icon name="lucide:inbox" class="text-5xl mb-4 text-slate-350" />
                 <p class="text-base font-bold text-slate-700">No messages found</p>
                 <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">No messages match search or category criteria.</p>
               </div>
@@ -130,16 +130,17 @@ const { data: messages, pending, refresh } = await useFetch('/api/admin/messages
       search: searchTerm.value,
       catId: filterCategory.value
     }
-  })
+  }),
+  key: 'admin-messages-list'
 })
 
 const deleteMessage = async (id) => {
   if (confirm('Are you sure you want to delete this message?')) {
     try {
-      await $fetch(`/api/admin/messages/${id}`, { method: 'DELETE' })
+      await useNuxtApp().$fetch(`/api/admin/messages/${id}`, { method: 'DELETE' })
       refresh()
     } catch (error) {
-      alert('Failed to delete message.')
+      useToast().error('Failed to delete message.')
     }
   }
 }

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (!id) throw createError({ statusCode: 400, statusMessage: 'Invalid ID' });
 
   // Fetch the target user details to check their role before performing any actions
-  const targetUser = await prisma.user.findUnique({
+  const targetUser = await prisma.users.findUnique({
     where: { id }
   });
   if (!targetUser) throw createError({ statusCode: 404, statusMessage: 'User not found' });
@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
       updateData.password = await bcrypt.hash(password, 12); // Use 12 rounds for a balance of speed/security
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: { id },
       data: updateData
     });
@@ -90,7 +90,8 @@ export default defineEventHandler(async (event) => {
   }
 
   if (event.node.req.method === 'DELETE') {
-    await prisma.user.delete({ where: { id } });
-    return { success: true };
+    await prisma.users.delete({ where: { id } });
+    await clearPublicCache();
+      return { success: true };
   }
 });

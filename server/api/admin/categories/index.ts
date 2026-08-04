@@ -5,9 +5,10 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     try {
-      const categories = await prisma.category.findMany({
+      const categories = await prisma.categories.findMany({
         orderBy: { id: 'asc' }
       })
+      await clearPublicCache();
       return { success: true, data: categories }
     } catch (error: any) {
       console.error('Error fetching categories:', error)
@@ -27,11 +28,12 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Category name exceeds limit of 50 characters' })
       }
 
-      const newCategory = await prisma.category.create({
+      const newCategory = await prisma.categories.create({
         data: {
           name: sanitizePlainText(catName)
         }
       })
+      await clearPublicCache();
       return { success: true, data: newCategory }
     } catch (error: any) {
       console.error('Error creating category:', error)

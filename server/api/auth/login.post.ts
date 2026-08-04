@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Find user by email
-  const user = await prisma.user.findFirst({
+  const user = await prisma.users.findFirst({
     where: { email },
   });
 

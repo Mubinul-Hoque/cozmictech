@@ -8,7 +8,7 @@
       </div>
       <div>
         <span class="px-4 py-2.5 bg-white rounded-2xl shadow-sm border border-slate-200 text-xs font-bold text-slate-600 flex items-center gap-2 hover:shadow-md hover:border-slate-300 transition-all duration-200">
-          <i class="bi bi-calendar3 text-[#feb900]"></i>
+          <Icon name="lucide:calendar3" class="text-[#feb900]" />
           {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
         </span>
       </div>
@@ -34,11 +34,11 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.postsCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-indigo-100 shadow-sm">
-              <i class="bi bi-journal-text text-xl"></i>
+              <Icon name="lucide:book-open-text" class="text-xl" />
             </div>
           </div>
           <div class="mt-6 flex items-center text-xs font-semibold text-indigo-600">
-            <span>Manage publication <i class="bi bi-arrow-right ml-1"></i></span>
+            <span>Manage publication <Icon name="lucide:arrow-right" class="ml-1" /></span>
           </div>
         </NuxtLink>
 
@@ -51,11 +51,11 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.projectsCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-amber-100 shadow-sm">
-              <i class="bi bi-briefcase text-xl"></i>
+              <Icon name="lucide:briefcase" class="text-xl" />
             </div>
           </div>
           <div class="mt-6 flex items-center text-xs font-semibold text-amber-600">
-            <span>Manage cases <i class="bi bi-arrow-right ml-1"></i></span>
+            <span>Manage cases <Icon name="lucide:arrow-right" class="ml-1" /></span>
           </div>
         </NuxtLink>
 
@@ -68,11 +68,11 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.testimonialsCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-emerald-100 shadow-sm">
-              <i class="bi bi-chat-quote text-xl"></i>
+              <Icon name="lucide:message-square-quote" class="text-xl" />
             </div>
           </div>
           <div class="mt-6 flex items-center text-xs font-semibold text-emerald-600">
-            <span>Manage feedback <i class="bi bi-arrow-right ml-1"></i></span>
+            <span>Manage feedback <Icon name="lucide:arrow-right" class="ml-1" /></span>
           </div>
         </NuxtLink>
 
@@ -85,11 +85,11 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.teamCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-purple-100 shadow-sm">
-              <i class="bi bi-people text-xl"></i>
+              <Icon name="lucide:users" class="text-xl" />
             </div>
           </div>
           <div class="mt-6 flex items-center text-xs font-semibold text-purple-600">
-            <span>Manage profiles <i class="bi bi-arrow-right ml-1"></i></span>
+            <span>Manage profiles <Icon name="lucide:arrow-right" class="ml-1" /></span>
           </div>
         </NuxtLink>
 
@@ -104,7 +104,7 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.servicesCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-sky-100 shadow-sm">
-              <i class="bi bi-hdd-network text-xl"></i>
+              <Icon name="lucide:server" class="text-xl" />
             </div>
           </div>
         </NuxtLink>
@@ -117,7 +117,7 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.messagesCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-600 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-slate-100 shadow-sm">
-              <i class="bi bi-envelope text-xl"></i>
+              <Icon name="lucide:mail" class="text-xl" />
             </div>
           </div>
         </NuxtLink>
@@ -130,7 +130,7 @@
               <p class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ stats?.usersCount || 0 }}</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 border border-rose-100 shadow-sm">
-              <i class="bi bi-person-lock text-xl"></i>
+              <Icon name="lucide:user-cog" class="text-xl" />
             </div>
           </div>
         </NuxtLink>
@@ -142,7 +142,7 @@
         
         <div class="max-w-xl relative z-10 space-y-4">
           <span class="inline-flex items-center gap-1.5 bg-[#feb900]/10 border border-[#feb900]/25 text-[#feb900] text-[10px] font-bold tracking-wider uppercase px-3 py-1 rounded-full">
-            <i class="bi bi-info-circle-fill"></i> Content Management System
+            <Icon name="lucide:info" /> Content Management System
           </span>
           <h3 class="text-xl sm:text-2xl font-bold tracking-tight">Operational Guide</h3>
           <p class="text-slate-400 text-sm leading-relaxed text-justify">
@@ -163,6 +163,7 @@ definePageMeta({
 const headers = useRequestHeaders(['cookie']);
 const { data: stats, pending } = useFetch('/api/admin/dashboard/stats', {
   lazy: true,
-  headers
+  headers,
+  key: 'admin-stats'
 });
 </script>

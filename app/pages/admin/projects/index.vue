@@ -13,7 +13,7 @@
           class="group relative inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-[#feb900] hover:bg-[#e5a600] border border-transparent rounded-full shadow-sm hover:shadow-md focus:outline-none cursor-pointer" 
           style="color: #1e293b;"
         >
-          <i class="bi bi-plus-lg mr-2 group-hover:rotate-90 transition-transform duration-200"></i>
+          <Icon name="lucide:plus" class="mr-2 group-hover:rotate-90 transition-transform duration-200" />
           Add Project
         </NuxtLink>
         <button 
@@ -21,14 +21,14 @@
           @click="openCategoryModal()" 
           class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all bg-[#feb900] hover:bg-[#e5a600] text-slate-900 border border-transparent rounded-full shadow-sm cursor-pointer"
         >
-          <i class="bi bi-plus-lg mr-2"></i> Add Category
+          <Icon name="lucide:plus" class="mr-2" /> Add Category
         </button>
         <button 
           v-if="activeTab === 'sectors'"
           @click="openSectorModal()" 
           class="inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all bg-[#feb900] hover:bg-[#e5a600] text-slate-900 border border-transparent rounded-full shadow-sm cursor-pointer"
         >
-          <i class="bi bi-plus-lg mr-2"></i> Add Sector
+          <Icon name="lucide:plus" class="mr-2" /> Add Sector
         </button>
       </div>
     </div>
@@ -61,7 +61,7 @@
     <!-- Success / Error Feedback Banner -->
     <div v-if="feedbackMsg" class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-emerald-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-check-circle-fill text-emerald-500 text-lg"></i>
+        <Icon name="lucide:check-circle-fill" class="text-emerald-500 text-lg" />
         <span class="font-bold text-slate-700">{{ feedbackMsg }}</span>
       </div>
     </div>
@@ -80,7 +80,7 @@
       <div class="p-5 border-b border-slate-200 bg-slate-50/40 flex flex-col sm:flex-row gap-4 justify-between items-center">
         <div class="relative max-w-sm w-full">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <i class="bi bi-search text-slate-400"></i>
+            <Icon name="lucide:search" class="text-slate-400" />
           </div>
           <input 
             v-model="searchQuery" 
@@ -127,7 +127,7 @@
           >
             <option value="">All Statuses</option>
             <option value="Completed">Completed</option>
-            <option value="In Progress">In Progress</option>
+            <option value="Ongoing">Ongoing</option>
           </select>
         </div>
       </div>
@@ -147,8 +147,8 @@
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-12 w-12 rounded-xl border border-slate-200 overflow-hidden shadow-sm bg-slate-50 flex items-center justify-center">
-                    <img v-if="project.images" :src="`/assets/img/projects/${project.images.split(',')[0].trim()}`" class="h-12 w-12 object-cover transition-transform duration-300 group-hover:scale-105" @error="$event.target.src='/assets/img/placeholder.jpg'" />
-                    <i v-else class="bi bi-image text-slate-300 text-xl"></i>
+                    <img v-if="project.images && project.images.length > 0" :src="`/assets/img/projects/${project.images[0]}`" class="h-12 w-12 object-cover transition-transform duration-300 group-hover:scale-105" @error="$event.target.src='/assets/img/placeholder.jpg'" />
+                    <Icon v-else name="lucide:image" class="text-slate-300 text-xl" />
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-bold text-[#364d59] group-hover:text-slate-900 transition-colors">{{ project.title }}</div>
@@ -171,10 +171,10 @@
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                   <NuxtLink :to="`/admin/projects/${project.id}`" class="w-9 h-9 flex items-center justify-center text-slate-450 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-all duration-150" title="Edit Project">
-                    <i class="bi bi-pencil-square text-base"></i>
+                    <Icon name="lucide:edit" class="text-base" />
                   </NuxtLink>
                   <button @click="deleteProject(project.id)" class="w-9 h-9 flex items-center justify-center text-slate-450 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-150" title="Delete Project">
-                    <i class="bi bi-trash3 text-base"></i>
+                    <Icon name="lucide:trash-2" class="text-base" />
                   </button>
                 </div>
               </td>
@@ -182,7 +182,7 @@
             <tr v-if="projectsData?.data?.length === 0">
               <td colspan="3" class="px-6 py-12 text-center">
                 <div class="flex flex-col items-center justify-center text-slate-400">
-                  <i class="bi bi-inbox text-5xl mb-4 text-slate-350"></i>
+                  <Icon name="lucide:inbox" class="text-5xl mb-4 text-slate-350" />
                   <p class="text-base font-bold text-slate-700">No projects found</p>
                   <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">Try resetting filters or write another query.</p>
                 </div>
@@ -225,7 +225,7 @@
         <div class="animate-spin rounded-full h-8 w-8 border-4 border-slate-100 border-t-[#feb900]"></div>
       </div>
       <div v-else-if="!categories?.data?.length" class="text-center py-20 text-slate-400">
-        <i class="bi bi-tags text-4xl mb-4 block"></i>
+        <Icon name="lucide:tags" class="text-4xl mb-4 block" />
         <p class="font-semibold text-slate-700">No project categories found</p>
       </div>
       <div v-else class="overflow-x-auto">
@@ -243,8 +243,8 @@
               <td class="px-6 py-4 font-bold text-slate-800">{{ cat.name }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-center">
                 <div class="inline-flex gap-2">
-                  <button @click="openCategoryModal(cat)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><i class="bi bi-pencil"></i></button>
-                  <button @click="deleteCategory(cat.id)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><i class="bi bi-trash"></i></button>
+                  <button @click="openCategoryModal(cat)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><Icon name="lucide:pencil" /></button>
+                  <button @click="deleteCategory(cat.id)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><Icon name="lucide:trash-2" /></button>
                 </div>
               </td>
             </tr>
@@ -259,7 +259,7 @@
         <div class="animate-spin rounded-full h-8 w-8 border-4 border-slate-100 border-t-[#feb900]"></div>
       </div>
       <div v-else-if="!sectors?.data?.length" class="text-center py-20 text-slate-400">
-        <i class="bi bi-grid text-4xl mb-4 block"></i>
+        <Icon name="lucide:layout-grid" class="text-4xl mb-4 block" />
         <p class="font-semibold text-slate-700">No sectors found</p>
       </div>
       <div v-else class="overflow-x-auto">
@@ -277,8 +277,8 @@
               <td class="px-6 py-4 font-bold text-slate-800">{{ sec.sector }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-center">
                 <div class="inline-flex gap-2">
-                  <button @click="openSectorModal(sec)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><i class="bi bi-pencil"></i></button>
-                  <button @click="deleteSector(sec.id)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><i class="bi bi-trash"></i></button>
+                  <button @click="openSectorModal(sec)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><Icon name="lucide:pencil" /></button>
+                  <button @click="deleteSector(sec.id)" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center border border-slate-200 transition-colors cursor-pointer"><Icon name="lucide:trash-2" /></button>
                 </div>
               </td>
             </tr>
@@ -288,44 +288,48 @@
     </div>
 
     <!-- Category Modal -->
-    <div v-if="showCatModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
-        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-800">{{ editingCategory ? 'Edit Category' : 'Add Category' }}</h3>
-          <button @click="showCatModal = false" class="text-slate-400 hover:text-slate-700 text-lg focus:outline-none cursor-pointer"><i class="bi bi-x-lg"></i></button>
+    <Teleport to="body">
+      <div v-if="showCatModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-800">{{ editingCategory ? 'Edit Category' : 'Add Category' }}</h3>
+            <button @click="showCatModal = false" class="text-slate-400 hover:text-slate-700 text-lg focus:outline-none cursor-pointer"><Icon name="lucide:x-lg" /></button>
+          </div>
+          <form @submit.prevent="saveCategory" class="space-y-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Category Name *</label>
+              <input type="text" v-model="catForm.name" required placeholder="e.g. Bridges & Highways" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+            <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <button type="button" @click="showCatModal = false" class="px-4 py-2 border border-slate-300 rounded-full text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer">Cancel</button>
+              <button type="submit" class="px-4 py-2 bg-[#feb900] hover:bg-amber-500 text-slate-900 font-bold rounded-full text-xs cursor-pointer">Save Category</button>
+            </div>
+          </form>
         </div>
-        <form @submit.prevent="saveCategory" class="space-y-4">
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Category Name *</label>
-            <input type="text" v-model="catForm.name" required placeholder="e.g. Bridges & Highways" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm" />
-          </div>
-          <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
-            <button type="button" @click="showCatModal = false" class="px-4 py-2 border border-slate-300 rounded-full text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-[#feb900] hover:bg-amber-500 text-slate-900 font-bold rounded-full text-xs cursor-pointer">Save Category</button>
-          </div>
-        </form>
       </div>
-    </div>
+    </Teleport>
 
     <!-- Sector Modal -->
-    <div v-if="showSecModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
-        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-800">{{ editingSector ? 'Edit Sector' : 'Add Sector' }}</h3>
-          <button @click="showSecModal = false" class="text-slate-400 hover:text-slate-700 text-lg focus:outline-none cursor-pointer"><i class="bi bi-x-lg"></i></button>
+    <Teleport to="body">
+      <div v-if="showSecModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-100">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-800">{{ editingSector ? 'Edit Sector' : 'Add Sector' }}</h3>
+            <button @click="showSecModal = false" class="text-slate-400 hover:text-slate-700 text-lg focus:outline-none cursor-pointer"><Icon name="lucide:x-lg" /></button>
+          </div>
+          <form @submit.prevent="saveSector" class="space-y-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Sector Name *</label>
+              <input type="text" v-model="secForm.sector" required placeholder="e.g. Geotechnical" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+            <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <button type="button" @click="showSecModal = false" class="px-4 py-2 border border-slate-300 rounded-full text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer">Cancel</button>
+              <button type="submit" class="px-4 py-2 bg-[#feb900] hover:bg-amber-500 text-slate-900 font-bold rounded-full text-xs cursor-pointer">Save Sector</button>
+            </div>
+          </form>
         </div>
-        <form @submit.prevent="saveSector" class="space-y-4">
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Sector Name *</label>
-            <input type="text" v-model="secForm.sector" required placeholder="e.g. Geotechnical" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm" />
-          </div>
-          <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
-            <button type="button" @click="showSecModal = false" class="px-4 py-2 border border-slate-300 rounded-full text-xs font-bold text-slate-650 hover:bg-slate-50 cursor-pointer">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-[#feb900] hover:bg-amber-500 text-slate-900 font-bold rounded-full text-xs cursor-pointer">Save Sector</button>
-          </div>
-        </form>
       </div>
-    </div>
+    </Teleport>
 
   </div>
 </template>
@@ -366,6 +370,7 @@ const { data: projectsData, pending, refresh: refreshProjects } = useFetch('/api
     sectorId: selectedSector
   },
   headers,
+  key: 'admin-projects-list',
   watch: [currentPage, debouncedSearch, selectedStatus, selectedCategory, selectedSector]
 });
 
@@ -386,12 +391,13 @@ watch([selectedStatus, selectedCategory, selectedSector], () => {
 const deleteProject = async (id) => {
   if (confirm('Are you sure you want to delete this project?')) {
     try {
-      await $fetch(`/api/admin/projects/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/projects/${id}`, { method: 'DELETE' });
       feedbackMsg.value = 'Project successfully deleted.';
       setTimeout(() => feedbackMsg.value = '', 4000);
+      clearNuxtData();
       refreshProjects();
     } catch (error) {
-      alert('Failed to delete project.');
+      useToast().error('Failed to delete project.');
     }
   }
 };
@@ -419,25 +425,27 @@ const saveCategory = async () => {
   const url = editingCategory.value ? `/api/admin/categories/${editingCategory.value.id}` : '/api/admin/categories';
   const method = editingCategory.value ? 'PUT' : 'POST';
   try {
-    await $fetch(url, { method, body: catForm });
+    await useNuxtApp().$fetch(url, { method, body: catForm });
     feedbackMsg.value = editingCategory.value ? 'Category successfully updated.' : 'Category successfully created.';
     setTimeout(() => feedbackMsg.value = '', 4000);
     showCatModal.value = false;
+    clearNuxtData();
     refreshCategories();
   } catch (error) {
-    alert(error.data?.statusMessage || 'Failed to save category');
+    useToast().error(error.data?.statusMessage || 'Failed to save category');
   }
 };
 
 const deleteCategory = async (id) => {
   if (confirm('Are you sure you want to delete this category?')) {
     try {
-      await $fetch(`/api/admin/categories/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/categories/${id}`, { method: 'DELETE' });
       feedbackMsg.value = 'Category successfully deleted.';
       setTimeout(() => feedbackMsg.value = '', 4000);
+      clearNuxtData();
       refreshCategories();
     } catch (error) {
-      alert('Failed to delete category.');
+      useToast().error('Failed to delete category.');
     }
   }
 };
@@ -471,25 +479,27 @@ const saveSector = async () => {
   const url = editingSector.value ? `/api/admin/sectors/${editingSector.value.id}` : '/api/admin/sectors';
   const method = editingSector.value ? 'PUT' : 'POST';
   try {
-    await $fetch(url, { method, body: secForm });
+    await useNuxtApp().$fetch(url, { method, body: secForm });
     feedbackMsg.value = editingSector.value ? 'Sector successfully updated.' : 'Sector successfully created.';
     setTimeout(() => feedbackMsg.value = '', 4000);
     showSecModal.value = false;
+    clearNuxtData();
     refreshSectors();
   } catch (error) {
-    alert(error.data?.statusMessage || 'Failed to save sector');
+    useToast().error(error.data?.statusMessage || 'Failed to save sector');
   }
 };
 
 const deleteSector = async (id) => {
   if (confirm('Are you sure you want to delete this sector? All associated categories may lose their link.')) {
     try {
-      await $fetch(`/api/admin/sectors/${id}`, { method: 'DELETE' });
+      await useNuxtApp().$fetch(`/api/admin/sectors/${id}`, { method: 'DELETE' });
       feedbackMsg.value = 'Sector successfully deleted.';
       setTimeout(() => feedbackMsg.value = '', 4000);
+      clearNuxtData();
       refreshSectors();
     } catch (error) {
-      alert('Failed to delete sector.');
+      useToast().error('Failed to delete sector.');
     }
   }
 };

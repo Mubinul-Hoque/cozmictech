@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     try {
-      const member = await prisma.team.findUnique({ where: { id } });
+      const member = await prisma.team_members.findUnique({ where: { id } });
       if (!member) throw createError({ statusCode: 404, statusMessage: 'Team member not found' });
       return member;
     } catch (error: any) {
@@ -30,28 +30,31 @@ export default defineEventHandler(async (event) => {
       const fb = String(body.fb || '').trim();
       const insta = String(body.insta || '').trim();
       const linkedin = String(body.linkedin || '').trim();
+      const twitter = String(body.twitter || '').trim();
 
       // Enforce database limits
       if (
-        name.length > 50 || designation.length > 50 || message.length > 500 ||
-        image.length > 100 || fb.length > 255 || insta.length > 255 || linkedin.length > 255
+        name.length > 100 || designation.length > 100 || message.length > 1000 ||
+        image.length > 255 || fb.length > 255 || insta.length > 255 || linkedin.length > 255 || twitter.length > 255
       ) {
         throw createError({ statusCode: 400, statusMessage: 'Input exceeds database length limit' });
       }
 
-      const member = await prisma.team.update({
+      const member = await prisma.team_members.update({
         where: { id },
         data: {
           name: sanitizePlainText(name),
           designation: sanitizePlainText(designation),
           message: sanitizePlainText(message),
           image: sanitizePlainText(image),
-          fb: sanitizePlainText(fb),
-          insta: sanitizePlainText(insta),
-          linkedin: sanitizePlainText(linkedin)
+          facebook_url: fb ? sanitizePlainText(fb) : null,
+          instagram_url: insta ? sanitizePlainText(insta) : null,
+          linkedin_url: linkedin ? sanitizePlainText(linkedin) : null,
+          twitter_url: twitter ? sanitizePlainText(twitter) : null
         }
       });
 
+      await clearPublicCache();
       return { success: true, member };
     } catch (error: any) {
       throw createError({ statusCode: error.statusCode || 500, statusMessage: error.statusMessage || 'Failed to update team member' });
@@ -60,7 +63,8 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'DELETE') {
     try {
-      await prisma.team.delete({ where: { id } });
+      await prisma.team_members.delete({ where: { id } });
+      await clearPublicCache();
       return { success: true };
     } catch (error) {
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete team member' });

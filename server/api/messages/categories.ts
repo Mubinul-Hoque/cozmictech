@@ -3,8 +3,8 @@ import { prisma } from '../../utils/prisma'
 export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
     try {
-      const categories = await prisma.message_category.findMany({
-        where: { active: true },
+      const categories = await prisma.categories.findMany({
+        where: { type: 'message' },
         orderBy: { name: 'asc' }
       })
       return { success: true, data: categories }

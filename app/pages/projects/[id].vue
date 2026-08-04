@@ -5,15 +5,13 @@
       <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-[#0f172a]/95 z-0"></div>
       
       <div class="container mx-auto px-4 md:px-8 relative text-center z-10" data-aos="fade-down">
-        <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight uppercase line-clamp-1">
-          {{ data?.project?.title || 'Project Details' }}
-        </h2>
-        <ol class="flex justify-center items-center gap-2 text-xs md:text-sm text-[#feb900] font-semibold tracking-wider uppercase bg-black/30 backdrop-blur-md px-4 py-2 rounded-full w-fit mx-auto border border-white/10">
+        <h3 class="text-base md:text-xl font-extrabold text-white mb-4 tracking-tight uppercase line-clamp-1">
+          Project Details
+        </h3>
+        <ol class="inline-flex w-fit flex-wrap justify-center items-center gap-2 text-[10px] md:text-xs text-[#feb900] font-semibold tracking-wider uppercase bg-black/30 backdrop-blur-md px-4 py-2 rounded-full max-w-full mx-auto border border-white/10">
           <li><NuxtLink to="/" class="text-white/80 hover:text-[#feb900] transition-colors">Home</NuxtLink></li>
-          <li class="text-white/40"><i class="bi bi-chevron-right text-[10px]"></i></li>
+          <li class="text-white/40"><Icon name="lucide:chevron-right" class="text-[10px]" /></li>
           <li><NuxtLink to="/projects" class="text-white/80 hover:text-[#feb900] transition-colors">Projects</NuxtLink></li>
-          <li class="text-white/40"><i class="bi bi-chevron-right text-[10px]"></i></li>
-          <li class="text-gray-300 truncate max-w-[200px]">{{ data?.project?.title }}</li>
         </ol>
       </div>
     </div>
@@ -22,15 +20,25 @@
     <section class="py-16">
       <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
         
+        <!-- Project Title Header -->
+        <div class="mb-10">
+          <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-3 tracking-tight">{{ data?.project?.title }}</h1>
+          <div class="flex items-center gap-2 text-slate-500 font-medium mb-4" v-if="data?.project?.location">
+            <Icon name="lucide:map-pin" class="text-[#feb900] text-lg" />
+            <span>{{ data.project.location }}</span>
+          </div>
+          <div class="w-16 h-1.5 bg-[#feb900]"></div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
           <!-- Left Content Area (Image Gallery & Description) -->
-          <div class="lg:col-span-8 space-y-12">
-            
+          <div class="lg:col-span-8 space-y-8">
+
             <!-- Dynamic Image Gallery Slider -->
             <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm p-4 space-y-4">
               <!-- Main Image Display -->
-              <div class="relative overflow-hidden rounded-2xl h-[350px] md:h-[480px] bg-slate-900 group">
+              <div class="relative overflow-hidden rounded-2xl h-[350px] md:h-[480px] bg-slate-100 group">
                 <div class="w-full h-full relative" v-if="sliderImages.length">
                   <div 
                     v-for="(img, idx) in sliderImages" 
@@ -60,7 +68,7 @@
                   class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/40 hover:bg-[#feb900] text-white hover:text-[#0f172a] flex items-center justify-center transition-all duration-300 z-20 border border-white/10 hover:border-transparent"
                   aria-label="Previous Slide"
                 >
-                  <i class="bi bi-chevron-left text-lg"></i>
+                  <Icon name="lucide:chevron-left" class="text-lg" />
                 </button>
                 <button 
                   v-if="sliderImages.length > 1"
@@ -68,7 +76,7 @@
                   class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/40 hover:bg-[#feb900] text-white hover:text-[#0f172a] flex items-center justify-center transition-all duration-300 z-20 border border-white/10 hover:border-transparent"
                   aria-label="Next Slide"
                 >
-                  <i class="bi bi-chevron-right text-lg"></i>
+                  <Icon name="lucide:chevron-right" class="text-lg" />
                 </button>
 
                 <!-- Fullscreen Overlay Trigger -->
@@ -77,7 +85,7 @@
                   class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 hover:bg-[#feb900] text-white hover:text-[#0f172a] flex items-center justify-center transition-all duration-300 z-20 border border-white/10 hover:border-transparent opacity-0 group-hover:opacity-100"
                   title="View Fullscreen"
                 >
-                  <i class="bi bi-arrows-angle-expand text-sm"></i>
+                  <Icon name="lucide:arrows-angle-expand" class="text-sm" />
                 </button>
               </div>
 
@@ -87,7 +95,7 @@
                   v-for="(img, idx) in sliderImages" 
                   :key="idx"
                   @click="activeSlideIdx = idx"
-                  class="w-20 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 flex-shrink-0 bg-slate-900"
+                  class="w-20 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 flex-shrink-0 bg-slate-100"
                   :class="idx === activeSlideIdx ? 'border-[#feb900] ring-4 ring-[#feb900]/10 scale-105 shadow-sm' : 'border-gray-200 opacity-60 hover:opacity-100'"
                 >
                   <img :src="img" alt="Thumbnail" class="w-full h-full object-cover" />
@@ -133,13 +141,13 @@
                 >
                   <div class="relative h-[160px] overflow-hidden bg-slate-900">
                     <img 
-                      :src="rel.images ? '/assets/img/projects/' + rel.images : '/assets/img/projects/remodeling-1.jpg'" 
+                      :src="rel.images && rel.images.length > 0 ? '/assets/img/projects/' + rel.images[0] : '/assets/img/projects/remodeling-1.jpg'" 
                       :alt="rel.title" 
                       class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <NuxtLink :to="'/projects/' + rel.id" class="w-10 h-10 rounded-full bg-[#feb900] text-[#0f172a] flex items-center justify-center">
-                        <i class="bi bi-arrow-right text-lg"></i>
+                        <Icon name="lucide:arrow-right" class="text-lg" />
                       </NuxtLink>
                     </div>
                   </div>
@@ -158,28 +166,28 @@
           <!-- Right Sidebar (Sticky Metadata Card) -->
           <div class="lg:col-span-4 lg:sticky lg:top-28 space-y-6">
             
-            <div class="bg-[#0f172a] text-white border border-white/5 p-8 rounded-3xl shadow-xl space-y-6 relative overflow-hidden">
+            <div class="bg-white text-slate-800 border border-gray-100 p-8 rounded-3xl shadow-sm space-y-6 relative overflow-hidden">
               <!-- Grid background details -->
-              <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/10 via-transparent to-white/5 opacity-40 z-0"></div>
+              <div class="absolute inset-0 bg-gradient-to-tr from-slate-50 via-transparent to-slate-50/50 opacity-40 z-0"></div>
               
-              <h3 class="font-extrabold text-lg tracking-wider uppercase border-b border-white/10 pb-4 flex items-center gap-2 relative z-10">
-                <i class="bi bi-info-circle-fill text-[#feb900]"></i>
+              <h3 class="font-extrabold text-lg tracking-wider uppercase border-b border-gray-100 pb-4 flex items-center gap-2 relative z-10 text-[#2e3135]">
+                <Icon name="lucide:info" class="text-[#feb900]" />
                 <span>Specifications</span>
               </h3>
 
               <div class="space-y-5 relative z-10">
                 <!-- Categories -->
                 <div class="flex items-start gap-4" v-if="data?.categories?.length">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-tags"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:tags" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Categories</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Categories</span>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <span 
                         v-for="cat in data.categories" 
                         :key="cat.id"
-                        class="inline-block bg-white/10 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-white/5"
+                        class="inline-block bg-gray-100 text-gray-700 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-gray-200/50"
                       >
                         {{ cat.name }}
                       </span>
@@ -189,78 +197,80 @@
 
                 <!-- Sector -->
                 <div class="flex items-start gap-4" v-if="data?.sector?.sector">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-grid"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:layout-grid" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Sector</span>
-                    <span class="text-sm font-bold text-white">{{ data.sector.sector }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Sector</span>
+                    <span class="text-sm font-bold text-slate-800">{{ data.sector.sector }}</span>
                   </div>
                 </div>
 
                 <!-- Client -->
                 <div class="flex items-start gap-4" v-if="data?.client?.client_name">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-person-badge"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:id-card" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Client</span>
-                    <span class="text-sm font-bold text-white">{{ data.client.client_name }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Client</span>
+                    <span class="text-sm font-bold text-slate-800">{{ data.client.client_name }}</span>
                   </div>
                 </div>
 
-                <!-- Location -->
-                <div class="flex items-start gap-4" v-if="data?.project?.location">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-geo-alt"></i>
-                  </div>
-                  <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Location</span>
-                    <span class="text-sm font-bold text-white">{{ data.project.location }}</span>
-                  </div>
-                </div>
+
 
                 <!-- Project Cost -->
                 <div class="flex items-start gap-4" v-if="data?.project?.project_cost">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-cash-stack"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:banknote" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Est. Cost</span>
-                    <span class="text-sm font-bold text-white">{{ data.project.project_cost }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Est. Cost</span>
+                    <span class="text-sm font-bold text-slate-800">{{ data.project.project_cost }}</span>
                   </div>
                 </div>
 
                 <!-- Area -->
                 <div class="flex items-start gap-4" v-if="data?.project?.area">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-aspect-ratio"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:scaling" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Total Area</span>
-                    <span class="text-sm font-bold text-white">{{ data.project.area }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Total Area</span>
+                    <span class="text-sm font-bold text-slate-800">{{ data.project.area }}</span>
                   </div>
                 </div>
 
                 <!-- Height -->
                 <div class="flex items-start gap-4" v-if="data?.project?.height">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-building"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:building-2" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Height / Floors</span>
-                    <span class="text-sm font-bold text-white">{{ data.project.height }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Height / Floors</span>
+                    <span class="text-sm font-bold text-slate-800">{{ data.project.height }}</span>
+                  </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="flex items-start gap-4" v-if="formattedTimeline">
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:calendar" />
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Timeline</span>
+                    <span class="text-sm font-bold text-slate-800">{{ formattedTimeline }}</span>
                   </div>
                 </div>
 
                 <!-- Status -->
                 <div class="flex items-start gap-4" v-if="data?.project?.status">
-                  <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <i class="bi bi-check-circle"></i>
+                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
+                    <Icon name="lucide:check-circle-2" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-gray-400 uppercase tracking-widest block">Execution Status</span>
-                    <span class="inline-block text-xs font-bold uppercase px-2.5 py-1 bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/25 mt-1">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Execution Status</span>
+                    <span class="inline-block text-xs font-bold uppercase px-2.5 py-1 bg-emerald-500/10 text-emerald-600 rounded-md border border-emerald-500/25 mt-1">
                       {{ data.project.status }}
                     </span>
                   </div>
@@ -268,49 +278,35 @@
               </div>
 
               <!-- Pagination / Custom Project Navigation -->
-              <div class="border-t border-white/10 pt-6 flex items-center justify-between gap-4 relative z-10">
+              <div class="border-t border-gray-100 pt-6 flex items-center justify-between gap-4 relative z-10">
                 <NuxtLink 
                   v-if="data?.prevProjectId"
                   :to="'/projects/' + data.prevProjectId" 
-                  class="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-[#feb900] transition-colors"
+                  class="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#feb900] transition-colors"
                   title="Previous Project"
                 >
-                  <i class="bi bi-arrow-left"></i> Prev
+                  <Icon name="lucide:arrow-left" /> Prev
                 </NuxtLink>
-                <span v-else class="text-xs text-gray-600 cursor-not-allowed">First</span>
+                <span v-else class="text-xs text-slate-400 cursor-not-allowed">First</span>
 
                 <NuxtLink 
                   to="/projects" 
-                  class="w-9 h-9 rounded-xl bg-white/5 hover:bg-[#feb900] text-white hover:text-[#0f172a] flex items-center justify-center transition-all duration-300 border border-white/10 hover:border-transparent"
+                  class="w-9 h-9 rounded-xl bg-slate-50 hover:bg-[#feb900] text-slate-500 hover:text-[#0f172a] flex items-center justify-center transition-all duration-300 border border-gray-100 hover:border-transparent"
                   title="View All Projects"
                 >
-                  <i class="bi bi-grid-3x3-gap-fill text-xs"></i>
+                  <Icon name="lucide:layout-grid" class="text-xs" />
                 </NuxtLink>
 
                 <NuxtLink 
                   v-if="data?.nextProjectId"
                   :to="'/projects/' + data.nextProjectId" 
-                  class="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-[#feb900] transition-colors"
+                  class="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#feb900] transition-colors"
                   title="Next Project"
                 >
-                  Next <i class="bi bi-arrow-right"></i>
+                  Next <Icon name="lucide:arrow-right" />
                 </NuxtLink>
-                <span v-else class="text-xs text-gray-600 cursor-not-allowed">Last</span>
+                <span v-else class="text-xs text-slate-400 cursor-not-allowed">Last</span>
               </div>
-            </div>
-
-            <!-- Technical Consultant Call To Action Card -->
-            <div class="bg-amber-50 border border-amber-200/60 p-8 rounded-3xl space-y-4 shadow-sm">
-              <h4 class="font-extrabold text-lg text-[#0f172a]">Need Expert Input?</h4>
-              <p class="text-xs text-gray-600 leading-relaxed">
-                Our consultancy board is prepared to address your geotechnical, engineering, and supervisory requirements immediately.
-              </p>
-              <NuxtLink 
-                to="/contact" 
-                class="inline-block bg-[#0f172a] hover:bg-[#feb900] hover:text-[#0f172a] text-white text-center text-xs font-bold uppercase tracking-wider py-4.5 rounded-2xl transition-all duration-300 w-full shadow-md hover:shadow-lg"
-              >
-                Connect With Engineers
-              </NuxtLink>
             </div>
 
           </div>
@@ -330,7 +326,7 @@
         class="absolute top-6 right-6 text-white text-3xl hover:text-[#feb900] focus:outline-none bg-white/10 hover:bg-white/20 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
         @click="closeFullscreen"
       >
-        <i class="bi bi-x"></i>
+        <Icon name="lucide:x" />
       </button>
 
       <img 
@@ -353,12 +349,28 @@ const { data } = await useFetch(() => `/api/projects/${projectId.value}`)
 const activeSlideIdx = ref(0)
 const fullscreenOpen = ref(false)
 
+const formattedTimeline = computed(() => {
+  const p = data.value?.project
+  if (!p) return ''
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  }
+
+  const start = formatDate(p.start_date)
+  const end = formatDate(p.end_date)
+  
+  if (start && end) return `${start} - ${end}`
+  if (start) return `${start} - Present`
+  if (end) return `Completed by ${end}`
+  return ''
+})
+
 const sliderImages = computed(() => {
-  if (!data.value?.project) return []
-  const imgs = []
-  const { images } = data.value.project
-  if (images) imgs.push(images)
-  return imgs.map(name => `/assets/img/projects/${name}`)
+  if (!data.value?.project || !data.value.project.images || !Array.isArray(data.value.project.images)) return []
+  return data.value.project.images.map(name => `/assets/img/projects/${name}`)
 })
 
 const currentSlideUrl = computed(() => {

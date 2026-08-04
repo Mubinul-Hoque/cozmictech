@@ -1,87 +1,52 @@
 import { prisma } from '../utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
-    const [contactInfo, socials, homepage] = await Promise.all([
-      prisma.contact.findFirst({
-        select: {
-          id: true,
-          sec_title: true,
-          company_title: true,
-          address: true,
-          phone: true,
-          cell: true,
-          email: true,
-          email2: true,
-          map: true
-        }
-      }),
-      prisma.social.findMany(),
-      prisma.homepage.findFirst({
-        select: {
-          company_title: true,
-          logo: true,
-          favicon: true,
-          theme: true
-        }
-      })
-    ])
-    
-    const socialMap: any = {
-      twitter: '#',
-      fb: '#',
-      insta: '#',
-      linkedin: '#'
-    }
-    socials.forEach(s => {
-      if (s.name?.toLowerCase() === 'twitter') socialMap.twitter = s.link || '#'
-      if (s.name?.toLowerCase() === 'facebook') socialMap.fb = s.link || '#'
-      if (s.name?.toLowerCase() === 'instagram') socialMap.insta = s.link || '#'
-      if (s.name?.toLowerCase() === 'linkedin') socialMap.linkedin = s.link || '#'
+export default defineCachedEventHandler(async (_event) => {
+  const [allSettings, socials, services, aboutStorySec] = await Promise.all([
+    prisma.settings.findMany(),
+    prisma.social_links.findMany(),
+    prisma.services.findMany({
+      select: { id: true, name: true }
+    }),
+    prisma.page_sections.findFirst({
+      where: { page_slug: 'about', section_key: 'our_story' }
     })
+  ])
 
-    return {
-      contact: contactInfo || {
-        address: '8/19, Sir Sayed Ahmed Road, Block-A, Mohammadpur, Dhaka-1207, Bangladesh',
-        phone: '+88 01894932401',
-        cell: '+88 01894932401',
-        email: 'info@cozmictech.com',
-        email2: 'info@cozmictech.com',
-        company_title: 'Cozmic Technology',
-        sec_title: 'Contact'
-      },
-      social: socialMap,
-      homepage: homepage || {
-        company_title: 'Cozmic Technology',
-        logo: '',
-        favicon: '',
-        theme: 'theme-default'
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching common data:', error)
-    return {
-      contact: {
-        address: '8/19, Sir Sayed Ahmed Road, Block-A, Mohammadpur, Dhaka-1207, Bangladesh',
-        phone: '+88 01894932401',
-        cell: '+88 01894932401',
-        email: 'info@cozmictech.com',
-        email2: 'info@cozmictech.com',
-        company_title: 'Cozmic Technology',
-        sec_title: 'Contact'
-      },
-      social: {
-        twitter: '#',
-        fb: '#',
-        insta: '#',
-        linkedin: '#'
-      },
-      homepage: {
-        company_title: 'Cozmic Technology',
-        logo: '',
-        favicon: '',
-        theme: 'theme-default'
-      }
-    }
+  const settingsMap: Record<string, string> = {}
+  allSettings.forEach(s => settingsMap[s.setting_key] = s.setting_value || '')
+
+  const socialMap: Record<string, string> = { twitter: '#', fb: '#', insta: '#', linkedin: '#' }
+  socials.forEach(s => {
+    const name = s.platform_name?.toLowerCase()
+    if (name === 'twitter') socialMap.twitter = s.url || '#'
+    if (name === 'facebook') socialMap.fb = s.url || '#'
+    if (name === 'instagram') socialMap.insta = s.url || '#'
+    if (name === 'linkedin') socialMap.linkedin = s.url || '#'
+  })
+
+  return {
+    contact: {
+      address: settingsMap['contact_address'] || '8/19, Sir Sayed Ahmed Road, Block-A, Mohammadpur, Dhaka-1207, Bangladesh',
+      phone: settingsMap['contact_phone'] || '+88 01894932401', 
+      cell: settingsMap['contact_cell'] || '+88 01894932401',
+      email: settingsMap['contact_email'] || 'info@cozmictech.com', 
+      email2: settingsMap['contact_email2'] || 'info@cozmictech.com',
+      company_title: settingsMap['company_title'] || 'Cozmic Technology', 
+      sec_title: 'Contact',
+      map: settingsMap['contact_map'] || ''
+    },
+    social: socialMap,
+    homepage: { 
+      company_title: settingsMap['company_title'] || 'Cozmic Technology', 
+      logo: settingsMap['logo'] || '', 
+      favicon: settingsMap['favicon'] || '', 
+      theme: settingsMap['theme'] || 'theme-default' 
+    },
+    services: services || [],
+    aboutUs: aboutStorySec ? { story_body: aboutStorySec.content } : null
   }
+}, {
+  maxAge: 60, // 1-minute TTL — shared header/footer data
+  name: 'common-data',
+  getKey: () => 'common-v2'
 })

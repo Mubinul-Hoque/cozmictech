@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
     const whereClause: any = {}
     if (catId) {
-      whereClause.message_cat_id = catId
+      whereClause.category_id = catId
     }
     if (search) {
       whereClause.OR = [
@@ -25,13 +25,23 @@ export default defineEventHandler(async (event) => {
         name: true,
         email: true,
         subject: true,
-        status: true,
-        date: true,
-        message_cat_id: true,
-        category: true
+        is_read: true,
+        created_at: true,
+        category_id: true,
+        categories: true
       },
-      orderBy: { date: 'desc' }
+      orderBy: { created_at: 'desc' }
     })
-    return messages;
+
+    // Map fields back to what the frontend expects
+    const mappedMessages = messages.map(m => ({
+      ...m,
+      status: m.is_read ? 'Read' : 'Unread',
+      date: m.created_at,
+      message_cat_id: m.category_id,
+      category: m.categories ? { title: m.categories.name } : null
+    }));
+
+    return mappedMessages;
   }
 })

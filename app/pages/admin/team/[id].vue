@@ -15,7 +15,7 @@
           to="/admin/team" 
           class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 border border-slate-200 active:scale-95"
         >
-          <i class="bi bi-arrow-left"></i> Cancel
+          <Icon name="lucide:arrow-left" /> Cancel
         </NuxtLink>
       </div>
     </div>
@@ -23,7 +23,7 @@
     <!-- Error Banner -->
     <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm">
       <div class="flex items-center gap-3">
-        <i class="bi bi-x-circle-fill text-rose-400 text-lg"></i>
+        <Icon name="lucide:x-circle" class="text-rose-400 text-lg" />
         <span class="font-bold text-rose-300">{{ errorMsg }}</span>
       </div>
     </div>
@@ -68,7 +68,7 @@
           <div>
             <label for="fb" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Facebook Link (Optional)</label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-facebook"></i></span>
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:facebook" /></span>
               <input 
                 id="fb" 
                 v-model="form.fb" 
@@ -83,7 +83,7 @@
           <div>
             <label for="insta" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Instagram Link (Optional)</label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-instagram"></i></span>
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:instagram" /></span>
               <input 
                 id="insta" 
                 v-model="form.insta" 
@@ -98,13 +98,30 @@
           <div>
             <label for="linkedin" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">LinkedIn Link (Optional)</label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="bi bi-linkedin"></i></span>
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:linkedin" /></span>
               <input 
                 id="linkedin" 
                 v-model="form.linkedin" 
                 type="url" 
                 class="block w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm" 
                 placeholder="e.g. https://linkedin.com/in/username" 
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <!-- Twitter URL -->
+          <div>
+            <label for="twitter" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Twitter Link (Optional)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:twitter" /></span>
+              <input 
+                id="twitter" 
+                v-model="form.twitter" 
+                type="url" 
+                class="block w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm" 
+                placeholder="e.g. https://twitter.com/username" 
               />
             </div>
           </div>
@@ -121,7 +138,7 @@
                 class="w-full h-full object-cover" 
                 @error="$event.target.src='/assets/img/team/team-1.jpg'"
               />
-              <i v-else class="bi bi-person text-3xl text-slate-300"></i>
+              <Icon v-else name="lucide:user" class="text-3xl text-slate-300" />
             </div>
             
             <div class="space-y-1">
@@ -140,7 +157,7 @@
               >
                 {{ uploading ? 'Uploading...' : 'Choose Image' }}
               </button>
-              <p class="text-[10px] text-slate-400">Supported formats: JPG, PNG, WEBP (Max 2MB)</p>
+              <p class="text-[10px] text-slate-400">Supported formats: JPG, PNG, WEBP (Max 200KB)</p>
             </div>
           </div>
         </div>
@@ -202,22 +219,24 @@ const form = ref({
   image: '',
   fb: '',
   insta: '',
-  linkedin: ''
+  linkedin: '',
+  twitter: ''
 });
 
 onMounted(async () => {
   if (!isNew.value) {
     loadingData.value = true;
     try {
-      const data = await $fetch(`/api/admin/team/${id}`);
+      const data = await useNuxtApp().$fetch(`/api/admin/team/${id}`);
       form.value = {
         name: data.name || '',
         designation: data.designation || '',
         message: data.message || '',
         image: data.image || '',
-        fb: data.fb || '',
-        insta: data.insta || '',
-        linkedin: data.linkedin || ''
+        fb: data.facebook_url || '',
+        insta: data.instagram_url || '',
+        linkedin: data.linkedin_url || '',
+        twitter: data.twitter_url || ''
       };
     } catch (err) {
       console.error(err);
@@ -232,21 +251,27 @@ const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
+  if (file.size > 200 * 1024) {
+    errorMsg.value = `File too large. Maximum size is 200KB.`;
+    return;
+  }
+
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('folder', 'team');
 
   uploading.value = true;
   errorMsg.value = '';
 
   try {
-    const data = await $fetch('/api/admin/upload', {
+    const data = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     });
     form.value.image = data.filename;
   } catch (err) {
     console.error(err);
-    errorMsg.value = 'File upload failed. Make sure it is an image and is under 2MB.';
+    errorMsg.value = err.data?.statusMessage || 'File upload failed. Make sure it is an image and is under 200KB.';
   } finally {
     uploading.value = false;
   }
@@ -260,10 +285,13 @@ const handleSave = async () => {
   const method = isNew.value ? 'POST' : 'PUT';
 
   try {
-    await $fetch(url, {
+    await useNuxtApp().$fetch(url, {
       method,
       body: form.value
     });
+    clearNuxtData();
+    useToast().success('Saved successfully');
+    await refreshNuxtData('admin-team-list');
     router.push('/admin/team');
   } catch (err) {
     console.error(err);

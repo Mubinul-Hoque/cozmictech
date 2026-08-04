@@ -1,27 +1,22 @@
 import { prisma } from '../utils/prisma'
 
-export default defineEventHandler(async (event) => {
-  try {
-    const services = await prisma.services.findMany({
-      select: {
-        id: true,
-        name: true,
-        icon: true,
-        short_description: true
-      }
+export default defineEventHandler(async (_event) => {
+  const [services, servicesIntro] = await Promise.all([
+    prisma.services.findMany({
+      select: { id: true, name: true, icon: true, short_description: true }
+    }),
+    prisma.page_sections.findFirst({
+      where: { page_slug: 'home', section_key: 'services_intro' }
     })
+  ])
 
-    return {
-      sectors: services,
-      services: [],
-      servicesChild: []
-    }
-  } catch (error) {
-    console.error('Error fetching services data:', error)
-    return {
-      sectors: [],
-      services: [],
-      servicesChild: []
+  return {
+    sectors: services,
+    services: [],
+    servicesChild: [],
+    homepage: {
+      title3: servicesIntro?.title || 'Our Services',
+      tag3: servicesIntro?.subtitle_or_tag || 'We provide reliable, efficient, and cost-effective geotechnical investigation and engineering consultancy services to firms nationwide.'
     }
   }
 })

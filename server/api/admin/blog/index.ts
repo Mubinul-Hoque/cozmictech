@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       if (query.catId) {
         const parsedCat = parseInt(String(query.catId));
         if (!isNaN(parsedCat)) {
-          whereClause.post_catid = parsedCat;
+          whereClause.category_id = parsedCat;
         }
       }
 
@@ -41,15 +41,15 @@ export default defineEventHandler(async (event) => {
           where: whereClause,
           skip,
           take: limit,
-          orderBy: { date: 'desc' },
+          orderBy: { created_at: 'desc' },
           select: {
             id: true,
             title: true,
             image: true,
-            author: true,
-            post_catid: true,
-            sdate: true,
-            date: true
+            author_name: true,
+            category_id: true,
+            published_at: true,
+            created_at: true
           }
         }),
         prisma.posts.count({
@@ -57,10 +57,18 @@ export default defineEventHandler(async (event) => {
         })
       ]);
 
+      const mappedPosts = posts.map(p => ({
+        ...p,
+        author: p.author_name,
+        post_catid: p.category_id,
+        sdate: p.published_at ? p.published_at.toLocaleDateString() : p.created_at.toLocaleDateString(),
+        date: p.created_at
+      }));
+
       const totalPages = Math.ceil(total / limit);
 
       return {
-        data: posts,
+        data: mappedPosts,
         total,
         page,
         limit,
@@ -88,24 +96,35 @@ export default defineEventHandler(async (event) => {
       const sdate = String(body.sdate || new Date().toLocaleDateString('en-GB')).trim();
       const image = String(body.image || '').trim();
 
-      if (title.length > 255 || author.length > 50 || sdate.length > 50 || image.length > 255) {
-        throw createError({ statusCode: 400, statusMessage: 'Input length exceeds maximum allowed limit' });
-      }
-
       const post = await prisma.posts.create({
         data: {
           title: sanitizePlainText(title),
-          post_catid: parseInt(body.post_catid),
+          category_id: parseInt(body.post_catid),
           content: sanitizeHtmlContent(body.content),
           image: sanitizePlainText(image),
-          author: sanitizePlainText(author),
-          sdate: sanitizePlainText(sdate)
+          author_name: sanitizePlainText(author),
+          published_at: new Date()
         }
       });
 
-      return { success: true, post };
+      await clearPublicCache();
+      return {
+        success: true,
+        message: 'Post created successfully',
+        data: {
+          ...post,
+          author: post.author_name,
+          post_catid: post.category_id,
+          sdate: post.published_at ? post.published_at.toLocaleDateString() : post.created_at.toLocaleDateString(),
+          date: post.created_at
+        }
+      };
     } catch (error: any) {
-      throw createError({ statusCode: error.statusCode || 500, statusMessage: error.statusMessage || 'Failed to create blog post' });
+      console.error('Error in api/admin/blog POST:', error);
+      throw createError({ 
+        statusCode: error.statusCode || 500, 
+        statusMessage: error.statusMessage || 'Failed to create post' 
+      });
     }
   }
 });

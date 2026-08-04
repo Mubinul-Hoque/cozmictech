@@ -14,12 +14,12 @@
 
         <!-- Mobile Nav Toggles -->
         <i 
-          class="mobile-nav-toggle mobile-nav-show bi bi-list" 
+          class="mobile-nav-toggle mobile-nav-show" 
           :class="{ 'hidden': mobileNavOpen }"
           @click="toggleMobileNav"
         ></i>
         <i 
-          class="mobile-nav-toggle mobile-nav-hide bi bi-x" 
+          class="mobile-nav-toggle mobile-nav-hide" 
           :class="{ 'hidden': !mobileNavOpen }"
           @click="toggleMobileNav"
         ></i>
@@ -77,9 +77,9 @@
                   <strong>Email:</strong> {{ data?.contact?.email }}
                 </p>
                 <div class="social-links flex mt-3 gap-2">
-                  <a :href="data?.social?.fb || '#'" target="_blank" class="flex items-center justify-center"><i class="bi bi-facebook"></i></a>
-                  <a :href="data?.social?.insta || '#'" target="_blank" class="flex items-center justify-center"><i class="bi bi-instagram"></i></a>
-                  <a :href="data?.social?.linkedin || '#'" target="_blank" class="flex items-center justify-center"><i class="bi bi-linkedin"></i></a>
+                  <a :href="data?.social?.fb || '#'" target="_blank" class="flex items-center justify-center"><Icon name="lucide:facebook" /></a>
+                  <a :href="data?.social?.insta || '#'" target="_blank" class="flex items-center justify-center"><Icon name="lucide:instagram" /></a>
+                  <a :href="data?.social?.linkedin || '#'" target="_blank" class="flex items-center justify-center"><Icon name="lucide:linkedin" /></a>
                 </div>
               </div>
             </div>
@@ -101,20 +101,25 @@
             <div class="md:col-span-3 lg:col-span-2 footer-links">
               <h4>Our Services</h4>
               <ul>
-                <li><NuxtLink to="/services">Geotechnical Investigation</NuxtLink></li>
-                <li><NuxtLink to="/services">Engineering Consultancy</NuxtLink></li>
-                <li><NuxtLink to="/services">Project Management</NuxtLink></li>
-                <li><NuxtLink to="/services">Construction &amp; Supervision</NuxtLink></li>
-                <li><NuxtLink to="/services">Procurement &amp; Supply</NuxtLink></li>
+                <li v-for="service in data?.services || []" :key="service.id">
+                  <NuxtLink to="/services"><span v-html="service.name"></span></NuxtLink>
+                </li>
               </ul>
             </div>
 
-            <!-- Column 4: Summary -->
+            <!-- Column 4: Contact CTA -->
             <div class="md:col-span-6 lg:col-span-4 footer-links">
-              <h4>About Our Firm</h4>
-              <p class="text-justify leading-relaxed">
-                Cozmic Technology is a premier Geotechnical Engineering and Detail Engineering Consultancy firm in Bangladesh. We provide professional, sustainable, and cost-effective solutions.
+              <h4>Get In Touch</h4>
+              <p class="leading-relaxed mb-6 text-sm" style="color: rgba(255,255,255,0.65);">
+                Have a project in mind or need expert guidance? Our engineering team is ready to help.
               </p>
+              <NuxtLink
+                to="/contact"
+                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-300 bg-[#feb900] text-[#0f172a] hover:bg-white hover:text-[#0f172a]"
+              >
+                <Icon name="lucide:envelope-fill" />
+                Contact Us
+              </NuxtLink>
             </div>
 
           </div>
@@ -140,7 +145,7 @@
       @click="scrollToTop"
       aria-label="Scroll to top"
     >
-      <i class="bi bi-arrow-up-short"></i>
+      <Icon name="lucide:arrow-up" />
     </button>
   </div>
 </template>
@@ -173,15 +178,22 @@ onMounted(() => {
   // Hide preloader when app is mounted
   loading.value = false
 
-  // Setup scroll event listeners
+  // P13 — Throttle scroll handler with requestAnimationFrame to prevent
+  // reactive updates on every pixel of scroll movement
+  let scrollTicking = false
   const handleScroll = () => {
-    scrolled.value = window.scrollY > 50
-    showScrollTop.value = window.scrollY > 100
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        scrolled.value = window.scrollY > 50
+        showScrollTop.value = window.scrollY > 100
+        scrollTicking = false
+      })
+      scrollTicking = true
+    }
   }
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', handleScroll, { passive: true })
   handleScroll()
 
-  // Save clean up action
   onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
   })
@@ -237,7 +249,7 @@ const toggleDropdown = (event) => {
 <style>
 /* Preloader deactivation styles */
 #preloader {
-  transition: all 0.6s ease-out;
+  transition: all 0s;
 }
 #preloader.preloader-deactivated {
   opacity: 0 !important;

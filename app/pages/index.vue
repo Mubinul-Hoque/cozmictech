@@ -9,17 +9,17 @@
             <h2 data-aos="fade-down" class="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
               Welcome to <span>{{ data?.homepage?.company_title || 'Cozmic Technology' }}</span>
             </h2>
-            <p data-aos="fade-up" data-aos-delay="100" class="text-lg md:text-xl text-gray-200 mb-10 leading-relaxed uppercase tracking-wider">
+            <p data-aos="fade-up" class="text-lg md:text-xl text-gray-200 mb-10 leading-relaxed uppercase tracking-wider">
               {{ data?.homepage?.slogan || "Let's work together to make great things possible." }}
             </p>
-            <NuxtLink data-aos="fade-up" data-aos-delay="200" to="/contact" class="btn-get-started">
+            <NuxtLink data-aos="fade-up" to="/contact" class="btn-get-started">
               Get Started
             </NuxtLink>
           </div>
         </div>
       </div>
 
-      <!-- Hero Slideshow Backgrounds -->
+      <!-- P14 — Hero Carousel: only render active + adjacent slides to avoid downloading all images -->
       <div id="hero-carousel" class="carousel slide">
         <div 
           v-for="(img, idx) in heroImages" 
@@ -27,7 +27,7 @@
           class="carousel-item"
           :class="{ 'active': idx === activeHeroIdx }"
           :style="{ 
-            backgroundImage: `url(${img})`,
+            backgroundImage: (idx === activeHeroIdx || idx === nextHeroIdx) ? `url(${img})` : 'none',
             opacity: idx === activeHeroIdx ? 1 : 0,
             visibility: idx === activeHeroIdx ? 'visible' : 'hidden',
             transition: 'opacity 1s ease-in-out, visibility 1s ease-in-out'
@@ -35,11 +35,11 @@
         ></div>
 
         <!-- Hero Navigation Controls -->
-        <a class="carousel-control-prev" href="#" role="button" @click.prevent="prevHeroSlide">
-          <span class="carousel-control-prev-icon bi bi-chevron-left" aria-hidden="true"></span>
+        <a v-if="heroImages.length > 1" class="carousel-control-prev" href="#" role="button" @click.prevent="prevHeroSlide">
+          <Icon name="lucide:chevron-left" class="text-3xl" aria-hidden="true" />
         </a>
-        <a class="carousel-control-next" href="#" role="button" @click.prevent="nextHeroSlide">
-          <span class="carousel-control-next-icon bi bi-chevron-right" aria-hidden="true"></span>
+        <a v-if="heroImages.length > 1" class="carousel-control-next" href="#" role="button" @click.prevent="nextHeroSlide">
+          <Icon name="lucide:chevron-right" class="text-3xl" aria-hidden="true" />
         </a>
       </div>
     </section>
@@ -69,10 +69,13 @@
             </div>
           </div>
 
+          <!-- P10 — added width/height + loading=lazy for CLS prevention -->
           <div class="relative group overflow-hidden rounded-lg shadow-xl" data-aos="zoom-in">
             <img 
               :src="data?.homepage?.glance_img ? '/assets/img/' + data.homepage.glance_img : '/assets/img/glance.jpg'" 
               alt="At a Glance" 
+              width="600" height="400"
+              loading="lazy"
               class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
@@ -87,7 +90,8 @@
       <div class="container mx-auto px-4 md:px-8">
         <div class="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-60 hover:opacity-85 transition-opacity duration-300">
           <div v-for="client in data?.clients || []" :key="client.id" class="h-12 flex items-center">
-            <img :src="client.logo ? '/assets/img/' + client.logo : '/assets/img/favicon.png'" :alt="client.client_name" class="max-h-full max-w-[120px] grayscale hover:grayscale-0 transition-all duration-300" />
+            <!-- P10 — lazy load client logos (below fold) -->
+            <img :src="client.logo ? '/assets/img/' + client.logo : '/assets/img/favicon.png'" :alt="client.client_name" width="120" height="48" loading="lazy" class="max-h-full max-w-[120px] grayscale hover:grayscale-0 transition-all duration-300" />
           </div>
         </div>
       </div>
@@ -99,7 +103,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
           <div class="relative overflow-hidden rounded-lg shadow-lg">
-            <img src="/assets/img/alt-services.jpg" alt="Our Strength" class="w-full h-[500px] object-cover" />
+            <!-- P10 — lazy load below-fold image -->
+            <img src="/assets/img/alt-services.jpg" alt="Our Strength" width="600" height="500" loading="lazy" class="w-full h-[500px] object-cover" />
           </div>
 
           <div class="space-y-8">
@@ -116,7 +121,7 @@
             <div class="space-y-6">
               <div v-for="strength in data?.strengths || []" :key="strength.id" class="flex gap-4 items-start">
                 <div class="flex-shrink-0 w-12 h-12 bg-amber-50 rounded flex items-center justify-center text-xl text-[#feb900]">
-                  <i :class="strength.icon || 'bi bi-check-circle'"></i>
+                  <Icon :name="strength.icon || 'lucide:check-circle-2'" />
                 </div>
                 <div>
                   <h4 class="text-lg font-bold text-[#2e3135]">{{ strength.title }}</h4>
@@ -128,7 +133,7 @@
               <template v-if="!data?.strengths?.length">
                 <div class="flex gap-4 items-start">
                   <div class="flex-shrink-0 w-12 h-12 bg-amber-50 rounded flex items-center justify-center text-xl text-[#feb900]">
-                    <i class="bi bi-people-fill"></i>
+                    <Icon name="lucide:users" />
                   </div>
                   <div>
                     <h4 class="text-lg font-bold text-[#2e3135]">Expert Technical Team</h4>
@@ -168,20 +173,23 @@
             >
               <div class="testimonial-wrap">
                 <div class="testimonial-item">
+                  <!-- P10 — lazy load testimonial avatars -->
                   <img 
                     :src="t.image ? (t.image.includes('/') ? t.image : '/assets/img/testimonials/' + t.image) : '/assets/img/testimonials/testimonials-1.jpg'" 
                     class="testimonial-img" 
-                    :alt="t.name?.trim()" 
+                    :alt="t.name?.trim()"
+                    width="80" height="80"
+                    loading="lazy"
                   />
                   <h3>{{ t.name?.trim() }}</h3>
                   <h4>{{ t.designation?.trim() }} - {{ t.company?.trim() }}</h4>
                   <div class="stars">
-                    <i v-for="star in (t.stars || 5)" :key="star" class="bi bi-star-fill"></i>
+                    <Icon v-for="star in (t.stars || 5)" :key="star" name="lucide:star" class="text-amber-400" />
                   </div>
                   <p>
-                    <i class="bi bi-quote quote-icon-left"></i>
-                    {{ t.story }}
-                    <i class="bi bi-quote quote-icon-right"></i>
+                    <Icon name="lucide:quote" class="quote-icon-right"/> &nbsp
+                    {{ t.story }} &nbsp
+                    <Icon name="lucide:quote" class="quote-icon-left" />
                   </p>
                 </div>
               </div>
@@ -218,16 +226,19 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div v-for="post in data?.recentPosts || []" :key="post.id" class="group border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all">
+        <div class="flex flex-wrap justify-center gap-8">
+          <div v-for="post in data?.recentPosts || []" :key="post.id" class="w-full md:w-[calc(33.333%-1.5rem)] max-w-sm group border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all">
             <div class="relative overflow-hidden h-48 bg-gray-100">
+              <!-- P10 — lazy load blog thumbnails -->
               <img 
                 :src="post.image ? (post.image.includes('/') ? post.image : '/assets/img/blog/' + post.image) : '/assets/img/blog/blog-1.jpg'" 
                 :alt="post.title" 
+                width="400" height="192"
+                loading="lazy"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
-            <div class="p-6 space-y-4">
+            <div class="p-6 space-y-4 text-center">
               <span class="text-xs font-bold text-[#feb900] uppercase tracking-wider">{{ post.sdate || 'Company News' }}</span>
               <h3 class="font-bold text-lg text-[#2e3135] line-clamp-2 group-hover:text-[#feb900] transition-colors">
                 <NuxtLink :to="'/blog/' + post.id">{{ post.title }}</NuxtLink>
@@ -235,8 +246,9 @@
               <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">
                 {{ post.content?.replace(/<[^>]*>/g, '') }}
               </p>
-              <div class="border-t border-gray-100 pt-4 flex items-center justify-between text-xs text-gray-500">
+              <div class="border-t border-gray-100 pt-4 flex items-center justify-center space-x-4 text-xs text-gray-500">
                 <span>By {{ post.author || 'Admin' }}</span>
+                <span>•</span>
                 <NuxtLink :to="'/blog/' + post.id" class="font-bold text-[#feb900] hover:text-[#ffc732]">Read More</NuxtLink>
               </div>
             </div>
@@ -263,6 +275,8 @@
             <img 
               :src="data.homepage.image7.includes('/') ? data.homepage.image7 : '/assets/img/' + data.homepage.image7" 
               :alt="data.homepage.title7" 
+              width="600" height="400"
+              loading="lazy"
               class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
@@ -278,6 +292,8 @@
             <img 
               :src="data.homepage.image8.includes('/') ? data.homepage.image8 : '/assets/img/' + data.homepage.image8" 
               :alt="data.homepage.title8" 
+              width="600" height="400"
+              loading="lazy"
               class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
@@ -311,6 +327,8 @@
             <img 
               :src="data.homepage.image9.includes('/') ? data.homepage.image9 : '/assets/img/' + data.homepage.image9" 
               :alt="data.homepage.title9" 
+              width="600" height="400"
+              loading="lazy"
               class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
@@ -323,13 +341,25 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 
+// P15 — Page-specific SEO meta
+useHead({
+  title: 'Cozmic Technology - Engineering Consultancy | Home',
+  meta: [
+    { name: 'description', content: 'Cozmic Technology is a premier engineering consultancy firm specializing in Geotechnical Investigation, Architecture, and Construction Project Management in Bangladesh.' },
+    { property: 'og:title', content: 'Cozmic Technology - Engineering Consultancy' },
+    { property: 'og:description', content: 'Trusted Geotechnical Investigation, Engineering Consultancy and Architecture firm in Bangladesh. 15+ years, 250+ projects.' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ]
+})
+
 const { data } = await useFetch('/api/homepage')
 
-// Hero Carousel State
+// P14 — Hero Carousel: compute next index so we can preload only the next image
 const heroImages = computed(() => {
-  const imgStr = data.value?.homepage?.bgslide_img
-  if (imgStr) {
-    return imgStr.split(',').map(s => s.trim()).filter(Boolean)
+  const images = data.value?.homepage?.hero_images
+  if (Array.isArray(images) && images.length > 0) {
+    return images
   }
   return [
     '/assets/img/hero-carousel/hero-carousel-1.jpg',
@@ -340,12 +370,13 @@ const heroImages = computed(() => {
   ]
 })
 const activeHeroIdx = ref(0)
+// P14 — expose next index so template only renders active+next background-image
+const nextHeroIdx = computed(() => (activeHeroIdx.value + 1) % (heroImages.value.length || 1))
 let heroTimer = null
 
 const startHeroSlideshow = () => {
-  heroTimer = setInterval(() => {
-    nextHeroSlide()
-  }, 5000)
+  if (heroImages.value.length <= 1) return
+  heroTimer = setInterval(() => { nextHeroSlide() }, 5000)
 }
 
 const nextHeroSlide = () => {
@@ -381,25 +412,11 @@ const pageCount = computed(() => {
 })
 
 const nextTestimonial = () => {
-  if (activeTestimonialIdx.value >= maxIdx.value) {
-    activeTestimonialIdx.value = 0
-  } else {
-    activeTestimonialIdx.value++
-  }
-}
-
-const prevTestimonial = () => {
-  if (activeTestimonialIdx.value <= 0) {
-    activeTestimonialIdx.value = maxIdx.value
-  } else {
-    activeTestimonialIdx.value--
-  }
+  activeTestimonialIdx.value = activeTestimonialIdx.value >= maxIdx.value ? 0 : activeTestimonialIdx.value + 1
 }
 
 const startTestimonialAutoplay = () => {
-  testimonialTimer = setInterval(() => {
-    nextTestimonial()
-  }, 5000)
+  testimonialTimer = setInterval(() => { nextTestimonial() }, 5000)
 }
 
 const stopTestimonialAutoplay = () => {
@@ -409,7 +426,7 @@ const stopTestimonialAutoplay = () => {
 onMounted(() => {
   startHeroSlideshow()
   updateSlidesPerView()
-  window.addEventListener('resize', updateSlidesPerView)
+  window.addEventListener('resize', updateSlidesPerView, { passive: true })
   startTestimonialAutoplay()
 })
 

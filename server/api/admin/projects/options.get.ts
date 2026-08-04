@@ -2,17 +2,27 @@ import { prisma } from '../../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
   try {
-    const [categories, sectors] = await Promise.all([
-      prisma.category.findMany({
+    const [categories, rawSectors, clients] = await Promise.all([
+      prisma.categories.findMany({
         orderBy: { id: 'asc' },
         select: { id: true, name: true }
       }),
       prisma.sectors.findMany({
         orderBy: { id: 'asc' },
-        select: { id: true, sector: true }
+        select: { id: true, name: true }
+      }),
+      prisma.clients.findMany({
+        orderBy: { client_name: 'asc' },
+        select: { id: true, client_name: true }
       })
     ]);
-    return { categories, sectors };
+
+    const sectors = rawSectors.map(s => ({
+      id: s.id,
+      sector: s.name
+    }));
+
+    return { categories, sectors, clients };
   } catch (error) {
     throw createError({ statusCode: 500, statusMessage: 'Failed to fetch project options data' });
   }

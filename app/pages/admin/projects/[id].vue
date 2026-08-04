@@ -2,7 +2,7 @@
   <div class="font-sans">
     <div class="mb-6 flex flex-col gap-1">
       <NuxtLink to="/admin/projects" class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors inline-flex items-center gap-1 mb-1">
-        <i class="bi bi-arrow-left"></i> Back to Projects
+        <Icon name="lucide:arrow-left" /> Back to Projects
       </NuxtLink>
       <h2 class="text-2xl font-bold text-slate-800 tracking-tight">{{ isNew ? 'Add New Project' : 'Edit Project' }}</h2>
     </div>
@@ -35,7 +35,7 @@
                     @click.stop="removeCategory(catId)"
                   >
                     {{ getCategoryName(catId) }}
-                    <i class="bi bi-x text-sm leading-none text-slate-400 hover:text-red-650 transition-colors"></i>
+                    <Icon name="lucide:x" class="text-sm leading-none text-slate-400 hover:text-red-650 transition-colors" />
                   </span>
                   
                   <!-- Placeholder / Trigger label -->
@@ -45,7 +45,7 @@
                   
                   <!-- Chevron Indicator -->
                   <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                    <i class="bi" :class="showDropdown ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    <Icon :name="showDropdown ? 'lucide:chevron-up' : 'lucide:chevron-down'" />
                   </div>
                 </div>
 
@@ -57,7 +57,7 @@
                   <!-- Search Bar inside Dropdown -->
                   <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
-                      <i class="bi bi-search text-xs"></i>
+                      <Icon name="lucide:search" class="text-xs" />
                     </span>
                     <input 
                       v-model="catSearch" 
@@ -78,7 +78,7 @@
                       :class="isCategorySelected(cat.id) ? 'bg-amber-50 text-[#0f172a] font-bold' : 'text-slate-700 hover:bg-slate-50'"
                     >
                       <span>{{ cat.name }}</span>
-                      <i v-if="isCategorySelected(cat.id)" class="bi bi-check-lg text-amber-600 font-bold"></i>
+                      <Icon v-if="isCategorySelected(cat.id)" name="lucide:check" class="text-amber-600 font-bold" />
                     </div>
                     <div v-if="!filteredCategories.length" class="text-center py-4 text-xs text-slate-400">
                       No matching categories found
@@ -87,14 +87,25 @@
                 </div>
               </div>
 
-              <!-- Sector -->
-              <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Sector</label>
-                <select v-model="form.sector_id" required class="block w-full bg-white border border-slate-300 rounded-lg py-2.5 px-4 text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors">
-                  <option v-for="sec in options?.sectors || []" :key="sec.id" :value="sec.id">
-                    {{ sec.sector || 'Sector ' + sec.id }}
-                  </option>
-                </select>
+              <!-- Sector & Client -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Sector *</label>
+                  <select v-model="form.sector_id" required class="block w-full bg-white border border-slate-300 rounded-lg py-2.5 px-4 text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors">
+                    <option v-for="sec in options?.sectors || []" :key="sec.id" :value="sec.id">
+                      {{ sec.sector || 'Sector ' + sec.id }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Client</label>
+                  <select v-model="form.client_id" class="block w-full bg-white border border-slate-300 rounded-lg py-2.5 px-4 text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors">
+                    <option :value="null">No Client (Internal/Unassigned)</option>
+                    <option v-for="client in options?.clients || []" :key="client.id" :value="client.id">
+                      {{ client.client_name }}
+                    </option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -103,8 +114,18 @@
               <select v-model="form.status" class="block w-full bg-white border border-slate-300 rounded-lg py-2.5 px-4 text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors">
                 <option value="Completed">Completed</option>
                 <option value="Ongoing">Ongoing</option>
-                <option value="Upcoming">Upcoming</option>
               </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Start Date</label>
+                <input v-model="form.start_date" type="date" class="block w-full border border-slate-300 rounded-lg py-2.5 px-4 bg-white text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">End Date</label>
+                <input v-model="form.end_date" type="date" class="block w-full border border-slate-300 rounded-lg py-2.5 px-4 bg-white text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors" />
+              </div>
             </div>
 
             <div>
@@ -114,20 +135,54 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Description</label>
-              <RichTextEditor v-model="form.description" placeholder="Describe the project narrative..." />
+              <LazyRichTextEditor v-model="form.description" placeholder="Describe the project narrative..." />
             </div>
           </div>
 
           <!-- Right Column -->
           <div class="space-y-5">
             <div>
-              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Images (Comma separated filenames)</label>
-              <input v-model="form.images" type="text" class="block w-full border border-slate-300 rounded-lg py-2.5 px-4 bg-white text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] sm:text-sm transition-colors" placeholder="image1.jpg, image2.jpg" />
-              <p class="mt-1.5 text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Or upload a new image below (added automatically)</p>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Project Images</label>
               
-              <div class="mt-3 flex items-center gap-3">
-                <input type="file" @change="handleFileUpload" accept="image/*" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 file:transition-colors file:cursor-pointer" />
-                <span v-if="uploading" class="text-xs font-bold text-amber-600 animate-pulse flex items-center gap-1"><i class="bi bi-arrow-repeat animate-spin"></i> Uploading...</span>
+              <!-- Image Gallery Preview -->
+              <div v-if="form.images && form.images.length > 0" class="flex flex-wrap gap-3 mb-3 p-3 border border-slate-200 rounded-lg bg-slate-50">
+                <div v-for="(img, idx) in form.images" :key="idx" class="relative group w-20 h-20 rounded-md overflow-hidden border border-slate-200 shadow-sm bg-white">
+                  <img :src="`/assets/img/projects/${img}`" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button type="button" @click.prevent="removeImage(idx)" class="w-7 h-7 bg-white text-red-600 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors shadow-sm" title="Remove image">
+                      <Icon name="lucide:trash-2" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="mb-3 p-4 border border-dashed border-slate-300 rounded-lg bg-slate-50 text-center text-xs text-slate-400">
+                No images uploaded yet.
+              </div>
+
+              <!-- Drag & Drop Upload Zone -->
+              <div 
+                class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 flex flex-col items-center justify-center gap-3 group"
+                :class="isDragging ? 'border-[#feb900] bg-amber-50/50 scale-[1.02]' : 'border-slate-300 hover:border-[#feb900] bg-slate-50 hover:bg-white'"
+                @dragover.prevent="isDragging = true"
+                @dragleave.prevent="isDragging = false"
+                @drop.prevent="handleFileDrop"
+              >
+                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#feb900] transition-colors" :class="{'text-[#feb900]': isDragging}">
+                  <Icon v-if="uploading" name="lucide:loader-2" class="animate-spin text-xl text-amber-500" />
+                  <Icon v-else name="lucide:cloud-upload" class="text-xl" />
+                </div>
+                
+                <div v-if="uploading" class="text-sm font-bold text-amber-600 animate-pulse">
+                  Uploading image(s)...
+                </div>
+                <div v-else>
+                  <p class="text-sm font-bold text-slate-700">Drag & drop images here, or</p>
+                  <label class="text-xs font-bold text-[#feb900] hover:text-amber-600 cursor-pointer mt-1 inline-block transition-colors bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg">
+                    browse files
+                    <input type="file" @change="handleFileUpload" accept="image/*" class="hidden" multiple />
+                  </label>
+                  <p class="text-[10px] text-slate-400 mt-3 font-medium uppercase tracking-wider">Supports JPG, PNG (Max 500KB per image)</p>
+                </div>
               </div>
             </div>
 
@@ -194,8 +249,10 @@ const form = ref({
   sector_id: 1,
   client_id: null,
   status: 'Completed',
+  start_date: '',
+  end_date: '',
   description: '',
-  images: '',
+  images: [],
   location: '',
   project_cost: '',
   service_cost: '',
@@ -203,7 +260,6 @@ const form = ref({
   height: '',
   feature: '',
   services: '',
-  show_status: '',
   story: ''
 });
 
@@ -211,24 +267,39 @@ const saving = ref(false);
 const uploading = ref(false);
 const showDropdown = ref(false);
 const catSearch = ref('');
+const isDragging = ref(false);
+
 
 const { data: options } = await useFetch('/api/admin/projects/options');
 
-if (!isNew) {
-  const { data: project } = await useFetch(`/api/admin/projects/${route.params.id}`);
-  if (project.value) {
-    // Populate form
-    Object.keys(form.value).forEach(key => {
-      if (project.value[key] !== undefined && project.value[key] !== null) {
-        form.value[key] = project.value[key];
+onMounted(async () => {
+  if (!isNew) {
+    try {
+      const project = await useNuxtApp().$fetch(`/api/admin/projects/${route.params.id}`);
+      if (project) {
+        // Populate form
+        Object.keys(form.value).forEach(key => {
+          if (project[key] !== undefined && project[key] !== null) {
+            if (key === 'images' && !Array.isArray(project[key])) {
+              // Fallback if data hasn't been migrated properly
+              form.value[key] = project[key] ? String(project[key]).split(',').map(s => s.trim()) : [];
+            } else if ((key === 'start_date' || key === 'end_date') && project[key]) {
+              form.value[key] = String(project[key]).split('T')[0];
+            } else {
+              form.value[key] = project[key];
+            }
+          }
+        });
+        // Populate category_ids from project_categories relationship
+        if (project.project_categories) {
+          form.value.category_ids = project.project_categories.map(pc => pc.category_id);
+        }
       }
-    });
-    // Populate category_ids from project_categories relationship
-    if (project.value.project_categories) {
-      form.value.category_ids = project.value.project_categories.map(pc => pc.category_id);
+    } catch (err) {
+      useToast().error('Failed to load project data');
     }
   }
-}
+});
 
 // Close dropdown on click outside
 if (process.client) {
@@ -277,32 +348,77 @@ const removeCategory = (catId) => {
   }
 };
 
-const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+const validateFile = (file) => {
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  if (!allowedTypes.includes(file.type)) {
+    useToast().error(`Invalid file format: ${file.name}. Only JPG and PNG are allowed.`);
+    return false;
+  }
+  
+  if (file.size > 500 * 1024) { // 500 KB limit
+    useToast().error(`File too large: ${file.name}. Maximum size is 500KB.`);
+    return false;
+  }
+  
+  return true;
+};
+
+const processFile = async (file) => {
+  if (!file || !validateFile(file)) return;
 
   uploading.value = true;
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('folder', 'projects');
 
   try {
-    const res = await $fetch('/api/admin/upload', {
+    const res = await useNuxtApp().$fetch('/api/admin/upload', {
       method: 'POST',
       body: formData
     });
     
     if (res.success) {
-      if (form.value.images) {
-        form.value.images += `, ${res.filename}`;
-      } else {
-        form.value.images = res.filename;
+      if (!Array.isArray(form.value.images)) {
+        form.value.images = [];
       }
+      form.value.images.push(res.filename);
+      clearNuxtData();
+    useToast().success('Image uploaded successfully');
     }
   } catch (error) {
-    alert('Upload failed: ' + (error.data?.statusMessage || error.message));
+    useToast().error('Upload failed: ' + (error.data?.statusMessage || error.message));
   } finally {
     uploading.value = false;
-    event.target.value = ''; // Reset input
+  }
+};
+
+const handleFileUpload = async (event) => {
+  const files = event.target.files;
+  if (!files || !files.length) return;
+  
+  for (let i = 0; i < files.length; i++) {
+    await processFile(files[i]);
+  }
+  event.target.value = ''; // Reset input
+};
+
+const handleFileDrop = async (event) => {
+  isDragging.value = false;
+  const files = event.dataTransfer.files;
+  if (!files || !files.length) return;
+  
+  for (let i = 0; i < files.length; i++) {
+    if (files[i].type.startsWith('image/')) {
+      await processFile(files[i]);
+    } else {
+      useToast().error('Only image files are allowed: ' + files[i].name);
+    }
+  }
+};
+
+const removeImage = (idx) => {
+  if (Array.isArray(form.value.images)) {
+    form.value.images.splice(idx, 1);
   }
 };
 
@@ -312,10 +428,17 @@ const saveProject = async () => {
     const url = isNew ? '/api/admin/projects' : `/api/admin/projects/${route.params.id}`;
     const method = isNew ? 'POST' : 'PUT';
     
-    await $fetch(url, { method, body: form.value });
+    await useNuxtApp().$fetch(url, { method, body: form.value });
+    
+    // Clear Nuxt's client-side useFetch cache so that public pages load fresh data
+    clearNuxtData();
+    await refreshNuxtData('admin-projects-list');
+
+    clearNuxtData();
+    useToast().success('Project saved successfully!');
     router.push('/admin/projects');
   } catch (error) {
-    alert(error.data?.statusMessage || 'Failed to save project');
+    useToast().error(error.data?.statusMessage || 'Failed to save project');
   } finally {
     saving.value = false;
   }
