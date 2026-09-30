@@ -1,9 +1,11 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
 
   if (method === 'GET') {
+    await requirePermission(event, 'blog', 'view');
     try {
       const query = getQuery(event);
       
@@ -84,6 +86,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'POST') {
+    await requirePermission(event, 'blog', 'create');
     try {
       const body = await readBody(event);
       if (!body.title || !body.post_catid || !body.content) {

@@ -1,5 +1,6 @@
 import { verifyJwt } from '../../utils/jwt';
 import { prisma } from '../../utils/prisma';
+import { getSessionTimeoutHours } from '../../utils/session';
 
 export default defineEventHandler(async (event) => {
   const token = getCookie(event, 'auth_token');
@@ -31,10 +32,28 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (user.is_active === false) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Access Denied - Account is deactivated',
+    });
+  }
+
+  const { getUserRbacProfile } = await import('../../utils/rbac');
+  const rbacProfile = await getUserRbacProfile(user.id);
+
+  const timeoutHours = await getSessionTimeoutHours();
   const { password: _, ...userWithoutPassword } = user;
 
   return {
     success: true,
-    user: userWithoutPassword,
+    user: {
+      ...userWithoutPassword,
+      role: rbacProfile?.role_name || user.role,
+      role_id: rbacProfile?.role_id || user.role_id,
+      is_super_admin: rbacProfile?.is_super_admin || false,
+      permissions: rbacProfile?.permissions || {},
+    },
+    sessionTimeoutHours: timeoutHours,
   };
 });

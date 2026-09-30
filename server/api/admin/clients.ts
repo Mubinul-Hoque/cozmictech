@@ -1,11 +1,13 @@
 import { prisma } from '../../utils/prisma'
 import { sanitizePlainText } from '../../utils/sanitize'
+import { requirePermission } from '../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
 
   // 1. GET: Fetch all clients
   if (method === 'GET') {
+    await requirePermission(event, 'clients', 'view')
     try {
       const clients = await prisma.clients.findMany({
         orderBy: { id: 'desc' }
@@ -23,6 +25,7 @@ export default defineEventHandler(async (event) => {
 
   // 2. POST: Create a new client logo record
   if (method === 'POST') {
+    await requirePermission(event, 'clients', 'create')
     try {
       const body = await readBody(event)
       const { client_name, logo } = body
@@ -52,6 +55,7 @@ export default defineEventHandler(async (event) => {
 
   // 3. PUT: Update an existing client logo record
   if (method === 'PUT') {
+    await requirePermission(event, 'clients', 'edit')
     try {
       const body = await readBody(event)
       const { id, client_name, logo } = body
@@ -86,6 +90,7 @@ export default defineEventHandler(async (event) => {
 
   // 4. DELETE: Delete a client logo record
   if (method === 'DELETE') {
+    await requirePermission(event, 'clients', 'delete')
     try {
       const query = getQuery(event)
       const id = query.id ? parseInt(query.id as string) : null

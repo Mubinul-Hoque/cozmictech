@@ -1,9 +1,11 @@
 import { prisma } from '../../../utils/prisma'
+import { requirePermission } from '../../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
 
   if (method === 'GET') {
+    await requirePermission(event, 'careers', 'view');
     try {
       const careers = await prisma.careers.findMany({
         orderBy: { created_at: 'desc' },
@@ -39,6 +41,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'POST') {
+    await requirePermission(event, 'careers', 'create');
     try {
       const body = await readBody(event)
       if (!body.post) {

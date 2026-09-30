@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
@@ -7,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
 
   if (method === 'GET') {
+    await requirePermission(event, 'projects', 'view');
     try {
       const project = await prisma.projects.findUnique({
         where: { id },
@@ -28,10 +30,29 @@ export default defineEventHandler(async (event) => {
       });
       if (!project) throw createError({ statusCode: 404, statusMessage: 'Project not found' });
       
+      let parsedServices: Array<{ title: string; details: string }> = [];
+      if (project.services_json) {
+        try {
+          const parsed = JSON.parse(project.services_json);
+          if (Array.isArray(parsed)) parsedServices = parsed;
+        } catch (e) {
+          parsedServices = [];
+        }
+      }
+      if (!parsedServices.length && project.services_rendered) {
+        const raw = project.services_rendered.replace(/<br\s*\/?>/gi, '\n');
+        const items = raw.includes('\n') ? raw.split('\n') : raw.split(',');
+        parsedServices = items
+          .map(i => i.replace(/^[-*•–—\s]+/, '').replace(/&amp;/g, '&').trim())
+          .filter(Boolean)
+          .map(title => ({ title, details: '' }));
+      }
+
       const mappedProject = {
         ...project,
         images: project.images_json ? JSON.parse(project.images_json) : [],
-        services: project.services_rendered || '',
+        services: parsedServices,
+        specifications: project.specifications_json ? JSON.parse(project.specifications_json) : [],
         project_categories: project.project_categories_link.map(pcl => ({
           category_id: pcl.category_id,
           category: pcl.categories
@@ -45,6 +66,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'PUT') {
+    await requirePermission(event, 'projects', 'edit');
     try {
       const body = await readBody(event);
       
@@ -90,6 +112,15 @@ export default defineEventHandler(async (event) => {
         }
       }
 
+      // Build free-form specifications array [{title, value}]
+      const rawSpecs = Array.isArray(body.specifications) ? body.specifications : [];
+      const cleanSpecs = rawSpecs
+        .map((item: any) => ({
+          title: sanitizePlainText(String(item?.title ?? '').trim()).slice(0, 200),
+          value: sanitizePlainText(String(item?.value ?? '').trim()).slice(0, 2000)
+        }))
+        .filter(item => item.title && item.value);
+
       const updatedProject = await prisma.$transaction(async (tx) => {
         // Delete all old associations
         await tx.project_categories_link.deleteMany({
@@ -113,20 +144,28 @@ export default defineEventHandler(async (event) => {
         const project_cost = String(body.project_cost || '').trim();
         const service_cost = String(body.service_cost || '').trim();
         const location = String(body.location || '').trim();
-        const feature = String(body.feature || '').trim();
-        const story = String(body.story || '').trim();
-        const area = String(body.area || '').trim();
-        const height = String(body.height || '').trim();
 
         // Enforce database limits
         if (
           title.length > 255 ||
-          project_cost.length > 20 || service_cost.length > 20 ||
-          location.length > 100 || feature.length > 255 || story.length > 20 ||
-          area.length > 50 || height.length > 25
+          project_cost.length > 100 || service_cost.length > 100 ||
+          location.length > 255
         ) {
           throw createError({ statusCode: 400, statusMessage: 'Input exceeds database length limit' });
         }
+
+        // Build dynamic services array [{title, details}]
+        const rawServices = Array.isArray(body.services) ? body.services : [];
+        const cleanServices = rawServices
+          .map((item: any) => ({
+            title: sanitizePlainText(String(item?.title ?? '').trim()).slice(0, 255),
+            details: sanitizePlainText(String(item?.details ?? '').trim()).slice(0, 3000)
+          }))
+          .filter(item => item.title);
+
+        const servicesSummary = cleanServices
+          .map(s => s.details ? `${s.title}: ${s.details}` : s.title)
+          .join('\n');
 
         // Update main record and write new category associations
         return await tx.projects.update({
@@ -140,14 +179,12 @@ export default defineEventHandler(async (event) => {
             status: status,
             start_date: start_date,
             end_date: end_date,
-            services_rendered: sanitizeHtmlContent(body.services || ''),
+            services_rendered: servicesSummary,
+            services_json: JSON.stringify(cleanServices),
             project_cost: sanitizePlainText(project_cost),
             service_cost: sanitizePlainText(service_cost),
             location: sanitizePlainText(location),
-            feature: sanitizePlainText(feature),
-            story: sanitizePlainText(story),
-            area: sanitizePlainText(area),
-            height: sanitizePlainText(height),
+            specifications_json: JSON.stringify(cleanSpecs),
             project_categories_link: {
               create: category_ids.map(catId => ({
                 categories: { connect: { id: catId } }
@@ -168,6 +205,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'projects', 'delete');
     try {
       await prisma.projects.delete({ where: { id } });
       

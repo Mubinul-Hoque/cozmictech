@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma'
+import { requirePermission } from '../../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
@@ -9,6 +10,7 @@ export default defineEventHandler(async (event) => {
   const id = parseInt(idStr)
 
   if (method === 'GET') {
+    await requirePermission(event, 'careers', 'view');
     try {
       const career = await prisma.careers.findUnique({
         where: { id }
@@ -31,6 +33,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'PUT') {
+    await requirePermission(event, 'careers', 'edit');
     try {
       const body = await readBody(event)
       if (!body.post) {
@@ -85,6 +88,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'careers', 'delete');
     try {
       await prisma.careers.delete({
         where: { id }

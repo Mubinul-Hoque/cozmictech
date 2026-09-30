@@ -26,12 +26,23 @@
         </div>
 
         <form class="space-y-6" @submit.prevent="handleLogin">
-          <!-- Failure Notification Banner -->
+          <!-- Session Expiration / Timeout Notification -->
+          <div v-if="infoMsg" class="rounded-2xl bg-amber-500/10 border border-amber-500/25 p-4 text-sm animate-fade-in">
+            <div class="flex items-start">
+              <Icon name="lucide:clock" class="text-[#feb900] text-lg leading-none mt-0.5 flex-shrink-0" />
+              <div class="ml-3">
+                <h4 class="font-bold text-amber-300">Session Expired</h4>
+                <p class="mt-1 text-slate-300 text-xs leading-relaxed">{{ infoMsg }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Failure / Lockout Notification Banner -->
           <div v-if="errorMsg" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 animate-shake text-sm">
             <div class="flex items-start">
-              <Icon name="lucide:x-circle" class="text-rose-400 text-lg leading-none mt-0.5" />
+              <Icon :name="isLockedOut ? 'lucide:shield-alert' : 'lucide:x-circle'" class="text-rose-400 text-lg leading-none mt-0.5 flex-shrink-0" />
               <div class="ml-3">
-                <h4 class="font-bold text-rose-300">Access Denied</h4>
+                <h4 class="font-bold text-rose-300">{{ isLockedOut ? 'Security Lockout Active' : 'Access Denied' }}</h4>
                 <p class="mt-1 text-slate-300 text-xs leading-relaxed">{{ errorMsg }}</p>
               </div>
             </div>
@@ -117,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 definePageMeta({
   layout: false
@@ -127,11 +138,25 @@ const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
 const errorMsg = ref('');
+const infoMsg = ref('');
 const loading = ref(false);
 const router = useRouter();
+const route = useRoute();
+
+const isLockedOut = computed(() => {
+  const msg = errorMsg.value.toLowerCase();
+  return msg.includes('locked') || msg.includes('too many');
+});
+
+onMounted(() => {
+  if (route.query.reason === 'timeout') {
+    infoMsg.value = 'Your session has expired due to inactivity. Please log in again for security.';
+  }
+});
 
 const handleLogin = async () => {
   errorMsg.value = '';
+  infoMsg.value = '';
   loading.value = true;
   
   try {

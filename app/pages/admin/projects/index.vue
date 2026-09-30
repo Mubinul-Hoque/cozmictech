@@ -77,7 +77,7 @@
       </div>
       
       <!-- Search and Filter Bar -->
-      <div class="p-5 border-b border-slate-200 bg-slate-50/40 flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div class="p-5 border-b border-slate-200 bg-slate-50/40 flex flex-col xl:flex-row gap-4 justify-between items-stretch xl:items-center">
         <div class="relative max-w-sm w-full">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <Icon name="lucide:search" class="text-slate-400" />
@@ -89,11 +89,11 @@
             placeholder="Search projects..."
           />
         </div>
-        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+        <div class="flex flex-wrap items-center gap-2.5 w-full xl:w-auto justify-start xl:justify-end">
           <!-- Category Filter -->
           <select 
             v-model="selectedCategory" 
-            class="px-4 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
+            class="px-3.5 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
           >
             <option value="">All Categories</option>
             <option 
@@ -108,7 +108,7 @@
           <!-- Sector Filter -->
           <select 
             v-model="selectedSector" 
-            class="px-4 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
+            class="px-3.5 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
           >
             <option value="">All Sectors</option>
             <option 
@@ -123,12 +123,37 @@
           <!-- Status Filter -->
           <select 
             v-model="selectedStatus" 
-            class="px-4 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
+            class="px-3.5 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
           >
             <option value="">All Statuses</option>
             <option value="Completed">Completed</option>
             <option value="Ongoing">Ongoing</option>
           </select>
+
+          <!-- Sort Control Group -->
+          <div class="inline-flex items-center bg-white border border-slate-350 rounded-full shadow-sm pl-3 pr-1 py-1 gap-1.5 text-xs">
+            <span class="text-slate-400 font-bold uppercase text-[10px] tracking-wider flex items-center gap-1">
+              <Icon name="lucide:arrow-up-down" class="text-slate-400 text-xs" />
+              Sort:
+            </span>
+            <select 
+              v-model="sortBy" 
+              class="bg-transparent font-bold text-slate-700 hover:text-slate-900 focus:outline-none cursor-pointer pr-1 text-xs"
+            >
+              <option value="id">Default (Newest)</option>
+              <option value="end_date">End Date</option>
+              <option value="start_date">Start Date</option>
+              <option value="service_cost">Contract Value</option>
+            </select>
+            <button 
+              type="button"
+              @click="toggleSortOrder" 
+              class="w-7 h-7 rounded-full bg-slate-100 hover:bg-[#feb900] text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer"
+              :title="sortOrder === 'asc' ? 'Ascending (Click for Descending)' : 'Descending (Click for Ascending)'"
+            >
+              <Icon :name="sortOrder === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down'" class="text-xs font-bold" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -138,20 +163,55 @@
           <thead class="bg-slate-50/50">
             <tr>
               <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Project Details</th>
+              
+              <!-- Start Date Sort Header -->
+              <th scope="col" class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none group" @click="handleSort('start_date')">
+                <div class="inline-flex items-center gap-1.5 transition-colors" :class="sortBy === 'start_date' ? 'text-amber-600 font-extrabold' : 'text-slate-400 group-hover:text-slate-700'">
+                  <span>Start Date</span>
+                  <span v-if="sortBy === 'start_date'" class="inline-flex items-center text-amber-500">
+                    <Icon :name="sortOrder === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down'" class="text-sm font-bold" />
+                  </span>
+                  <Icon v-else name="lucide:arrow-up-down" class="text-xs text-slate-300 group-hover:text-slate-400" />
+                </div>
+              </th>
+
+              <!-- End Date Sort Header -->
+              <th scope="col" class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none group" @click="handleSort('end_date')">
+                <div class="inline-flex items-center gap-1.5 transition-colors" :class="sortBy === 'end_date' ? 'text-amber-600 font-extrabold' : 'text-slate-400 group-hover:text-slate-700'">
+                  <span>End Date</span>
+                  <span v-if="sortBy === 'end_date'" class="inline-flex items-center text-amber-500">
+                    <Icon :name="sortOrder === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down'" class="text-sm font-bold" />
+                  </span>
+                  <Icon v-else name="lucide:arrow-up-down" class="text-xs text-slate-300 group-hover:text-slate-400" />
+                </div>
+              </th>
+
+              <!-- Contract Value Sort Header -->
+              <th scope="col" class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none group" @click="handleSort('service_cost')">
+                <div class="inline-flex items-center gap-1.5 transition-colors" :class="sortBy === 'service_cost' ? 'text-amber-600 font-extrabold' : 'text-slate-400 group-hover:text-slate-700'">
+                  <span>Contract Value</span>
+                  <span v-if="sortBy === 'service_cost'" class="inline-flex items-center text-amber-500">
+                    <Icon :name="sortOrder === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down'" class="text-sm font-bold" />
+                  </span>
+                  <Icon v-else name="lucide:arrow-up-down" class="text-xs text-slate-300 group-hover:text-slate-400" />
+                </div>
+              </th>
+
               <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
               <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
             <tr v-for="project in projectsData?.data || []" :key="project.id" class="hover:bg-slate-50/50 transition-colors duration-150 group">
+              <!-- Project Details -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-12 w-12 rounded-xl border border-slate-200 overflow-hidden shadow-sm bg-slate-50 flex items-center justify-center">
                     <img v-if="project.images && project.images.length > 0" :src="`/assets/img/projects/${project.images[0]}`" class="h-12 w-12 object-cover transition-transform duration-300 group-hover:scale-105" @error="$event.target.src='/assets/img/placeholder.jpg'" />
                     <Icon v-else name="lucide:image" class="text-slate-300 text-xl" />
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-bold text-[#364d59] group-hover:text-slate-900 transition-colors">{{ project.title }}</div>
+                  <div class="ml-4 max-w-xs sm:max-w-sm truncate">
+                    <div class="text-sm font-bold text-[#364d59] group-hover:text-slate-900 transition-colors truncate" :title="project.title">{{ project.title }}</div>
                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">ID: #{{ project.id }}</div>
                     <div class="flex flex-wrap gap-1 mt-1">
                       <span v-for="pc in project.project_categories || []" :key="pc.category.id" class="inline-block bg-slate-100 text-slate-600 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded">
@@ -161,6 +221,29 @@
                   </div>
                 </div>
               </td>
+
+              <!-- Start Date -->
+              <td class="px-5 py-4 whitespace-nowrap">
+                <span class="text-xs font-semibold" :class="sortBy === 'start_date' ? 'text-amber-800 font-bold bg-amber-50/80 px-2 py-1 rounded-md border border-amber-200/80' : 'text-slate-600'">
+                  {{ formatDate(project.start_date) }}
+                </span>
+              </td>
+
+              <!-- End Date -->
+              <td class="px-5 py-4 whitespace-nowrap">
+                <span class="text-xs font-semibold" :class="sortBy === 'end_date' ? 'text-amber-800 font-bold bg-amber-50/80 px-2 py-1 rounded-md border border-amber-200/80' : 'text-slate-600'">
+                  {{ formatDate(project.end_date) }}
+                </span>
+              </td>
+
+              <!-- Contract Value -->
+              <td class="px-5 py-4 whitespace-nowrap">
+                <span class="text-xs" :class="sortBy === 'service_cost' ? 'text-amber-800 font-extrabold bg-amber-50/80 px-2 py-1 rounded-md border border-amber-200/80' : 'text-slate-700 font-bold'">
+                  {{ formatCost(project.service_cost) }}
+                </span>
+              </td>
+
+              <!-- Status -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border" 
                   :class="project.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50/50 text-amber-700 border-amber-200'">
@@ -168,6 +251,8 @@
                   {{ project.status }}
                 </span>
               </td>
+
+              <!-- Actions -->
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                   <NuxtLink :to="`/admin/projects/${project.id}`" class="w-9 h-9 flex items-center justify-center text-slate-450 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-all duration-150" title="Edit Project">
@@ -180,7 +265,7 @@
               </td>
             </tr>
             <tr v-if="projectsData?.data?.length === 0">
-              <td colspan="3" class="px-6 py-12 text-center">
+              <td colspan="6" class="px-6 py-12 text-center">
                 <div class="flex flex-col items-center justify-center text-slate-400">
                   <Icon name="lucide:inbox" class="text-5xl mb-4 text-slate-350" />
                   <p class="text-base font-bold text-slate-700">No projects found</p>
@@ -351,8 +436,41 @@ const debouncedSearch = ref('');
 const selectedStatus = ref('');
 const selectedCategory = ref('');
 const selectedSector = ref('');
+const sortBy = ref('id');
+const sortOrder = ref('desc');
 const currentPage = ref(1);
 const pageSize = ref(10);
+
+const handleSort = (field) => {
+  if (sortBy.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = field;
+    sortOrder.value = 'desc';
+  }
+  currentPage.value = 1;
+};
+
+const toggleSortOrder = () => {
+  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  currentPage.value = 1;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch {
+    return String(dateStr);
+  }
+};
+
+const formatCost = (costStr) => {
+  if (!costStr || !String(costStr).trim()) return '—';
+  return String(costStr).trim();
+};
 
 // Fetch categories & sectors
 const headers = useRequestHeaders(['cookie']);
@@ -367,11 +485,13 @@ const { data: projectsData, pending, refresh: refreshProjects } = useFetch('/api
     search: debouncedSearch,
     status: selectedStatus,
     catId: selectedCategory,
-    sectorId: selectedSector
+    sectorId: selectedSector,
+    sortBy,
+    sortOrder
   },
   headers,
   key: 'admin-projects-list',
-  watch: [currentPage, debouncedSearch, selectedStatus, selectedCategory, selectedSector]
+  watch: [currentPage, debouncedSearch, selectedStatus, selectedCategory, selectedSector, sortBy, sortOrder]
 });
 
 // Debounce search query
@@ -384,7 +504,7 @@ watch(searchQuery, (newVal) => {
   }, 400);
 });
 
-watch([selectedStatus, selectedCategory, selectedSector], () => {
+watch([selectedStatus, selectedCategory, selectedSector, sortBy, sortOrder], () => {
   currentPage.value = 1;
 });
 

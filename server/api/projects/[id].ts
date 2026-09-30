@@ -30,10 +30,30 @@ export default defineEventHandler(async (event) => {
     const sector = { ...project.sectors, sector: project.sectors?.name };
     const client = project.client;
 
+    let parsedServices: Array<{ title: string; details: string }> = [];
+    if (project.services_json) {
+      try {
+        const parsed = JSON.parse(project.services_json);
+        if (Array.isArray(parsed)) parsedServices = parsed;
+      } catch (e) {
+        parsedServices = [];
+      }
+    }
+    if (!parsedServices.length && project.services_rendered) {
+      const raw = project.services_rendered.replace(/<br\s*\/?>/gi, '\n');
+      const items = raw.includes('\n') ? raw.split('\n') : raw.split(',');
+      parsedServices = items
+        .map(i => i.replace(/^[-*•–—\s]+/, '').replace(/&amp;/g, '&').trim())
+        .filter(Boolean)
+        .map(title => ({ title, details: '' }));
+    }
+
     const mappedProject = {
       ...project,
       images: project.images_json ? JSON.parse(project.images_json) : [],
-      services: project.services_rendered || '',
+      services: parsedServices,
+      services_rendered: project.services_rendered || '',
+      specifications: project.specifications_json ? JSON.parse(project.specifications_json) : [],
       project_categories: project.project_categories_link.map(link => ({ category_id: link.category_id }))
     };
 

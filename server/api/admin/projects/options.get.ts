@@ -1,6 +1,8 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
+  await requirePermission(event, 'projects', 'view');
   try {
     const [categories, rawSectors, clients] = await Promise.all([
       prisma.categories.findMany({

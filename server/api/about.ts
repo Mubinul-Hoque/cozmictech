@@ -9,8 +9,8 @@ export default defineCachedEventHandler(async (_event) => {
       take: 50,
       select: {
         id: true, name: true, designation: true,
-        image: true, message: true, fb: true,
-        insta: true, linkedin: true
+        image: true, message: true, facebook_url: true,
+        instagram_url: true, linkedin_url: true
       }
     }),
     prisma.services.findMany({
@@ -18,6 +18,17 @@ export default defineCachedEventHandler(async (_event) => {
     }),
     prisma.social_links.findMany()
   ])
+
+  const mappedTeam = team.map(m => ({
+    id: m.id,
+    name: m.name,
+    designation: m.designation,
+    image: m.image,
+    message: m.message,
+    fb: m.facebook_url,
+    insta: m.instagram_url,
+    linkedin: m.linkedin_url
+  }))
 
   const settingsMap: Record<string, string> = {}
   allSettings.forEach(s => settingsMap[s.setting_key] = s.setting_value || '')
@@ -71,7 +82,7 @@ export default defineCachedEventHandler(async (_event) => {
     if (name === 'linkedin') socialMap.linkedin = s.url || '#'
   })
 
-  return { aboutUs, team, social: socialMap, services }
+  return { aboutUs, team: mappedTeam, social: socialMap, services }
 }, {
   maxAge: 60 * 10, // 10-minute TTL
   name: 'about-page',

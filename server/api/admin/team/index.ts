@@ -1,9 +1,11 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
 
   if (method === 'GET') {
+    await requirePermission(event, 'team', 'view');
     try {
       const team = await prisma.team_members.findMany({
         orderBy: { id: 'desc' }
@@ -15,6 +17,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'POST') {
+    await requirePermission(event, 'team', 'create');
     try {
       const body = await readBody(event);
       if (!body.name || !body.designation) {

@@ -28,6 +28,17 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         options.headers = new Headers(options.headers as HeadersInit || {})
         options.headers.set('X-CSRF-Token', csrfToken.value)
       }
+    },
+    onResponseError ({ request, response }) {
+      if (response?.status === 401 && String(request).includes('/api/admin')) {
+        const authUser = useState('authUser')
+        authUser.value = null
+        if (import.meta.client && typeof window !== 'undefined') {
+          if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+            window.location.href = '/admin/login?reason=timeout'
+          }
+        }
+      }
     }
   })
 

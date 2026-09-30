@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
@@ -9,6 +10,7 @@ export default defineEventHandler(async (event) => {
   const id = parseInt(idStr);
 
   if (method === 'GET') {
+    await requirePermission(event, 'blog', 'view');
     try {
       const post = await prisma.posts.findUnique({
         where: { id }
@@ -30,6 +32,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'PUT') {
+    await requirePermission(event, 'blog', 'edit');
     try {
       const body = await readBody(event);
       if (!body.title || !body.post_catid || !body.content) {
@@ -73,6 +76,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'blog', 'delete');
     try {
       await prisma.posts.delete({
         where: { id }

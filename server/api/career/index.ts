@@ -1,6 +1,6 @@
 import { prisma } from '../../utils/prisma'
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (_event) => {
   try {
     const [careers, homepageSection] = await Promise.all([
       prisma.careers.findMany({
@@ -44,4 +44,8 @@ export default defineEventHandler(async (event) => {
       homepage: null
     }
   }
+}, {
+  maxAge: 60 * 10, // 10-minute TTL
+  name: 'career-page',
+  getKey: () => 'career-v2'
 })

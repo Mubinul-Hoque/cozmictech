@@ -1,10 +1,13 @@
 import { prisma } from '../../utils/prisma'
+import { getSessionTimeoutHours, setSessionTimeoutHours } from '../../utils/session'
+import { requirePermission } from '../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
 
   // ─── GET ───────────────────────────────────────────────────────────────────
   if (method === 'GET') {
+    await requirePermission(event, 'global_settings', 'view')
     try {
       const [homeSections, allSettings, socials] = await Promise.all([
         prisma.page_sections.findMany({ where: { page_slug: 'home' } }),
@@ -81,12 +84,25 @@ export default defineEventHandler(async (event) => {
         map: settingsMap['contact_map'] || ''
       }
 
+      const footer = {
+        copyright_text: settingsMap['footer_copyright_text'] || settingsMap['company_title'] || 'Cozmic Technology',
+        copyright_year: settingsMap['footer_copyright_year'] || '',
+        copyright_auto_year: settingsMap['footer_copyright_auto_year'] !== 'false',
+        designed_by_text: settingsMap['footer_designed_by_text'] || 'mDynamic',
+        designed_by_prefix: settingsMap['footer_designed_by_prefix'] || 'Designed by',
+        designed_by_url: settingsMap['footer_designed_by_url'] || 'https://mdynamic.us/'
+      }
+
+      const sessionTimeoutHours = await getSessionTimeoutHours();
       await clearPublicCache();
       return {
         success: true,
         homepage,
         contact,
-        social: socialMap
+        social: socialMap,
+        footer,
+        session_timeout_hours: sessionTimeoutHours,
+        isSuperAdmin: event.context.user?.role === 'SuperAdmin'
       }
     } catch (error: any) {
       console.error('Error fetching admin settings:', error)
@@ -96,9 +112,10 @@ export default defineEventHandler(async (event) => {
 
   // ─── POST ──────────────────────────────────────────────────────────────────
   if (method === 'POST') {
+    await requirePermission(event, 'global_settings', 'edit')
     try {
       const body = await readBody(event)
-      const { homepage, contact, social } = body
+      const { homepage, contact, social, footer } = body
 
       const safeSanitize = (val: unknown): string => {
         if (val === undefined || val === null) return ''
@@ -113,18 +130,27 @@ export default defineEventHandler(async (event) => {
       }
 
       // 1. Update Global Settings
-      const settingsToUpdate = {
+      const settingsToUpdate: Record<string, string> = {
         'company_title': safeSanitize(homepage?.company_title),
         'slogan': safeSanitize(homepage?.slogan),
         'logo': safeSanitize(homepage?.logo),
         'favicon': safeSanitize(homepage?.favicon),
         'theme': safeSanitize(homepage?.theme || 'theme-default'),
-        'contact_address': safeSanitize(contact?.address),
-        'contact_phone': safeSanitize(contact?.phone),
-        'contact_cell': safeSanitize(contact?.cell),
-        'contact_email': safeSanitize(contact?.email),
-        'contact_email2': safeSanitize(contact?.email2),
-        'contact_map': safeSanitize(contact?.map)
+        'footer_copyright_text': safeSanitize(footer?.copyright_text),
+        'footer_copyright_year': safeSanitize(footer?.copyright_year),
+        'footer_copyright_auto_year': footer?.copyright_auto_year ? 'true' : 'false',
+        'footer_designed_by_text': safeSanitize(footer?.designed_by_text),
+        'footer_designed_by_prefix': safeSanitize(footer?.designed_by_prefix || 'Designed by'),
+        'footer_designed_by_url': safeSanitize(footer?.designed_by_url)
+      }
+
+      if (contact) {
+        settingsToUpdate['contact_address'] = safeSanitize(contact.address)
+        settingsToUpdate['contact_phone'] = safeSanitize(contact.phone)
+        settingsToUpdate['contact_cell'] = safeSanitize(contact.cell)
+        settingsToUpdate['contact_email'] = safeSanitize(contact.email)
+        settingsToUpdate['contact_email2'] = safeSanitize(contact.email2)
+        settingsToUpdate['contact_map'] = safeSanitize(contact.map)
       }
 
       for (const [key, val] of Object.entries(settingsToUpdate)) {
@@ -133,6 +159,14 @@ export default defineEventHandler(async (event) => {
           update: { setting_value: val },
           create: { setting_key: key, setting_value: val }
         })
+      }
+
+      // Update session timeout if provided and user is SuperAdmin
+      if (body.session_timeout_hours !== undefined) {
+        const currentUser = event.context.user;
+        if (currentUser?.role === 'SuperAdmin') {
+          await setSessionTimeoutHours(Number(body.session_timeout_hours));
+        }
       }
 
       // 2. Update Page Sections (Home)

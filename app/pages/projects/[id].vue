@@ -85,7 +85,7 @@
                   class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 hover:bg-[#feb900] text-white hover:text-[#0f172a] flex items-center justify-center transition-all duration-300 z-20 border border-white/10 hover:border-transparent opacity-0 group-hover:opacity-100"
                   title="View Fullscreen"
                 >
-                  <Icon name="lucide:arrows-angle-expand" class="text-sm" />
+                  <Icon name="lucide:maximize-2" class="text-sm" />
                 </button>
               </div>
 
@@ -104,7 +104,10 @@
             </div>
 
             <!-- Project Details Description -->
-            <div class="bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-sm space-y-6">
+            <div 
+              v-if="data?.project?.description && data.project.description.trim() !== '' && data.project.description !== '<p><br></p>'"
+              class="bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-sm space-y-6"
+            >
               <h3 class="text-2xl md:text-3xl font-extrabold text-[#2e3135]">Project Narrative</h3>
               <div class="w-16 h-1 bg-[#feb900]"></div>
               
@@ -112,18 +115,73 @@
                 class="formatted-content text-gray-600 leading-relaxed text-justify text-sm md:text-base"
                 v-html="data?.project?.description"
               ></div>
+            </div>
 
-              <!-- Services tags -->
-              <div class="pt-6 border-t border-gray-100" v-if="data?.project?.services">
-                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-400 block mb-3">Provided Engineering Services</span>
-                <div class="flex flex-wrap gap-2">
-                  <span 
-                    v-for="s in data.project.services.split(',')" 
-                    :key="s" 
-                    class="bg-gray-100 border border-gray-200/50 text-gray-700 text-xs font-bold px-3.5 py-2 rounded-full tracking-wide shadow-sm"
-                  >
-                    {{ s.trim() }}
+            <!-- Provided Engineering Services Card -->
+            <div
+              v-if="populatedServices.length > 0"
+              class="bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-sm space-y-6"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-2xl md:text-3xl font-extrabold text-[#2e3135]">Provided Services</h3>
+                  <div class="w-16 h-1 bg-[#feb900] mt-2"></div>
+                </div>
+                <span class="text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">
+                  {{ populatedServices.length }} Service{{ populatedServices.length !== 1 ? 's' : '' }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  v-for="(svc, idx) in populatedServices"
+                  :key="idx"
+                  class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 hover:border-amber-300 hover:bg-amber-50/20 transition-all duration-300 flex flex-col justify-start group"
+                >
+                  <div class="flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 text-[#feb900] group-hover:bg-[#feb900] group-hover:text-slate-900 group-hover:border-transparent transition-all shadow-2xs font-extrabold text-xs">
+                      {{ idx + 1 }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="text-base font-bold text-slate-800 group-hover:text-[#0f172a] transition-colors leading-snug">
+                        {{ svc.title }}
+                      </h4>
+                      <p v-if="svc.details" class="text-xs md:text-sm text-slate-600 leading-relaxed mt-2 whitespace-pre-wrap">
+                        {{ svc.details }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Technical Specifications Card -->
+            <div
+              v-if="populatedSpecs.length > 0"
+              class="bg-white border border-gray-100 rounded-3xl p-8 md:p-10 shadow-sm space-y-6"
+            >
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <h3 class="text-2xl md:text-3xl font-extrabold text-[#2e3135]">Technical Specifications</h3>
+                  <div class="w-16 h-1 bg-[#feb900] mt-2"></div>
+                </div>
+                <span class="text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">
+                  {{ data?.sector?.sector }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                <div
+                  v-for="(spec, idx) in populatedSpecs"
+                  :key="idx"
+                  class="space-y-1"
+                >
+                  <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">
+                    {{ spec.title }}
                   </span>
+                  <p class="text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-wrap break-words">
+                    {{ spec.value }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -230,29 +288,18 @@
                   </div>
                 </div>
 
-                <!-- Area -->
-                <div class="flex items-start gap-4" v-if="data?.project?.area">
+                <!-- Service Cost -->
+                <div class="flex items-start gap-4" v-if="data?.project?.service_cost">
                   <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <Icon name="lucide:scaling" />
+                    <Icon name="lucide:coins" />
                   </div>
                   <div>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Total Area</span>
-                    <span class="text-sm font-bold text-slate-800">{{ data.project.area }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Service Value</span>
+                    <span class="text-sm font-bold text-slate-800">{{ data.project.service_cost }}</span>
                   </div>
                 </div>
 
-                <!-- Height -->
-                <div class="flex items-start gap-4" v-if="data?.project?.height">
-                  <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
-                    <Icon name="lucide:building-2" />
-                  </div>
-                  <div>
-                    <span class="text-[10px] text-slate-500 uppercase tracking-widest block">Height / Floors</span>
-                    <span class="text-sm font-bold text-slate-800">{{ data.project.height }}</span>
-                  </div>
-                </div>
 
-                <!-- Timeline -->
                 <div class="flex items-start gap-4" v-if="formattedTimeline">
                   <div class="w-10 h-10 rounded-xl bg-slate-50 border border-gray-100 flex items-center justify-center flex-shrink-0 text-[#feb900]">
                     <Icon name="lucide:calendar" />
@@ -340,14 +387,47 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const route = useRoute()
 const projectId = computed(() => parseInt(route.params.id))
 const { data } = await useFetch(() => `/api/projects/${projectId.value}`)
 
+// Analytics: track project view with context
+const { trackPageView } = useAnalytics()
+onMounted(() => {
+  if (!import.meta.client) return
+  const project = data.value?.project
+  setTimeout(() => {
+    trackPageView({
+      projectId: project?.id ?? null,
+      sectorId: project?.sector_id ?? null,
+      categoryId: project?.categories?.[0]?.id ?? null,
+    })
+  }, 400)
+})
+
 const activeSlideIdx = ref(0)
 const fullscreenOpen = ref(false)
+
+// Render only valid service items from the dynamic services array
+const populatedServices = computed(() => {
+  const raw = data.value?.project?.services;
+  if (Array.isArray(raw)) {
+    return raw.filter(s => s && s.title && String(s.title).trim().length > 0);
+  }
+  if (typeof raw === 'string' && raw.trim().length > 0) {
+    return raw.split(',').map(s => ({ title: s.trim(), details: '' })).filter(s => s.title);
+  }
+  return [];
+});
+
+// Render only non-empty spec rows from the free-form array
+const populatedSpecs = computed(() => {
+  const specs = data.value?.project?.specifications
+  if (!Array.isArray(specs)) return []
+  return specs.filter(s => s?.title?.trim() && s?.value?.trim())
+})
 
 const formattedTimeline = computed(() => {
   const p = data.value?.project

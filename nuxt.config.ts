@@ -37,10 +37,23 @@ export default defineNuxtConfig({
   // Image configuration
   image: {
     quality: 80,
+    format: ['webp', 'avif', 'jpeg', 'jpg', 'png']
+  },
+
+  nitro: {
+    compressPublicAssets: true
   },
 
   routeRules: {
-    '/assets/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } }
+    '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    '/assets/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    '/api/homepage': { headers: { 'cache-control': 'public, max-age=300, stale-while-revalidate=600' } },
+    '/api/common': { headers: { 'cache-control': 'public, max-age=60, stale-while-revalidate=300' } },
+    '/api/blog': { headers: { 'cache-control': 'public, max-age=180, stale-while-revalidate=300' } },
+    '/api/services': { headers: { 'cache-control': 'public, max-age=300, stale-while-revalidate=600' } },
+    '/api/about': { headers: { 'cache-control': 'public, max-age=300, stale-while-revalidate=600' } },
+    '/api/advanced-search-config': { headers: { 'cache-control': 'public, max-age=300, stale-while-revalidate=600' } },
+    '/api/career/**': { headers: { 'cache-control': 'public, max-age=300, stale-while-revalidate=600' } }
   },
 
   app: {

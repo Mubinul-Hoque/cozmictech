@@ -3,6 +3,9 @@
     <!-- Global Admin Notifications -->
     <AdminToast />
     
+    <!-- Admin Inactivity Auto-Logout Warning Modal -->
+    <AdminSessionWarning />
+    
     <!-- Backdrop Overlay for Mobile Sidebar -->
     <div 
       v-if="sidebarOpen" 
@@ -41,78 +44,169 @@
       <!-- Navigation Menu -->
       <nav class="flex-1 overflow-y-auto py-6 px-4 z-10 space-y-1">
         <ul class="space-y-1.5">
-          <li>
+          <li v-if="can('dashboard')">
             <NuxtLink to="/admin" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:gauge" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Overview
             </NuxtLink>
           </li>
-          <li>
+          <li v-if="can('contact')">
             <NuxtLink to="/admin/messages" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:mail" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Inbox Messages
             </NuxtLink>
           </li>
           
-          <li class="px-5 pt-6 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <li v-if="hasContentAccess" class="px-5 pt-6 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
             Content Manager
           </li>
-          <li>
-            <NuxtLink to="/admin/blog" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <Icon name="lucide:book-open-text" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
-              Blog Articles
-            </NuxtLink>
+          
+          <!-- Collapsible Pages Dropdown -->
+          <li v-if="hasPagesAccess">
+            <button 
+              type="button" 
+              @click="pagesOpen = !pagesOpen"
+              class="w-full group flex items-center justify-between px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 focus:outline-none select-none cursor-pointer"
+              :class="{ 'text-white bg-white/10 font-semibold': isPagesActive }"
+            >
+              <div class="flex items-center">
+                <Icon name="lucide:layers" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" :class="isPagesActive ? 'text-[#feb900]' : 'text-slate-300'" />
+                <span>Pages</span>
+              </div>
+              <Icon 
+                name="lucide:chevron-down" 
+                class="text-base transition-transform duration-200 text-slate-400 group-hover:text-white"
+                :class="{ 'rotate-180': pagesOpen }"
+              />
+            </button>
+
+            <!-- Collapsible Sub-menu -->
+            <transition
+              enter-active-class="transition-all duration-200 ease-out overflow-hidden"
+              enter-from-class="opacity-0 max-h-0"
+              enter-to-class="opacity-100 max-h-96"
+              leave-active-class="transition-all duration-150 ease-in overflow-hidden"
+              leave-from-class="opacity-100 max-h-96"
+              leave-to-class="opacity-0 max-h-0"
+            >
+              <div v-show="pagesOpen" class="mt-1 pl-4 pr-1">
+                <ul class="border-l-2 border-white/10 pl-2 space-y-1 py-1">
+                  <li v-if="can('pages')">
+                    <NuxtLink 
+                      to="/admin/about" 
+                      class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" 
+                      active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" 
+                      @click="sidebarOpen = false"
+                    >
+                      <Icon name="lucide:file-user" class="mr-3 text-base group-hover:scale-110 transition-transform duration-200" />
+                      About
+                    </NuxtLink>
+                  </li>
+                  <li v-if="can('services')">
+                    <NuxtLink 
+                      to="/admin/services" 
+                      class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" 
+                      active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" 
+                      @click="sidebarOpen = false"
+                    >
+                      <Icon name="lucide:server" class="mr-3 text-base group-hover:scale-110 transition-transform duration-200" />
+                      Services
+                    </NuxtLink>
+                  </li>
+                  <li v-if="can('blog')">
+                    <NuxtLink 
+                      to="/admin/blog" 
+                      class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" 
+                      active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" 
+                      @click="sidebarOpen = false"
+                    >
+                      <Icon name="lucide:book-open-text" class="mr-3 text-base group-hover:scale-110 transition-transform duration-200" />
+                      Blog
+                    </NuxtLink>
+                  </li>
+                  <li v-if="can('careers')">
+                    <NuxtLink 
+                      to="/admin/career" 
+                      class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" 
+                      active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" 
+                      @click="sidebarOpen = false"
+                    >
+                      <Icon name="lucide:briefcase" class="mr-3 text-base group-hover:scale-110 transition-transform duration-200" />
+                      Careers
+                    </NuxtLink>
+                  </li>
+                  <li v-if="can('contact')">
+                    <NuxtLink 
+                      to="/admin/contact" 
+                      class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" 
+                      active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" 
+                      @click="sidebarOpen = false"
+                    >
+                      <Icon name="lucide:phone-call" class="mr-3 text-base group-hover:scale-110 transition-transform duration-200" />
+                      Contact
+                    </NuxtLink>
+                  </li>
+                </ul>
+              </div>
+            </transition>
           </li>
-          <li>
+
+          <li v-if="can('projects')">
             <NuxtLink to="/admin/projects" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:briefcase" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Portfolio Projects
             </NuxtLink>
           </li>
-          <li>
+          <li v-if="can('clients')">
+            <NuxtLink to="/admin/clients" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
+              <Icon name="lucide:handshake" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
+              Clients
+            </NuxtLink>
+          </li>
+          <li v-if="can('advanced_search')">
+            <NuxtLink to="/admin/advanced-search" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
+              <Icon name="lucide:sliders-horizontal" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
+              Advanced Search
+            </NuxtLink>
+          </li>
+          <li v-if="can('testimonials')">
             <NuxtLink to="/admin/testimonials" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:message-square-quote" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Testimonials
             </NuxtLink>
           </li>
-          <li>
+          <li v-if="can('team')">
             <NuxtLink to="/admin/team" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:users" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Team Members
             </NuxtLink>
           </li>
-          <li>
-            <NuxtLink to="/admin/services" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <Icon name="lucide:server" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
-              Services
-            </NuxtLink>
-          </li>
-          <li>
+          <li v-if="can('global_settings')">
             <NuxtLink to="/admin/settings" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:settings" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
               Global Settings
             </NuxtLink>
           </li>
-          <li>
-            <NuxtLink to="/admin/about" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <Icon name="lucide:file-user" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
-              About Us Page
-            </NuxtLink>
-          </li>
-          <li>
-            <NuxtLink to="/admin/career" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
-              <Icon name="lucide:briefcase" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
-              Career Openings
-            </NuxtLink>
-          </li>
           
-          <li class="px-5 pt-6 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Access Control
+          <li v-if="hasAccessSection" class="px-5 pt-6 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Analytics &amp; Access
           </li>
-          <li>
+          <li v-if="can('visitor_analytics')">
+            <NuxtLink to="/admin/analytics" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
+              <Icon name="lucide:bar-chart-2" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
+              Visitor Analytics
+            </NuxtLink>
+          </li>
+          <li v-if="can('users_roles')">
             <NuxtLink to="/admin/users" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
               <Icon name="lucide:user-cog" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
-              Administrators
+              Users &amp; Roles
+            </NuxtLink>
+          </li>
+          <li v-if="can('security')">
+            <NuxtLink to="/admin/security" class="group flex items-center px-4 py-2.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" @click="sidebarOpen = false">
+              <Icon name="lucide:shield-check" class="mr-3.5 text-lg group-hover:scale-110 transition-transform duration-200" />
+              Security &amp; Policies
             </NuxtLink>
           </li>
         </ul>
@@ -147,6 +241,16 @@
           </div>
         </div>
         <div class="flex items-center space-x-3 sm:space-x-6">
+          <!-- Session Auto-Logout Indicator Badge -->
+          <NuxtLink 
+            to="/admin/settings" 
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 transition-colors text-xs font-semibold cursor-pointer"
+            :title="`Auto-logout configured to ${adminSession.timeoutHours.value} hour${adminSession.timeoutHours.value > 1 ? 's' : ''}`"
+          >
+            <Icon name="lucide:shield-check" class="text-amber-500 text-sm" />
+            <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Timeout: {{ adminSession.timeoutHours.value }}h</span>
+          </NuxtLink>
+
           <button class="relative w-10 h-10 flex items-center justify-center text-slate-500 hover:text-[#364d59] hover:bg-slate-100 rounded-full transition-all duration-200">
             <Icon name="lucide:bell" class="text-lg" />
             <span class="absolute top-2 right-2 w-2 h-2 bg-[#feb900] rounded-full border-2 border-white animate-pulse"></span>
@@ -177,10 +281,64 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted, ref, computed, watch } from 'vue';
+
 const authUser = useState('authUser');
+const { can, isSuperAdmin } = usePermissions();
 const router = useRouter();
 const route = useRoute();
 const sidebarOpen = ref(false);
+const adminSession = useAdminSession();
+
+const pagesOpen = ref(false);
+
+const hasPagesAccess = computed(() => {
+  return can('pages') || can('services') || can('blog') || can('careers') || can('contact');
+});
+
+const hasContentAccess = computed(() => {
+  return (
+    hasPagesAccess.value ||
+    can('projects') ||
+    can('clients') ||
+    can('advanced_search') ||
+    can('testimonials') ||
+    can('team') ||
+    can('global_settings')
+  );
+});
+
+const hasAccessSection = computed(() => {
+  return can('visitor_analytics') || can('users_roles') || can('security');
+});
+
+const isPagesActive = computed(() => {
+  const p = route.path;
+  return (
+    p.startsWith('/admin/about') ||
+    p.startsWith('/admin/services') ||
+    p.startsWith('/admin/blog') ||
+    p.startsWith('/admin/career') ||
+    p.startsWith('/admin/contact')
+  );
+});
+
+onMounted(() => {
+  adminSession.initSessionWatcher();
+  if (isPagesActive.value) {
+    pagesOpen.value = true;
+  }
+});
+
+watch(() => route.path, (newPath, oldPath) => {
+  if (newPath !== oldPath && isPagesActive.value) {
+    pagesOpen.value = true;
+  }
+});
+
+onUnmounted(() => {
+  adminSession.cleanupSessionWatcher();
+});
 
 const { data: commonData } = await useFetch('/api/common')
 useHead({
@@ -196,14 +354,8 @@ useHead({
   }
 })
 
-const logout = async () => {
-  try {
-    await $fetch('/api/auth/logout', { method: 'POST' });
-    authUser.value = null;
-    router.push('/admin/login');
-  } catch (error) {
-    console.error('Logout failed', error);
-  }
+const logout = () => {
+  adminSession.logout(false);
 };
 </script>
 

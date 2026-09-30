@@ -59,77 +59,79 @@
       <div class="p-8">
         <form @submit.prevent="saveSettings" class="space-y-8">
           
-          <!-- TAB 1: SITE IDENTITY -->
-          <div v-if="activeTab === 'identity'" class="space-y-6 max-w-3xl">
-            <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Site Branding & Meta Identity</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Company display Name</label>
-                <input 
-                  type="text" 
-                  v-model="form.homepage.company_title" 
-                  placeholder="e.g. Cozmic Technology" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Slogan / Subtitle Tagline</label>
-                <input 
-                  type="text" 
-                  v-model="form.homepage.slogan" 
-                  placeholder="e.g. Let's work together to make great things possible." 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <!-- Logo Upload Slot -->
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider font-sans">Website Logo Image</label>
-                <div class="flex items-center gap-4 mt-2">
-                  <div v-if="form.homepage.logo" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-1">
-                    <img :src="`/assets/img/${form.homepage.logo}`" class="max-w-full max-h-full object-contain" />
-                    <button @click.prevent="removeField('logo')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all active:scale-90">
-                      <Icon name="lucide:x" class="text-xs" />
-                    </button>
-                  </div>
-                  <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
-                    <span v-if="uploading.logo" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Logo</span>
-                    <input type="file" @change="onFileUpload($event, 'logo')" class="hidden" accept="image/*" />
-                  </label>
+          <!-- TAB 1: SITE IDENTITY & THEME PRESETS -->
+          <div v-if="activeTab === 'identity'" class="space-y-10 max-w-4xl">
+            <!-- Subsection 1: Site Branding & Meta Identity -->
+            <div class="space-y-6">
+              <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Site Branding &amp; Meta Identity</h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Company display Name</label>
+                  <input 
+                    type="text" 
+                    v-model="form.homepage.company_title" 
+                    placeholder="e.g. Cozmic Technology" 
+                    class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                  />
                 </div>
-                <p class="text-[10px] text-slate-400 font-medium">Replaces the top navigation header brand text with this image when set.</p>
-              </div>
 
-              <!-- Favicon Upload Slot -->
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider font-sans">Browser Favicon Icon</label>
-                <div class="flex items-center gap-4 mt-2">
-                  <div v-if="form.homepage.favicon" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-1">
-                    <img :src="`/assets/img/${form.homepage.favicon}`" class="max-w-full max-h-full object-contain" />
-                    <button @click.prevent="removeField('favicon')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all active:scale-90">
-                      <Icon name="lucide:x" class="text-xs" />
-                    </button>
-                  </div>
-                  <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
-                    <span v-if="uploading.favicon" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                    <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Favicon</span>
-                    <input type="file" @change="onFileUpload($event, 'favicon')" class="hidden" accept="image/*" />
-                  </label>
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Slogan / Subtitle Tagline</label>
+                  <input 
+                    type="text" 
+                    v-model="form.homepage.slogan" 
+                    placeholder="e.g. Let's work together to make great things possible." 
+                    class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                  />
                 </div>
-                <p class="text-[10px] text-slate-400 font-medium">Updates browser tab favicon. Ideal formats: .ico, png, or .svg.</p>
+
+                <!-- Logo Upload Slot -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider font-sans">Website Logo Image</label>
+                  <div class="flex items-center gap-4 mt-2">
+                    <div v-if="form.homepage.logo" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-1">
+                      <img :src="`/assets/img/${form.homepage.logo}`" class="max-w-full max-h-full object-contain" />
+                      <button @click.prevent="removeField('logo')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all active:scale-90">
+                        <Icon name="lucide:x" class="text-xs" />
+                      </button>
+                    </div>
+                    <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
+                      <span v-if="uploading.logo" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
+                      <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Logo</span>
+                      <input type="file" @change="onFileUpload($event, 'logo')" class="hidden" accept="image/*" />
+                    </label>
+                  </div>
+                  <p class="text-[10px] text-slate-400 font-medium">Replaces the top navigation header brand text with this image when set.</p>
+                </div>
+
+                <!-- Favicon Upload Slot -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider font-sans">Browser Favicon Icon</label>
+                  <div class="flex items-center gap-4 mt-2">
+                    <div v-if="form.homepage.favicon" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center p-1">
+                      <img :src="`/assets/img/${form.homepage.favicon}`" class="max-w-full max-h-full object-contain" />
+                      <button @click.prevent="removeField('favicon')" class="absolute top-0.5 right-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1 leading-none shadow transition-all active:scale-90">
+                        <Icon name="lucide:x" class="text-xs" />
+                      </button>
+                    </div>
+                    <label class="flex-1 max-w-xs flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
+                      <span v-if="uploading.favicon" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
+                      <span v-else class="text-xs font-bold flex items-center gap-2 uppercase tracking-wide"><Icon name="lucide:upload" /> Upload Favicon</span>
+                      <input type="file" @change="onFileUpload($event, 'favicon')" class="hidden" accept="image/*" />
+                    </label>
+                  </div>
+                  <p class="text-[10px] text-slate-400 font-medium">Updates browser tab favicon. Ideal formats: .ico, png, or .svg.</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- TAB: THEME PRESETS -->
-          <div v-if="activeTab === 'theme'" class="space-y-8 max-w-4xl">
-            <div>
-              <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Global Website Theme Presets</h3>
-              <p class="text-xs text-slate-400 mt-1">Select one of our professionally curated global theme presets to completely change the color palette, fonts, buttons, forms, links, and overall visual style of the website with a single click.</p>
-            </div>
+            <!-- Subsection 2: Global Website Theme Presets -->
+            <div class="pt-6 border-t border-slate-100 space-y-6">
+              <div>
+                <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Global Website Theme Presets</h3>
+                <p class="text-xs text-slate-400 mt-1">Select one of our professionally curated global theme presets to completely change the color palette, fonts, buttons, forms, links, and overall visual style of the website with a single click.</p>
+              </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Preset 1: Amber Construction -->
@@ -296,8 +298,9 @@
 
             </div>
           </div>
+        </div>
 
-          <!-- TAB 2: HERO BANNER SLIDESHOW -->
+        <!-- TAB 2: HERO BANNER SLIDESHOW -->
           <div v-if="activeTab === 'hero'" class="space-y-6 max-w-3xl">
             <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Hero Carousel & Background Slides</h3>
             
@@ -600,289 +603,392 @@
           </div>
 
           <!-- TAB 6: FOOTER & SOCIAL LINKS -->
-          <div v-if="activeTab === 'footer'" class="space-y-6 max-w-3xl">
-            <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Footer & Social Network URLs</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Facebook Page URL</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:facebook" /></span>
-                  <input 
-                    type="text" 
-                    v-model="form.social.fb" 
-                    placeholder="https://facebook.com/page" 
-                    class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                  />
+          <div v-if="activeTab === 'footer'" class="space-y-8 max-w-4xl">
+            <!-- SECTION A: Footer Copyright & Credits -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+              <div class="border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:copyright" class="text-[#feb900] text-lg" />
+                  <h3 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight">Footer Legal Copyright &amp; Credits</h3>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">
+                  Manage the copyright statement, year, designer attribution, and external URL displayed in the bottom footer.
+                </p>
+              </div>
+
+              <!-- Live Preview Card -->
+              <div class="rounded-2xl bg-[#0f172a] text-white p-5 border border-slate-800 shadow-sm space-y-3">
+                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">
+                  <span class="flex items-center gap-1.5"><Icon name="lucide:eye" class="text-[#feb900]" /> Frontend Live Preview</span>
+                  <span class="text-amber-400/80 font-mono text-[10px]">Real-time preview</span>
+                </div>
+                <div class="pt-1 text-center font-sans space-y-1.5">
+                  <div class="text-xs sm:text-sm text-slate-300">
+                    &copy; Copyright <span v-if="previewFooterYear">{{ previewFooterYear }} </span><strong class="text-white">{{ form.footer.copyright_text || form.homepage.company_title || 'Cozmic Technology' }}</strong>. All Rights Reserved
+                  </div>
+                  <div class="text-[11px] sm:text-xs text-slate-400">
+                    {{ form.footer.designed_by_prefix || 'Designed by' }} 
+                    <a :href="form.footer.designed_by_url || 'https://mdynamic.us/'" target="_blank" class="text-[#feb900] underline font-semibold hover:text-amber-300 transition-colors">
+                      {{ form.footer.designed_by_text || 'mDynamic' }}
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Instagram URL</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:instagram" /></span>
+              <!-- Form Inputs -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <!-- Copyright Text / Company Name -->
+                <div class="space-y-2 md:col-span-2">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Copyright Text / Company Name
+                  </label>
                   <input 
                     type="text" 
-                    v-model="form.social.insta" 
-                    placeholder="https://instagram.com/profile" 
-                    class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                    v-model="form.footer.copyright_text" 
+                    :placeholder="form.homepage.company_title || 'Cozmic Technology'" 
+                    class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
                   />
+                  <p class="text-[11px] text-slate-400">The company or entity name appearing in "&copy; Copyright ...". Defaults to Company Title if left blank.</p>
                 </div>
-              </div>
 
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">LinkedIn Company URL</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:linkedin" /></span>
-                  <input 
-                    type="text" 
-                    v-model="form.social.linkedin" 
-                    placeholder="https://linkedin.com/company/name" 
-                    class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                  />
-                </div>
-              </div>
+                <!-- Copyright Year Mode -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Copyright Year</label>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="form.footer.copyright_auto_year ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-700'">
+                      {{ form.footer.copyright_auto_year ? 'Dynamic (Current Year)' : 'Custom Static' }}
+                    </span>
+                  </div>
 
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Twitter URL</label>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:twitter" /></span>
-                  <input 
-                    type="text" 
-                    v-model="form.social.twitter" 
-                    placeholder="https://twitter.com/username" 
-                    class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TAB 7: CONTACT INFORMATION -->
-          <div v-if="activeTab === 'contact'" class="space-y-6 max-w-3xl">
-            <h3 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">Contact Details & Map Embed Configuration</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2 md:col-span-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Company Registered Address</label>
-                <textarea 
-                  rows="3"
-                  v-model="form.contact.address" 
-                  placeholder="Company Address details..." 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                ></textarea>
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Primary Phone</label>
-                <input 
-                  type="text" 
-                  v-model="form.contact.phone" 
-                  placeholder="e.g. +88 01894932401" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Alternative Cell / Mobile</label>
-                <input 
-                  type="text" 
-                  v-model="form.contact.cell" 
-                  placeholder="e.g. +88 01894932401" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Primary Contact Email</label>
-                <input 
-                  type="email" 
-                  v-model="form.contact.email" 
-                  placeholder="info@cozmictech.com" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Secondary Contact Email</label>
-                <input 
-                  type="email" 
-                  v-model="form.contact.email2" 
-                  placeholder="info@cozmictech.com" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Contact Section Header Title</label>
-                <input 
-                  type="text" 
-                  v-model="form.contact.sec_title" 
-                  placeholder="e.g. Contact" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Company Display Name</label>
-                <input 
-                  type="text" 
-                  v-model="form.contact.company_title" 
-                  placeholder="e.g. Cozmic Technology" 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
-                />
-              </div>
-
-              <div class="space-y-2 md:col-span-2">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Google Map Embed Link (src attribute)</label>
-                <textarea 
-                  rows="3"
-                  v-model="form.contact.map" 
-                  placeholder="https://www.google.com/maps/embed?pb=..." 
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors font-mono"
-                ></textarea>
-                <p class="text-[10px] text-slate-400 font-medium">Extract the source URL from the Google Map iframe code (the `src` attribute) and paste it here.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- TAB 8: CLIENT LOGOS -->
-          <div v-if="activeTab === 'clients'" class="space-y-6 animate-fade-in-up">
-            <div class="border-b border-slate-100 pb-4">
-              <h3 class="text-lg font-bold text-slate-700">Client Logos Directory</h3>
-              <p class="text-xs text-slate-400 mt-1">Manage brand logos and client names that display in the client banner at the bottom of the home page.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <!-- Left Column: Clients List Grid -->
-              <div class="lg:col-span-2 space-y-4">
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div 
-                    v-for="client in clientsList" 
-                    :key="client.id"
-                    class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-between gap-3 relative group hover:-translate-y-0.5 hover:shadow-sm transition-all duration-300"
-                  >
-                    <!-- Client Logo Image -->
-                    <div class="w-full aspect-[3/2] flex items-center justify-center bg-white rounded-xl border border-slate-100 p-3 overflow-hidden shadow-sm">
-                      <img 
-                        :src="client.logo ? `/assets/img/${client.logo}` : '/assets/img/favicon.png'" 
-                        :alt="client.client_name" 
-                        class="max-h-full max-w-full object-contain grayscale group-hover:grayscale-0 transition-all duration-300" 
+                  <label class="inline-flex items-center gap-3 cursor-pointer select-none">
+                    <div class="relative inline-flex items-center">
+                      <input 
+                        type="checkbox" 
+                        v-model="form.footer.copyright_auto_year" 
+                        class="sr-only peer"
                       />
+                      <div class="relative w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#feb900]"></div>
                     </div>
-                    
-                    <!-- Client Name -->
-                    <div class="text-center w-full px-1">
-                      <span class="text-xs font-bold text-slate-700 block truncate" :title="client.client_name">{{ client.client_name }}</span>
-                    </div>
+                    <span class="text-xs font-bold text-slate-700">
+                      Automatic / Current Year ({{ new Date().getFullYear() }})
+                    </span>
+                  </label>
 
-                    <!-- Client Action Bar -->
-                    <div class="flex gap-2 justify-center w-full border-t border-slate-200/60 pt-2.5 mt-1">
-                      <button 
-                        type="button" 
-                        @click="editClient(client)" 
-                        class="inline-flex items-center justify-center p-1.5 text-xs text-slate-500 hover:text-[#feb900] bg-white rounded-lg border border-slate-200 transition-colors shadow-sm cursor-pointer"
-                        title="Edit Client"
-                      >
-                        <Icon name="lucide:pencil" />
-                      </button>
-                      <button 
-                        type="button" 
-                        @click="deleteClient(client.id)" 
-                        class="inline-flex items-center justify-center p-1.5 text-xs text-slate-500 hover:text-rose-600 bg-white rounded-lg border border-slate-200 transition-colors shadow-sm cursor-pointer"
-                        title="Delete Client"
-                      >
-                        <Icon name="lucide:trash-2" />
-                      </button>
-                    </div>
+                  <div v-if="!form.footer.copyright_auto_year" class="pt-2">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Custom Year / Range</label>
+                    <input 
+                      type="text" 
+                      v-model="form.footer.copyright_year" 
+                      placeholder="e.g. 2026 or 2023-2026"
+                      class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 text-sm focus:outline-none focus:border-[#feb900]"
+                    />
                   </div>
-
-                  <!-- Empty state -->
-                  <div 
-                    v-if="clientsList.length === 0" 
-                    class="col-span-2 sm:col-span-3 py-16 text-center border border-dashed border-slate-350 rounded-3xl text-slate-400 font-bold uppercase tracking-wider text-xs bg-slate-50/50"
-                  >
-                    No client logos found. Use the form to add one.
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right Column: Add/Edit Form Card -->
-              <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 h-fit space-y-6 shadow-sm">
-                <div>
-                  <h4 class="text-sm font-extrabold text-slate-700 uppercase tracking-wider">
-                    {{ clientForm.id ? 'Edit Client Details' : 'Add Client Brand' }}
-                  </h4>
-                  <p class="text-[10px] text-slate-400 font-semibold mt-1">
-                    {{ clientForm.id ? 'Modify client details below and submit to save.' : 'Enter client details and upload a brand logo image.' }}
+                  <p class="text-[11px] text-slate-400">
+                    {{ form.footer.copyright_auto_year ? 'Automatically stays up-to-date with the current calendar year.' : 'Specify a custom year or year range (e.g. 2024-2026).' }}
                   </p>
                 </div>
 
-                <div class="space-y-4">
-                  <!-- Name Input -->
+                <!-- Designer Prefix & Name -->
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                   <div class="space-y-1">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Client / Partner Name</label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">"Designed by" Prefix</label>
                     <input 
                       type="text" 
-                      v-model="clientForm.client_name"
-                      placeholder="e.g. Google Cloud"
-                      class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-xs transition-colors"
+                      v-model="form.footer.designed_by_prefix" 
+                      placeholder="Designed by" 
+                      class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 text-sm focus:outline-none focus:border-[#feb900]"
                     />
                   </div>
-
-                  <!-- Logo Upload Slot -->
-                  <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Brand Logo Image</label>
-                    <div class="flex items-center gap-4 mt-1">
-                      <!-- Image preview -->
-                      <div v-if="clientForm.logo" class="relative w-16 h-16 rounded-xl border border-slate-200 overflow-hidden bg-white flex items-center justify-center p-1 shadow-sm">
-                        <img :src="`/assets/img/${clientForm.logo}`" class="max-w-full max-h-full object-contain" />
-                        <button 
-                          type="button" 
-                          @click="clientForm.logo = ''" 
-                          class="absolute -top-1 -right-1 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-0.5 leading-none shadow transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                        >
-                          <Icon name="lucide:x" class="text-xs" />
-                        </button>
-                      </div>
-                      <!-- Upload label button -->
-                      <label class="flex-1 flex flex-col items-center justify-center px-4 py-3 bg-white text-slate-500 rounded-xl border border-slate-300 border-dashed hover:border-[#feb900] hover:text-[#feb900] cursor-pointer transition-all">
-                        <span v-if="clientUploading" class="animate-spin rounded-full h-4 w-4 border-2 border-[#feb900] border-t-transparent"></span>
-                        <span v-else class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-wide">
-                          <Icon name="lucide:upload" /> {{ clientForm.logo ? 'Change Image' : 'Upload Logo' }}
-                        </span>
-                        <input type="file" @change="onClientLogoUpload" class="hidden" accept="image/*" />
-                      </label>
-                    </div>
-                    <p class="text-[9px] text-slate-400 font-semibold leading-relaxed">Required: transparent PNG or SVG logo looks best against the slate background.</p>
+                  <div class="space-y-1 pt-1">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Designer / Company Text</label>
+                    <input 
+                      type="text" 
+                      v-model="form.footer.designed_by_text" 
+                      placeholder="mDynamic" 
+                      class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-800 text-sm focus:outline-none focus:border-[#feb900]"
+                    />
                   </div>
+                  <p class="text-[11px] text-slate-400">Anchor text displayed for the attribution credit.</p>
+                </div>
 
-                  <!-- Submit Actions -->
-                  <div class="flex gap-2 pt-2">
-                    <button 
-                      type="button" 
-                      @click="saveClient"
-                      :disabled="clientSaving || clientUploading"
-                      class="flex-1 bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 py-2.5 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all shadow-sm cursor-pointer text-center"
-                    >
-                      <span v-if="clientSaving" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent mr-1"></span>
-                      {{ clientForm.id ? 'Save Changes' : 'Add Client' }}
-                    </button>
-                    <button 
-                      v-if="clientForm.id"
-                      type="button" 
-                      @click="resetClientForm"
-                      class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 px-4 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer text-center"
-                    >
-                      Cancel
-                    </button>
+                <!-- Designer URL -->
+                <div class="space-y-2 md:col-span-2">
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Designer / Company URL
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:link" /></span>
+                    <input 
+                      type="url" 
+                      v-model="form.footer.designed_by_url" 
+                      placeholder="https://mdynamic.us/" 
+                      class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                    />
+                  </div>
+                  <p class="text-[11px] text-slate-400">Target link opened in a new tab when clicking the designer credit.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION B: Social Network URLs -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+              <div class="border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:share-2" class="text-[#feb900] text-lg" />
+                  <h3 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight">Social Network Profiles</h3>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">
+                  Configure social profile URLs linked in the footer and site-wide headers.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Facebook Page URL</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:facebook" /></span>
+                    <input 
+                      type="text" 
+                      v-model="form.social.fb" 
+                      placeholder="https://facebook.com/page" 
+                      class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Instagram URL</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:instagram" /></span>
+                    <input 
+                      type="text" 
+                      v-model="form.social.insta" 
+                      placeholder="https://instagram.com/profile" 
+                      class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">LinkedIn Company URL</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:linkedin" /></span>
+                    <input 
+                      type="text" 
+                      v-model="form.social.linkedin" 
+                      placeholder="https://linkedin.com/company/name" 
+                      class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Twitter URL</label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><Icon name="lucide:twitter" /></span>
+                    <input 
+                      type="text" 
+                      v-model="form.social.twitter" 
+                      placeholder="https://twitter.com/username" 
+                      class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] text-sm transition-colors"
+                    />
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+
+          <!-- TAB 7: OUR STRENGTHS -->
+          <div v-if="activeTab === 'strengths'" class="space-y-6">
+            <!-- Header row -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+              <div>
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:zap" class="text-[#feb900] text-xl" />
+                  <h3 class="text-lg font-extrabold text-slate-800 tracking-tight">Our Strengths</h3>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">
+                  Manage the strength/advantage items displayed on the homepage. Each entry has a title, icon, and optional description.
+                </p>
+              </div>
+              <button
+                type="button"
+                @click="openStrengthModal()"
+                class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 text-slate-950 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all shadow-sm cursor-pointer"
+              >
+                <Icon name="lucide:plus-circle" class="text-base" />
+                Add Strength
+              </button>
+            </div>
+
+            <!-- Loading -->
+            <div v-if="loadingStrengths" class="flex justify-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-[#feb900]"></div>
+            </div>
+
+            <!-- Empty state -->
+            <div v-else-if="strengthsList.length === 0" class="text-center py-16 bg-slate-50/60 rounded-3xl border border-dashed border-slate-200">
+              <div class="w-14 h-14 rounded-2xl bg-amber-50 text-[#feb900] flex items-center justify-center text-3xl mx-auto mb-3">
+                <Icon name="lucide:zap" />
+              </div>
+              <p class="text-sm font-extrabold text-slate-700">No Strengths Added</p>
+              <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Click "Add Strength" above to create your first strength item.</p>
+            </div>
+
+            <!-- Cards grid -->
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div
+                v-for="item in strengthsList"
+                :key="item.id"
+                class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3 hover:shadow-md transition-all group"
+              >
+                <!-- Icon & Title -->
+                <div class="flex items-start gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-xl text-[#feb900] flex-shrink-0">
+                    <Icon :name="item.icon || 'lucide:zap'" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h4 class="text-sm font-extrabold text-slate-800 leading-snug truncate">{{ item.title }}</h4>
+                    <p class="text-[11px] font-mono text-slate-400 mt-0.5">{{ item.icon || 'lucide:zap' }}</p>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <p v-if="item.content" class="text-xs text-slate-500 leading-relaxed line-clamp-3">
+                  {{ item.content }}
+                </p>
+                <p v-else class="text-xs text-slate-300 italic">No description</p>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    @click="openStrengthModal(item)"
+                    class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 hover:border-[#feb900] hover:bg-amber-50 text-slate-600 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    <Icon name="lucide:pencil" class="text-xs" />
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    @click="deleteStrength(item.id)"
+                    :disabled="deletingStrengthId === item.id"
+                    class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-600 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <span v-if="deletingStrengthId === item.id" class="animate-spin rounded-full h-3 w-3 border-2 border-rose-500 border-t-transparent"></span>
+                    <Icon v-else name="lucide:trash-2" class="text-xs" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ STRENGTH MODAL ═══════════════════════════ -->
+  <div
+    v-if="showStrengthModal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+  >
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 sm:p-8 space-y-5">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-50 text-[#feb900] flex items-center justify-center text-xl flex-shrink-0">
+            <Icon name="lucide:zap" />
+          </div>
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-800">{{ strengthForm.id ? 'Edit Strength' : 'Add New Strength' }}</h3>
+            <p class="text-xs text-slate-400">Strength items are displayed on the frontend homepage</p>
+          </div>
+        </div>
+        <button @click="showStrengthModal = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition-colors cursor-pointer">
+          <Icon name="lucide:x" class="text-lg" />
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Title -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+            Strength Title <span class="text-rose-500">*</span>
+          </label>
+          <input
+            type="text"
+            v-model.trim="strengthForm.title"
+            placeholder="e.g. 15+ Years of Experience"
+            required
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 focus:outline-none focus:border-[#feb900] transition-colors"
+          />
+        </div>
+
+        <!-- Icon -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Icon <span class="text-slate-400 font-normal">(Lucide icon name)</span></label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-[#feb900] text-xl flex-shrink-0">
+              <Icon :name="strengthForm.icon || 'lucide:zap'" />
+            </div>
+            <input
+              type="text"
+              v-model.trim="strengthForm.icon"
+              placeholder="lucide:zap"
+              class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 font-mono focus:outline-none focus:border-[#feb900] transition-colors"
+            />
+          </div>
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            <button
+              v-for="ic in commonIcons"
+              :key="ic"
+              type="button"
+              @click="strengthForm.icon = ic"
+              class="inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-mono transition-all cursor-pointer"
+              :class="strengthForm.icon === ic ? 'border-[#feb900] bg-amber-50 text-amber-900' : 'border-slate-200 text-slate-500 hover:border-slate-300'"
+              :title="ic"
+            >
+              <Icon :name="ic" class="text-sm" />
+              {{ ic.replace('lucide:', '') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Description <span class="text-slate-400 font-normal">(optional)</span></label>
+          <textarea
+            v-model.trim="strengthForm.content"
+            rows="3"
+            placeholder="Brief description of this strength..."
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 resize-none focus:outline-none focus:border-[#feb900] transition-colors"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-1">
+        <button
+          type="button"
+          @click="showStrengthModal = false"
+          class="px-5 py-2.5 rounded-full border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          @click="saveStrength"
+          :disabled="savingStrength || !strengthForm.title"
+          class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+        >
+          <span v-if="savingStrength" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent"></span>
+          <Icon v-else name="lucide:check" class="text-sm" />
+          {{ savingStrength ? 'Saving...' : (strengthForm.id ? 'Update Strength' : 'Add Strength') }}
+        </button>
       </div>
     </div>
   </div>
@@ -903,16 +1009,13 @@ const successMsg = ref('')
 const errorMsg = ref('')
 
 const tabs = [
-  { id: 'identity', name: 'Site Identity', icon: 'bi bi-info-circle' },
-  { id: 'theme', name: 'Theme Presets', icon: 'bi bi-palette' },
+  { id: 'identity', name: 'Identity & Theme', icon: 'bi bi-palette' },
   { id: 'hero', name: 'Hero Slideshow', icon: 'bi bi-image' },
   { id: 'glance', name: 'At a Glance', icon: 'bi bi-eye' },
   { id: 'sections', name: 'Page Sections', icon: 'bi bi-layout-three-columns' },
   { id: 'custom', name: 'Custom Blocks', icon: 'bi bi-grid-3x3-gap' },
   { id: 'footer', name: 'Footer & Socials', icon: 'bi bi-share' },
-  { id: 'contact', name: 'Contact Details', icon: 'bi bi-telephone' },
-  { id: 'clients', name: 'Client Logos', icon: 'bi bi-briefcase' },
-    { id: 'strengths', name: 'Our Strengths', icon: 'lucide:lightning-charge' }
+  { id: 'strengths', name: 'Our Strengths', icon: 'lucide:lightning-charge' }
 ]
 
 const form = reactive({
@@ -955,7 +1058,22 @@ const form = reactive({
     fb: '',
     insta: '',
     linkedin: ''
+  },
+  footer: {
+    copyright_text: '',
+    copyright_year: '',
+    copyright_auto_year: true,
+    designed_by_text: '',
+    designed_by_prefix: 'Designed by',
+    designed_by_url: ''
   }
+})
+
+const previewFooterYear = computed(() => {
+  if (form.footer.copyright_auto_year) {
+    return new Date().getFullYear()
+  }
+  return form.footer.copyright_year || ''
 })
 
 const uploading = reactive({
@@ -974,6 +1092,8 @@ const slides = ref([])
 // Fetch current configurations
 const { data: settingsRes, pending, refresh } = await useFetch('/api/admin/settings')
 
+const route = useRoute()
+
 const loadSettings = () => {
   if (settingsRes.value && settingsRes.value.success) {
     if (settingsRes.value.homepage) {
@@ -990,11 +1110,37 @@ const loadSettings = () => {
     if (settingsRes.value.social) {
       Object.assign(form.social, settingsRes.value.social)
     }
+    if (settingsRes.value.footer) {
+      Object.assign(form.footer, settingsRes.value.footer)
+    }
   }
 }
 
 onMounted(() => {
   loadSettings()
+  if (route.query.tab === 'security') {
+    navigateTo('/admin/security', { replace: true })
+    return
+  }
+  if (route.query.tab === 'advanced_search') {
+    navigateTo('/admin/advanced-search', { replace: true })
+    return
+  }
+  if (route.query.tab === 'contact') {
+    navigateTo('/admin/contact', { replace: true })
+    return
+  }
+  if (route.query.tab === 'clients') {
+    navigateTo('/admin/clients', { replace: true })
+    return
+  }
+  if (route.query.tab === 'theme') {
+    activeTab.value = 'identity'
+    return
+  }
+  if (route.query.tab && tabs.some(t => t.id === route.query.tab)) {
+    activeTab.value = route.query.tab
+  }
 })
 
 watch(settingsRes, () => {
@@ -1084,9 +1230,13 @@ const saveSettings = async () => {
   form.homepage.hero_images = [...slides.value]
 
   try {
+    const payload = {
+      ...form
+    }
+
     const res = await useNuxtApp().$fetch('/api/admin/settings', {
       method: 'POST',
-      body: form
+      body: payload
     })
 
     if (res.success) {
@@ -1107,114 +1257,84 @@ const saveSettings = async () => {
   }
 }
 
-// Client Logos CRUD State & Logic
-const { data: clientsRes, refresh: refreshClients } = await useFetch('/api/admin/clients')
-const clientsList = computed(() => clientsRes.value?.data || [])
+// ─── OUR STRENGTHS CRUD ───────────────────────────────────────────────────────
+const strengthsList = ref([])
+const loadingStrengths = ref(false)
+const savingStrength = ref(false)
+const deletingStrengthId = ref(null)
+const showStrengthModal = ref(false)
 
-const clientForm = reactive({
-  id: null,
-  client_name: '',
-  logo: ''
-})
-const clientSaving = ref(false)
-const clientUploading = ref(false)
+const blankStrengthForm = () => ({ id: null, title: '', icon: 'lucide:zap', content: '' })
+const strengthForm = reactive(blankStrengthForm())
 
-const onClientLogoUpload = async (event) => {
-  const file = event.target.files[0]
-  if (!file) return
+const commonIcons = [
+  'lucide:zap', 'lucide:star', 'lucide:shield-check', 'lucide:trophy', 'lucide:rocket',
+  'lucide:award', 'lucide:target', 'lucide:lightbulb', 'lucide:handshake', 'lucide:users',
+  'lucide:globe', 'lucide:chart-line', 'lucide:badge-check', 'lucide:clock', 'lucide:cpu'
+]
 
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('folder', 'clients')
-
-  clientUploading.value = true
-  errorMsg.value = ''
-  successMsg.value = ''
-
+const fetchStrengths = async () => {
+  loadingStrengths.value = true
   try {
-    const data = await useNuxtApp().$fetch('/api/admin/upload', {
-      method: 'POST',
-      body: formData
-    })
-    clientForm.logo = data.filename
+    const res = await useNuxtApp().$fetch('/api/admin/strengths')
+    if (res?.success) strengthsList.value = res.data || []
   } catch (err) {
-    console.error(err)
-    errorMsg.value = 'Failed to upload logo image. Ensure it is a valid image under 5MB.'
+    console.error('Failed to fetch strengths:', err)
   } finally {
-    clientUploading.value = false
+    loadingStrengths.value = false
   }
 }
 
-const saveClient = async () => {
-  if (!clientForm.client_name) {
-    errorMsg.value = 'Client name is required.'
-    return
+const openStrengthModal = (item = null) => {
+  if (item) {
+    Object.assign(strengthForm, { id: item.id, title: item.title, icon: item.icon || 'lucide:zap', content: item.content || '' })
+  } else {
+    Object.assign(strengthForm, blankStrengthForm())
   }
+  showStrengthModal.value = true
+}
 
-  clientSaving.value = true
-  errorMsg.value = ''
-  successMsg.value = ''
-
-  const isEdit = !!clientForm.id
-  const method = isEdit ? 'PUT' : 'POST'
-
+const saveStrength = async () => {
+  if (!strengthForm.title.trim()) return
+  savingStrength.value = true
   try {
-    const res = await useNuxtApp().$fetch('/api/admin/clients', {
+    const method = strengthForm.id ? 'PUT' : 'POST'
+    const res = await useNuxtApp().$fetch('/api/admin/strengths', {
       method,
-      body: clientForm
+      body: { id: strengthForm.id, title: strengthForm.title, icon: strengthForm.icon, content: strengthForm.content }
     })
-
-    if (res.success) {
-      successMsg.value = res.message || 'Client saved successfully.'
-      resetClientForm()
-      refreshClients()
-      setTimeout(() => successMsg.value = '', 4000)
-    } else {
-      errorMsg.value = res.message || 'Failed to save client.'
+    if (res?.success) {
+      showStrengthModal.value = false
+      useToast().success(res.message || 'Strength saved successfully.')
+      await fetchStrengths()
     }
   } catch (err) {
-    console.error(err)
-    errorMsg.value = err.data?.message || err.message || 'An error occurred while saving client.'
+    useToast().error(err.data?.statusMessage || err.message || 'Failed to save strength.')
   } finally {
-    clientSaving.value = false
+    savingStrength.value = false
   }
 }
 
-const editClient = (client) => {
-  clientForm.id = client.id
-  clientForm.client_name = client.client_name
-  clientForm.logo = client.logo || ''
-}
-
-const resetClientForm = () => {
-  clientForm.id = null
-  clientForm.client_name = ''
-  clientForm.logo = ''
-}
-
-const deleteClient = async (id) => {
-  if (!confirm('Are you sure you want to delete this client?')) return
-
-  errorMsg.value = ''
-  successMsg.value = ''
-
+const deleteStrength = async (id) => {
+  if (!confirm('Are you sure you want to delete this strength item?')) return
+  deletingStrengthId.value = id
   try {
-    const res = await useNuxtApp().$fetch(`/api/admin/clients?id=${id}`, {
-      method: 'DELETE'
-    })
-
-    if (res.success) {
-      successMsg.value = res.message || 'Client deleted successfully.'
-      refreshClients()
-      setTimeout(() => successMsg.value = '', 4000)
-    } else {
-      errorMsg.value = res.message || 'Failed to delete client.'
+    const res = await useNuxtApp().$fetch(`/api/admin/strengths?id=${id}`, { method: 'DELETE' })
+    if (res?.success) {
+      useToast().success(res.message || 'Strength deleted.')
+      await fetchStrengths()
     }
   } catch (err) {
-    console.error(err)
-    errorMsg.value = err.data?.message || err.message || 'An error occurred while deleting client.'
+    useToast().error(err.data?.statusMessage || err.message || 'Failed to delete strength.')
+  } finally {
+    deletingStrengthId.value = null
   }
 }
+
+// Fetch strengths when tab becomes active
+watch(activeTab, (tab) => {
+  if (tab === 'strengths') fetchStrengths()
+})
 </script>
 
 <style scoped>

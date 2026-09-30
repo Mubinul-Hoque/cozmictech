@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma'
+import { requirePermission } from '../../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
@@ -9,6 +10,7 @@ export default defineEventHandler(async (event) => {
   const id = parseInt(idStr)
 
   if (method === 'PUT') {
+    await requirePermission(event, 'categories', 'edit');
     try {
       const body = await readBody(event)
       const catName = String(body.name || '').trim()
@@ -35,6 +37,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'categories', 'delete');
     try {
       await prisma.categories.delete({
         where: { id }

@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
@@ -7,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
 
   if (method === 'GET') {
+    await requirePermission(event, 'testimonials', 'view');
     try {
       const testimonial = await prisma.testimonials.findUnique({ where: { id } });
       if (!testimonial) throw createError({ statusCode: 404, statusMessage: 'Testimonial not found' });
@@ -17,6 +19,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'PUT') {
+    await requirePermission(event, 'testimonials', 'edit');
     try {
       const body = await readBody(event);
       if (!body.name || !body.designation || !body.story) {
@@ -58,6 +61,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'testimonials', 'delete');
     try {
       await prisma.testimonials.delete({ where: { id } });
       await clearPublicCache();

@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
@@ -7,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
 
   if (method === 'GET') {
+    await requirePermission(event, 'services', 'view');
     try {
       const service = await prisma.services.findUnique({ where: { id } });
       if (!service) throw createError({ statusCode: 404, statusMessage: 'Service not found' });
@@ -17,6 +19,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'PUT') {
+    await requirePermission(event, 'services', 'edit');
     try {
       const body = await readBody(event);
       const name = String(body.name || '').trim();
@@ -52,6 +55,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'services', 'delete');
     try {
       await prisma.services.delete({ where: { id } });
       await clearPublicCache();

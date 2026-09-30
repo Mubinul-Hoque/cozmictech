@@ -55,6 +55,7 @@ model posts {
 
   @@index([category_id], map: "fk_posts_category")
   @@index([created_at], map: "idx_posts_created_at")
+  @@index([published_at], map: "idx_posts_published_at")
 }
 
 model projects {
@@ -69,10 +70,8 @@ model projects {
   project_cost            String?                   @db.VarChar(100)
   service_cost            String?                   @db.VarChar(100)
   location                String?                   @db.VarChar(255)
-  feature                 String?                   @db.VarChar(255)
-  story                   String?                   @db.VarChar(100)
-  area                    String?                   @db.VarChar(100)
-  height                  String?                   @db.VarChar(100)
+  specifications_json     String?                   @db.LongText
+  services_json           String?                   @db.LongText
   start_date              DateTime?                 @db.Date
   end_date                DateTime?                 @db.Date
   created_at              DateTime                  @default(now()) @db.Timestamp(0)
@@ -85,6 +84,9 @@ model projects {
   @@index([sector_id], map: "fk_projects_sector")
   @@index([status], map: "idx_projects_status")
   @@index([created_at], map: "idx_projects_created_at")
+  @@index([start_date], map: "idx_projects_start_date")
+  @@index([end_date], map: "idx_projects_end_date")
+  @@index([title], map: "idx_projects_title")
 }
 
 model sectors {
@@ -93,6 +95,8 @@ model sectors {
   created_at DateTime   @default(now()) @db.Timestamp(0)
   updated_at DateTime   @default(now()) @db.Timestamp(0)
   projects   projects[]
+
+  @@index([name], map: "idx_sectors_name")
 }
 
 model services {
@@ -104,6 +108,8 @@ model services {
   description       String?  @db.Text
   created_at        DateTime @default(now()) @db.Timestamp(0)
   updated_at        DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([name], map: "idx_services_name")
 }
 
 model testimonials {
@@ -136,6 +142,9 @@ model careers {
   is_active         Boolean?  @default(true)
   created_at        DateTime  @default(now()) @db.Timestamp(0)
   updated_at        DateTime  @default(now()) @db.Timestamp(0)
+
+  @@index([is_active], map: "idx_careers_is_active")
+  @@index([created_at], map: "idx_careers_created_at")
 }
 
 model categories {
@@ -148,6 +157,9 @@ model categories {
   messages                messages[]
   posts                   posts[]
   project_categories_link project_categories_link[]
+
+  @@index([name], map: "idx_categories_name")
+  @@index([type], map: "idx_categories_type")
 }
 
 model page_sections {
@@ -164,6 +176,9 @@ model page_sections {
   is_active       Boolean? @default(true)
   created_at      DateTime @default(now()) @db.Timestamp(0)
   updated_at      DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([page_slug, section_key], map: "idx_page_sec_slug_key")
+  @@index([page_slug], map: "idx_page_sec_slug")
 }
 
 model project_categories_link {
@@ -181,6 +196,28 @@ model settings {
   setting_group String?  @db.VarChar(50)
   setting_value String?  @db.Text
   updated_at    DateTime @default(now()) @db.Timestamp(0)
+}
+
+model page_views {
+  id           Int      @id @default(autoincrement())
+  page_path    String   @db.VarChar(500)
+  page_title   String?  @db.VarChar(255)
+  referrer     String?  @db.VarChar(500)
+  country_code String?  @db.VarChar(10)
+  country_name String?  @db.VarChar(100)
+  device_type  String?  @db.VarChar(20)
+  source       String?  @db.VarChar(50)
+  keyword      String?  @db.VarChar(255)
+  sector_id    Int?
+  category_id  Int?
+  project_id   Int?
+  visited_at   DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([visited_at], map: "idx_pv_visited_at")
+  @@index([page_path], map: "idx_pv_page_path")
+  @@index([country_code], map: "idx_pv_country")
+  @@index([device_type], map: "idx_pv_device")
+  @@index([source], map: "idx_pv_source")
 }
 
 model social_links {
@@ -216,17 +253,74 @@ model team_members {
 }
 
 model users {
+  id         Int       @id @default(autoincrement())
+  username   String    @db.VarChar(50)
+  email      String    @unique(map: "idx_users_email") @db.VarChar(100)
+  password   String    @db.VarChar(255)
+  image      String?   @db.VarChar(255)
+  role       String    @default("Admin") @db.VarChar(50)
+  role_id    Int?
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+  updated_at DateTime  @default(now()) @db.Timestamp(0)
+  roles      roles?    @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "fk_users_role")
+
+  @@index([role_id], map: "fk_users_role")
+}
+
+model roles {
+  id          Int                @id @default(autoincrement())
+  name        String             @unique(map: "idx_roles_name") @db.VarChar(100)
+  description String?            @db.Text
+  is_system   Boolean            @default(false)
+  created_at  DateTime           @default(now()) @db.Timestamp(0)
+  updated_at  DateTime           @default(now()) @db.Timestamp(0)
+  users       users[]
+  permissions role_permissions[]
+}
+
+model role_permissions {
   id         Int      @id @default(autoincrement())
-  username   String   @db.VarChar(50)
-  email      String   @unique(map: "idx_users_email") @db.VarChar(100)
-  password   String   @db.VarChar(255)
-  image      String?  @db.VarChar(255)
-  role       String   @default("Admin") @db.VarChar(50)
+  role_id    Int
+  module     String   @db.VarChar(100)
+  action     String   @db.VarChar(50)
   created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
+  roles      roles    @relation(fields: [role_id], references: [id], onDelete: Cascade, map: "fk_role_permissions_role")
+
+  @@unique([role_id, module, action], map: "idx_role_perm_unique")
+  @@index([role_id], map: "fk_role_permissions_role")
+  @@index([module], map: "idx_role_perm_module")
 }
 
 enum ProjectStatus {
   Ongoing
   Completed
+}
+
+model security_logs {
+  id          Int      @id @default(autoincrement())
+  action      String   @db.VarChar(100)
+  identifier  String?  @db.VarChar(150)
+  user_id     Int?
+  ip_address  String?  @db.VarChar(100)
+  user_agent  String?  @db.VarChar(500)
+  device_type String?  @db.VarChar(50)
+  severity    String   @default("info") @db.VarChar(20)
+  details     String?  @db.Text
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([created_at], map: "idx_seclog_created_at")
+  @@index([ip_address], map: "idx_seclog_ip")
+  @@index([action], map: "idx_seclog_action")
+  @@index([severity], map: "idx_seclog_severity")
+}
+
+model blocked_ips {
+  id         Int      @id @default(autoincrement())
+  ip_address String   @unique(map: "idx_blocked_ips_ip") @db.VarChar(100)
+  reason     String?  @db.VarChar(255)
+  blocked_by String?  @db.VarChar(100)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([ip_address], map: "idx_bip_ip")
 }

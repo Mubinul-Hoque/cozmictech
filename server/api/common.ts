@@ -42,6 +42,14 @@ export default defineCachedEventHandler(async (_event) => {
       favicon: settingsMap['favicon'] || '', 
       theme: settingsMap['theme'] || 'theme-default' 
     },
+    footer: {
+      copyright_text: settingsMap['footer_copyright_text'] || settingsMap['company_title'] || 'Cozmic Technology',
+      copyright_year: settingsMap['footer_copyright_year'] || '',
+      copyright_auto_year: settingsMap['footer_copyright_auto_year'] !== 'false',
+      designed_by_text: settingsMap['footer_designed_by_text'] || 'mDynamic',
+      designed_by_prefix: settingsMap['footer_designed_by_prefix'] || 'Designed by',
+      designed_by_url: settingsMap['footer_designed_by_url'] || 'https://mdynamic.us/'
+    },
     services: services || [],
     aboutUs: aboutStorySec ? { story_body: aboutStorySec.content } : null
   }

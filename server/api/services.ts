@@ -1,6 +1,6 @@
 import { prisma } from '../utils/prisma'
 
-export default defineEventHandler(async (_event) => {
+export default defineCachedEventHandler(async (_event) => {
   const [services, servicesIntro] = await Promise.all([
     prisma.services.findMany({
       select: { id: true, name: true, icon: true, short_description: true }
@@ -19,4 +19,8 @@ export default defineEventHandler(async (_event) => {
       tag3: servicesIntro?.subtitle_or_tag || 'We provide reliable, efficient, and cost-effective geotechnical investigation and engineering consultancy services to firms nationwide.'
     }
   }
+}, {
+  maxAge: 60 * 10, // 10-minute TTL
+  name: 'services-page',
+  getKey: () => 'services-v2'
 })

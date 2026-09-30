@@ -1,4 +1,5 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
@@ -7,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
 
   if (method === 'GET') {
+    await requirePermission(event, 'team', 'view');
     try {
       const member = await prisma.team_members.findUnique({ where: { id } });
       if (!member) throw createError({ statusCode: 404, statusMessage: 'Team member not found' });
@@ -17,6 +19,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'PUT') {
+    await requirePermission(event, 'team', 'edit');
     try {
       const body = await readBody(event);
       if (!body.name || !body.designation) {
@@ -62,6 +65,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'team', 'delete');
     try {
       await prisma.team_members.delete({ where: { id } });
       await clearPublicCache();

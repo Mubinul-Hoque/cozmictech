@@ -6,14 +6,15 @@ import { URL } from 'url';
 
 dotenv.config();
 
-const dbUrl = process.env.DATABASE_URL || "mysql://root:@localhost:3306/cozmictech";
+const dbUrl = process.env.DATABASE_URL || "mysql://root:@127.0.0.1:3306/cozmictech_v2";
 const url = new URL(dbUrl);
+const hostname = url.hostname === 'localhost' ? '127.0.0.1' : (url.hostname || '127.0.0.1');
 const adapter = new PrismaMariaDb({
-  host: url.hostname || 'localhost',
+  host: hostname,
   port: url.port ? parseInt(url.port) : 3306,
   user: decodeURIComponent(url.username || 'root'),
   password: decodeURIComponent(url.password || ''),
-  database: decodeURIComponent(url.pathname.replace(/^\//, '') || 'cozmictech'),
+  database: decodeURIComponent(url.pathname.replace(/^\//, '') || 'cozmictech_v2'),
 });
 
 const prisma = new PrismaClient({ adapter });
@@ -22,19 +23,20 @@ async function main() {
   const email = 'mubinulhq@gmail.com';
   const hashedPassword = await bcrypt.hash('s.admin123##', 10);
 
-  const existing = await prisma.user.findFirst({ where: { email } });
+  const existing = await prisma.users.findFirst({ where: { email } });
   if (existing) {
-    await prisma.user.update({
+    const updated = await prisma.users.update({
       where: { id: existing.id },
       data: {
-        username: 'Mubinul Hoque',
+        username: existing.username || 'Mubinul Hoque',
         password: hashedPassword,
-        role: 'SuperAdmin'
+        role: 'SuperAdmin',
+        updated_at: new Date()
       }
     });
-    console.log('Super Admin user updated successfully! You can now log in.');
+    console.log(`Super Admin user updated successfully! ID: ${updated.id}, Email: ${updated.email}, Role: ${updated.role}`);
   } else {
-    await prisma.user.create({
+    const created = await prisma.users.create({
       data: {
         username: 'Mubinul Hoque',
         email,
@@ -42,7 +44,7 @@ async function main() {
         role: 'SuperAdmin',
       }
     });
-    console.log('Super Admin user created successfully! You can now log in.');
+    console.log(`Super Admin user created successfully! ID: ${created.id}, Email: ${created.email}, Role: ${created.role}`);
   }
 }
 
@@ -54,3 +56,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

@@ -129,10 +129,10 @@
       <div class="footer-legal text-center relative">
         <div class="container mx-auto px-4 lg:px-8">
           <div class="copyright">
-            &copy; Copyright <strong><span>{{ data?.homepage?.company_title || 'Cozmic Technology' }}</span></strong>. All Rights Reserved
+            &copy; Copyright <span v-if="displayCopyrightYear">{{ displayCopyrightYear }} </span><strong><span>{{ data?.footer?.copyright_text || data?.homepage?.company_title || 'Cozmic Technology' }}</span></strong>. All Rights Reserved
           </div>
           <div class="credits">
-            Designed by <a href="https://mdynamic.us/" target="_blank">mDynamic</a>
+            {{ data?.footer?.designed_by_prefix || 'Designed by' }} <a :href="data?.footer?.designed_by_url || 'https://mdynamic.us/'" target="_blank" rel="noopener noreferrer">{{ data?.footer?.designed_by_text || 'mDynamic' }}</a>
           </div>
         </div>
       </div>
@@ -151,9 +151,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 const { data } = await useFetch('/api/common')
+
+const displayCopyrightYear = computed(() => {
+  const footer = data.value?.footer
+  if (footer?.copyright_auto_year !== false) {
+    return new Date().getFullYear()
+  }
+  return footer?.copyright_year || ''
+})
 
 useHead({
   title: () => data.value?.homepage?.company_title ? `${data.value.homepage.company_title} - Engineering Consultancy` : 'Cozmic Technology - Engineering Consultancy',

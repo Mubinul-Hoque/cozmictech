@@ -1,7 +1,9 @@
 import { prisma } from '../../../utils/prisma';
+import { requirePermission } from '../../../utils/rbac';
 
 export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
+    await requirePermission(event, 'contact', 'view');
     const query = getQuery(event)
     const catId = query.catId ? parseInt(query.catId as string) : undefined
     const search = query.search ? (query.search as string).trim() : undefined
