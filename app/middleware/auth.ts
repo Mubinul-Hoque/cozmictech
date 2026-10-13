@@ -47,6 +47,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
         if (!isSuperAdmin) {
           const ROUTE_MODULE_MAP: Array<{ prefix: string; module: string }> = [
+            { prefix: '/admin/home', module: 'pages' },
             { prefix: '/admin/projects', module: 'projects' },
             { prefix: '/admin/services', module: 'services' },
             { prefix: '/admin/blog', module: 'blog' },

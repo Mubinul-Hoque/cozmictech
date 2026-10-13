@@ -52,16 +52,14 @@
           <!-- Category -->
           <div>
             <label for="post_catid" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
-            <select 
-              id="post_catid" 
-              v-model="form.post_catid" 
+            <select
+              id="post_catid"
+              v-model="form.post_catid"
               required
               class="block w-full px-4 py-3 bg-white border border-slate-300 rounded-2xl text-slate-800 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm"
             >
-              <option :value="1">Events</option>
-              <option :value="2">Engineering</option>
-              <option :value="3">Research</option>
-              <option :value="4">Insights</option>
+              <option v-if="!categories.length" :value="form.post_catid" disabled>No categories available</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
           </div>
 
@@ -129,12 +127,19 @@
 
         <!-- Main Body Content -->
         <div>
-          <label for="content" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Content (HTML / Paragraphs supported)</label>
-          <LazyRichTextEditor 
-            id="content" 
-            v-model="form.content" 
-            placeholder="Write the full body content of the blog post. Formatting options are supported."
-          />
+          <label for="content" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Content (HTML / Paragraphs supported) *</label>
+          <ClientOnly>
+            <RichTextEditor 
+              id="content" 
+              v-model="form.content" 
+              placeholder="Write the full body content of the blog post. Formatting options are supported."
+            />
+            <template #fallback>
+              <div class="h-64 border border-slate-200 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 text-xs">
+                Loading editor...
+              </div>
+            </template>
+          </ClientOnly>
         </div>
 
         <!-- Submit Buttons -->
@@ -177,21 +182,33 @@ const errorMsg = ref('');
 
 const form = ref({
   title: '',
-  post_catid: 2,
+  post_catid: null,
   author: 'Authority',
   sdate: new Date().toLocaleDateString('en-GB').replace(/\//g, '-'), // e.g. "29-06-2026"
   image: '',
   content: ''
 });
 
+const categories = ref([]);
+
 onMounted(async () => {
+  try {
+    const catRes = await useNuxtApp().$fetch('/api/admin/categories');
+    categories.value = catRes?.data || [];
+    if (isNew.value && categories.value.length) {
+      form.value.post_catid = categories.value[0].id;
+    }
+  } catch (err) {
+    console.error('Failed to load categories:', err);
+  }
+
   if (!isNew.value) {
     loadingData.value = true;
     try {
       const data = await useNuxtApp().$fetch(`/api/admin/blog/${id}`);
       form.value = {
         title: data.title || '',
-        post_catid: data.post_catid || 2,
+        post_catid: data.post_catid ?? (categories.value[0]?.id || null),
         author: data.author || 'Authority',
         sdate: data.sdate || '',
         image: data.image || '',

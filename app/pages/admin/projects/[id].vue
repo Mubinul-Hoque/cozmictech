@@ -265,7 +265,14 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Narrative &amp; Scope Content</label>
-              <LazyRichTextEditor v-model="form.description" placeholder="Describe the project narrative, scope of work, technical challenges, and achievements..." />
+              <ClientOnly>
+                <RichTextEditor v-model="form.description" placeholder="Describe the project narrative, scope of work, technical challenges, and achievements..." />
+                <template #fallback>
+                  <div class="h-64 border border-slate-200 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 text-xs">
+                    Loading editor...
+                  </div>
+                </template>
+              </ClientOnly>
             </div>
           </div>
 

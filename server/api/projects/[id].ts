@@ -3,6 +3,7 @@ import { prisma } from '../../utils/prisma';
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
   try {
+    setResponseHeader(event, 'cache-control', 'public, max-age=180, stale-while-revalidate=300');
     const project = await prisma.projects.findUnique({
       where: { id },
       include: {
@@ -101,8 +102,9 @@ export default defineEventHandler(async (event) => {
       prevProjectId: prevProject?.id || null,
       nextProjectId: nextProject?.id || null
     };
-  } catch (error) {
+  } catch (error: any) {
+    if (error.statusCode) throw error;
     console.error('Error fetching project details:', error);
-    return null;
+    throw createError({ statusCode: 500, statusMessage: 'Failed to fetch project details' });
   }
 });

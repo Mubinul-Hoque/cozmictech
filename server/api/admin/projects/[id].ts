@@ -1,5 +1,6 @@
 import { prisma } from '../../../utils/prisma';
 import { requirePermission } from '../../../utils/rbac';
+import { deleteUploadedImages } from '../../../utils/fileCleanup';
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
@@ -69,7 +70,11 @@ export default defineEventHandler(async (event) => {
     await requirePermission(event, 'projects', 'edit');
     try {
       const body = await readBody(event);
-      
+
+      if (!String(body.title || '').trim()) {
+        throw createError({ statusCode: 400, statusMessage: 'Project title is required' });
+      }
+
       // Process integer conversions
       const sector_id = parseInt(body.sector_id) || 1;
       const client_id = body.client_id ? parseInt(body.client_id) : null;
@@ -207,11 +212,19 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     await requirePermission(event, 'projects', 'delete');
     try {
+      const existing = await prisma.projects.findUnique({ where: { id }, select: { images_json: true } });
       await prisma.projects.delete({ where: { id } });
-      
+
+      if (existing?.images_json) {
+        try {
+          const images = JSON.parse(existing.images_json);
+          if (Array.isArray(images)) await deleteUploadedImages(images);
+        } catch {}
+      }
+
       // Invalidate the public projects cache
       await useStorage('cache').removeItem('nitro:handlers:projects-page:projects-v3.json');
-      
+
       await clearPublicCache();
       return { success: true };
     } catch (error) {

@@ -1,5 +1,6 @@
 import { prisma } from '../../../utils/prisma';
 import { requirePermission } from '../../../utils/rbac';
+import { deleteUploadedImage } from '../../../utils/fileCleanup';
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method;
@@ -45,11 +46,17 @@ export default defineEventHandler(async (event) => {
       const sdate = String(body.sdate || new Date().toLocaleDateString('en-GB')).trim();
       const image = String(body.image || '').trim();
 
+      const categoryId = parseInt(body.post_catid);
+      const categoryExists = await prisma.categories.findUnique({ where: { id: categoryId } });
+      if (!categoryExists) {
+        throw createError({ statusCode: 400, statusMessage: 'Selected category does not exist' });
+      }
+
       const post = await prisma.posts.update({
         where: { id },
         data: {
           title: sanitizePlainText(title),
-          category_id: parseInt(body.post_catid),
+          category_id: categoryId,
           content: sanitizeHtmlContent(body.content),
           image: sanitizePlainText(image),
           author_name: sanitizePlainText(author),
@@ -78,9 +85,11 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     await requirePermission(event, 'blog', 'delete');
     try {
+      const existing = await prisma.posts.findUnique({ where: { id }, select: { image: true } });
       await prisma.posts.delete({
         where: { id }
       });
+      await deleteUploadedImage(existing?.image);
       await clearPublicCache();
       return { success: true, message: 'Post deleted successfully' };
     } catch (error: any) {

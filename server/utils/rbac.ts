@@ -19,7 +19,7 @@ export const RBAC_MODULES: ModuleDefinition[] = [
   { id: 'team', name: 'Team Members', category: 'content', actions: ['view', 'create', 'edit', 'delete'] },
   { id: 'blog', name: 'Blog', category: 'content', actions: ['view', 'create', 'edit', 'delete', 'publish'] },
   { id: 'careers', name: 'Careers', category: 'content', actions: ['view', 'create', 'edit', 'delete', 'publish'] },
-  { id: 'contact', name: 'Contact & Messages', category: 'content', actions: ['view', 'edit', 'delete'] },
+  { id: 'contact', name: 'Contact & Messages', category: 'content', actions: ['view', 'create', 'edit', 'delete'] },
   { id: 'pages', name: 'Pages', category: 'content', actions: ['view', 'edit', 'publish'] },
   { id: 'advanced_search', name: 'Advanced Search', category: 'system', actions: ['view', 'manage_settings'] },
   { id: 'visitor_analytics', name: 'Visitor Analytics', category: 'analytics', actions: ['view'] },

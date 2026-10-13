@@ -141,12 +141,56 @@ export default defineEventHandler(async (event) => {
 
       const totalPages = Math.ceil(total / limit);
 
+      // Dynamically compute active categories and sectors that currently have at least 1 project
+      const [activeCategoriesRaw, activeSectorsRaw] = await Promise.all([
+        prisma.categories.findMany({
+          where: {
+            project_categories_link: { some: {} }
+          },
+          select: {
+            id: true,
+            name: true,
+            _count: {
+              select: { project_categories_link: true }
+            }
+          },
+          orderBy: { name: 'asc' }
+        }),
+        prisma.sectors.findMany({
+          where: {
+            projects: { some: {} }
+          },
+          select: {
+            id: true,
+            name: true,
+            _count: {
+              select: { projects: true }
+            }
+          },
+          orderBy: { name: 'asc' }
+        })
+      ]);
+
+      const filterOptions = {
+        categories: activeCategoriesRaw.map(c => ({
+          id: c.id,
+          name: c.name,
+          count: c._count?.project_categories_link || 0
+        })),
+        sectors: activeSectorsRaw.map(s => ({
+          id: s.id,
+          sector: s.name,
+          count: s._count?.projects || 0
+        }))
+      };
+
       return {
         data: mappedProjects,
         total,
         page,
         limit,
-        totalPages
+        totalPages,
+        filterOptions
       };
     } catch (error) {
       console.error('Error fetching admin projects:', error);
@@ -203,6 +247,9 @@ export default defineEventHandler(async (event) => {
 
       // String values with safety fallback and trimming
       const title = String(body.title || '').trim();
+      if (!title) {
+        throw createError({ statusCode: 400, statusMessage: 'Project title is required' });
+      }
       let images: any = [];
       if (Array.isArray(body.images)) {
         images = body.images.map((img: any) => String(img).trim()).filter(Boolean);

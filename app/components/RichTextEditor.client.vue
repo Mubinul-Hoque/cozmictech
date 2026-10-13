@@ -1,11 +1,23 @@
 <template>
   <div class="rich-text-editor-wrapper">
-    <div ref="editorEl" class="quill-editor-instance bg-white"></div>
+    <div v-show="!quillFailed" ref="editorEl" class="quill-editor-instance bg-white"></div>
+    <div v-if="quillFailed" class="space-y-2">
+      <div class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center justify-between">
+        <span>Standard text editor mode active (HTML formatting supported).</span>
+      </div>
+      <textarea
+        :value="modelValue"
+        :placeholder="placeholder"
+        rows="12"
+        class="w-full p-4 bg-white border border-slate-300 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] focus:ring-1 focus:ring-[#feb900] transition-all text-sm leading-relaxed font-sans"
+        @input="$emit('update:modelValue', $event.target.value)"
+      ></textarea>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
+import { ref, onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
@@ -22,63 +34,53 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 const editorEl = ref(null);
+const quillFailed = ref(false);
 let quillInstance = null;
 
-onMounted(() => {
-  if (!editorEl.value) return;
-
-  // Add custom SVG icons for Undo & Redo to Quill's UI icons registry
-  const icons = Quill.import('ui/icons');
-  icons['undo'] = `<svg viewBox="0 0 18 18">
-    <polygon class="ql-fill ql-stroke" points="6 10 4 12 2 10 6 10"/>
-    <path class="ql-stroke" d="M6,10 C9,6 14,8 14,12 C14,14 12,16 10,16"/>
-  </svg>`;
-  icons['redo'] = `<svg viewBox="0 0 18 18">
-    <polygon class="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10"/>
-    <path class="ql-stroke" d="M12,10 C9,6 4,8 4,12 C4,14 6,16 8,16"/>
-  </svg>`;
-
-  // Initialize Quill instance
-  quillInstance = new Quill(editorEl.value, {
-    theme: 'snow',
-    placeholder: props.placeholder,
-    modules: {
-      toolbar: {
-        container: [
-          [{ header: [1, 2, 3, 4, false] }],
-          ['bold', 'italic', 'underline'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ align: [] }],
-          ['link'],
-          ['clean'],
-          ['undo', 'redo']
-        ],
-        handlers: {
-          undo() {
-            if (quillInstance) quillInstance.history.undo();
-          },
-          redo() {
-            if (quillInstance) quillInstance.history.redo();
-          }
-        }
-      }
-    }
-  });
-
-  // Set initial content if any exists
-  if (props.modelValue) {
-    quillInstance.root.innerHTML = props.modelValue;
+onMounted(async () => {
+  await nextTick();
+  if (!editorEl.value) {
+    console.warn('Editor DOM element not found after nextTick, falling back to standard textarea');
+    quillFailed.value = true;
+    return;
   }
 
-  // Handle local text change notifications
-  quillInstance.on('text-change', () => {
-    let contentHtml = quillInstance.root.innerHTML;
-    // Normalize empty paragraphs (Quill sets '<p><br></p>' by default when editor is empty)
-    if (contentHtml === '<p><br></p>') {
-      contentHtml = '';
+  try {
+    // Initialize Quill instance safely with standard supported toolbar
+    quillInstance = new Quill(editorEl.value, {
+      theme: 'snow',
+      placeholder: props.placeholder,
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, 4, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          [{ align: [] }],
+          ['blockquote', 'code-block'],
+          ['link'],
+          ['clean']
+        ]
+      }
+    });
+
+    // Set initial content if any exists
+    if (props.modelValue) {
+      quillInstance.root.innerHTML = props.modelValue;
     }
-    emit('update:modelValue', contentHtml);
-  });
+
+    // Handle local text change notifications
+    quillInstance.on('text-change', () => {
+      let contentHtml = quillInstance.root.innerHTML;
+      // Normalize empty paragraphs (Quill sets '<p><br></p>' by default when editor is empty)
+      if (contentHtml === '<p><br></p>') {
+        contentHtml = '';
+      }
+      emit('update:modelValue', contentHtml);
+    });
+  } catch (err) {
+    console.error('Failed to initialize Quill editor, falling back to standard textarea:', err);
+    quillFailed.value = true;
+  }
 });
 
 // Watch for external content updates (e.g., when API data resolves and loads)

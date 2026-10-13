@@ -6,6 +6,7 @@ import {
   getBlockedIpList,
   blockIpAddress,
   unblockIpAddress,
+  archiveOldSecurityLogs,
 } from '../../utils/security';
 
 import { requirePermission } from '../../utils/rbac';
@@ -49,12 +50,36 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event);
     const action = body?.action || 'save_policies';
-    const actor = currentUser.username || currentUser.email || 'SuperAdmin';
+    const actor = userProfile.username || userProfile.email || 'SuperAdmin';
 
     // 1. Clear audit logs
     if (action === 'clear_logs') {
       await clearSecurityAuditLogs(actor);
       return { success: true, message: 'Security audit logs cleared successfully' };
+    }
+
+    // 1b. Archive logs older than 3 months
+    if (action === 'archive_old_logs') {
+      const { archived } = await archiveOldSecurityLogs(actor);
+      const updatedLogs = await getSecurityAuditLogs(150);
+      return {
+        success: true,
+        message: archived > 0
+          ? `${archived} log entr${archived === 1 ? 'y' : 'ies'} older than 3 months archived successfully`
+          : 'No log entries older than 3 months were found to archive',
+        archived,
+        logs: updatedLogs.map(l => ({
+          id: l.id,
+          timestamp: l.created_at.toISOString(),
+          action: l.action,
+          identifier: l.identifier || 'system',
+          ip: l.ip_address || 'unknown',
+          userAgent: l.user_agent || '',
+          deviceType: l.device_type || 'desktop',
+          severity: l.severity || 'info',
+          details: l.details || '',
+        })),
+      };
     }
 
     // 2. Block an IP address

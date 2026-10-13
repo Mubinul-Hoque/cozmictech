@@ -101,7 +101,7 @@
             <div class="w-24 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 flex items-center justify-center">
               <img 
                 v-if="form.image" 
-                :src="form.image.includes('/') ? form.image : '/assets/img/sectors/' + form.image" 
+                :src="form.image.includes('/') ? form.image : '/assets/img/services/' + form.image"
                 class="w-full h-full object-cover" 
                 @error="$event.target.src='/assets/img/services.jpg'"
               />
@@ -144,11 +144,18 @@
         <!-- Long Description -->
         <div>
           <label for="description" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Service Description</label>
-          <LazyRichTextEditor 
-            id="description" 
-            v-model="form.description" 
-            placeholder="Write detailed info about the engineering sector and services provided. Formatting options are supported."
-          />
+          <ClientOnly>
+            <RichTextEditor 
+              id="description" 
+              v-model="form.description" 
+              placeholder="Write detailed info about the engineering sector and services provided. Formatting options are supported."
+            />
+            <template #fallback>
+              <div class="h-64 border border-slate-200 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 text-xs">
+                Loading editor...
+              </div>
+            </template>
+          </ClientOnly>
         </div>
 
         <!-- Submit Buttons -->

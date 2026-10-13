@@ -1,9 +1,11 @@
 import { prisma } from '../../../utils/prisma'
+import { requirePermission } from '../../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
 
   if (method === 'GET') {
+    await requirePermission(event, 'contact', 'view');
     try {
       const categories = await prisma.categories.findMany({
         where: { type: 'message' },
@@ -11,12 +13,10 @@ export default defineEventHandler(async (event) => {
         select: {
           id: true,
           name: true,
-          slug: true,
           type: true
         }
       });
-      
-      await clearPublicCache();
+
       return { success: true, data: categories.map(c => ({
         ...c,
         category_name: c.name,
@@ -29,6 +29,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'POST') {
+    await requirePermission(event, 'contact', 'create');
     try {
       const body = await readBody(event)
       if (!body.category_name) {
@@ -38,7 +39,6 @@ export default defineEventHandler(async (event) => {
       const newCategory = await prisma.categories.create({
         data: {
           name: sanitizePlainText(body.category_name),
-          slug: sanitizePlainText(body.category_name).toLowerCase().replace(/[^a-z0-9]+/g, '-'),
           type: 'message'
         }
       })

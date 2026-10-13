@@ -52,6 +52,93 @@
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Left 2 Cols: Form Inputs -->
       <div class="lg:col-span-2 space-y-6">
+        <!-- Page Copy & Headlines -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+          <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+            <Icon name="lucide:text" class="text-[#feb900]" /> Hero Section
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Eyebrow Label</label>
+              <input type="text" v-model="form.hero_eyebrow" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Heading</label>
+              <input type="text" v-model="form.hero_heading" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Intro Paragraph</label>
+            <textarea rows="3" v-model="form.hero_body" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm"></textarea>
+          </div>
+        </div>
+
+        <!-- Info Card Copy -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+          <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+            <Icon name="lucide:layout-grid" class="text-[#feb900]" /> Info Card Labels &amp; Footers
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="space-y-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+              <p class="text-xs font-bold text-slate-600">Address Card</p>
+              <input type="text" v-model="form.card_address_label" placeholder="Label (e.g. Office Location)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+              <input type="text" v-model="form.card_address_heading" placeholder="Heading (e.g. Dhaka Headquarters)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+              <input type="text" v-model="form.card_address_footer" placeholder="Footer text" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+            </div>
+            <div class="space-y-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+              <p class="text-xs font-bold text-slate-600">Email Card</p>
+              <input type="text" v-model="form.card_email_label" placeholder="Label (e.g. Electronic Mail)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+              <input type="text" v-model="form.card_email_heading" placeholder="Heading (e.g. Direct Inquiries)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+              <input type="text" v-model="form.card_email_footer" placeholder="Footer text" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+            </div>
+            <div class="space-y-3 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+              <p class="text-xs font-bold text-slate-600">Phone Card</p>
+              <input type="text" v-model="form.card_phone_label" placeholder="Label (e.g. Telephone & Cellular)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+              <input type="text" v-model="form.card_phone_heading" placeholder="Heading (e.g. Direct Hotline)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+              <input type="text" v-model="form.card_phone_footer" placeholder="Footer text" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Map Card & Guarantee Box Copy -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+          <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
+            <Icon name="lucide:shield-check" class="text-[#feb900]" /> Map Card &amp; Response Guarantee Box
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Map Card Label</label>
+              <input type="text" v-model="form.map_card_label" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Map Card Badge Text</label>
+              <input type="text" v-model="form.map_card_badge" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Guarantee Eyebrow</label>
+              <input type="text" v-model="form.guarantee_eyebrow" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Guarantee Heading</label>
+              <input type="text" v-model="form.guarantee_heading" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Guarantee Body Text</label>
+            <textarea rows="3" v-model="form.guarantee_body" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm"></textarea>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Assurance Line</label>
+            <input type="text" v-model="form.guarantee_assurance" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+          </div>
+        </div>
+
         <!-- Physical Location -->
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
           <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
@@ -167,36 +254,37 @@
 
       <!-- Right 1 Col: Quick Card Preview -->
       <div class="space-y-6">
-        <div class="bg-gradient-to-br from-slate-900 to-[#364d59] text-white rounded-3xl p-6 shadow-lg space-y-5">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-5">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-[#feb900] text-slate-900 flex items-center justify-center font-bold">
               <Icon name="lucide:eye" class="text-xl" />
             </div>
             <div>
-              <h4 class="font-bold text-white text-sm">Contact Info Preview</h4>
-              <p class="text-xs text-slate-300">How it appears to visitors</p>
+              <h4 class="font-bold text-slate-800 text-sm">Contact Info Preview</h4>
+              <p class="text-xs text-slate-400">How it appears to visitors</p>
             </div>
           </div>
 
-          <div class="space-y-4 pt-2 text-xs text-slate-200">
-            <div class="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-              <span class="text-[10px] uppercase font-bold text-[#feb900] tracking-wider block">Office</span>
-              <p class="leading-relaxed text-white">{{ form.address || 'Address not specified' }}</p>
+          <div class="space-y-4 pt-2 text-xs text-slate-600">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Office</span>
+              <p class="leading-relaxed text-slate-800">{{ form.address || 'Address not specified' }}</p>
             </div>
 
-            <div class="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-              <span class="text-[10px] uppercase font-bold text-[#feb900] tracking-wider block">Phones</span>
-              <p class="text-white">{{ form.phone || 'Phone not set' }}</p>
-              <p v-if="form.cell" class="text-slate-300">Cell: {{ form.cell }}</p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Phones</span>
+              <p class="text-slate-800">{{ form.phone || 'Phone not set' }}</p>
+              <p v-if="form.cell" class="text-slate-500">Cell: {{ form.cell }}</p>
             </div>
 
-            <div class="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
-              <span class="text-[10px] uppercase font-bold text-[#feb900] tracking-wider block">Emails</span>
-              <p class="text-white">{{ form.email || 'Email not set' }}</p>
-              <p v-if="form.email2" class="text-slate-300">{{ form.email2 }}</p>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Emails</span>
+              <p class="text-slate-800">{{ form.email || 'Email not set' }}</p>
+              <p v-if="form.email2" class="text-slate-500">{{ form.email2 }}</p>
             </div>
           </div>
         </div>
+
 
         <div class="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-5 text-amber-900 text-xs space-y-2">
           <div class="flex items-center gap-2 font-bold text-amber-950">
@@ -232,7 +320,25 @@ const form = reactive({
   cell: '',
   email: '',
   email2: '',
-  map: ''
+  map: '',
+  hero_eyebrow: '',
+  hero_heading: '',
+  hero_body: '',
+  card_address_label: '',
+  card_address_heading: '',
+  card_address_footer: '',
+  card_email_label: '',
+  card_email_heading: '',
+  card_email_footer: '',
+  card_phone_label: '',
+  card_phone_heading: '',
+  card_phone_footer: '',
+  map_card_label: '',
+  map_card_badge: '',
+  guarantee_eyebrow: '',
+  guarantee_heading: '',
+  guarantee_body: '',
+  guarantee_assurance: ''
 })
 
 const loadSettings = async () => {
@@ -246,6 +352,9 @@ const loadSettings = async () => {
       form.email = res.contact.email || ''
       form.email2 = res.contact.email2 || ''
       form.map = res.contact.map || ''
+    }
+    if (res?.success && res.content) {
+      Object.assign(form, res.content)
     }
   } catch (err) {
     console.error('Failed to load contact settings:', err)

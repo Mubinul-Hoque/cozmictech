@@ -1,5 +1,6 @@
 import { prisma } from '../../../utils/prisma';
 import { requirePermission } from '../../../utils/rbac';
+import { deleteUploadedImage } from '../../../utils/fileCleanup';
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0');
@@ -63,7 +64,9 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     await requirePermission(event, 'testimonials', 'delete');
     try {
+      const existing = await prisma.testimonials.findUnique({ where: { id }, select: { image: true } });
       await prisma.testimonials.delete({ where: { id } });
+      await deleteUploadedImage(existing?.image);
       await clearPublicCache();
       return { success: true };
     } catch (error) {

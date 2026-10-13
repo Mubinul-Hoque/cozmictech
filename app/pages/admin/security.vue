@@ -576,10 +576,22 @@
                 Refresh Logs
               </button>
 
-              <button 
+              <button
                 v-if="isSuperAdmin && securityLogs.length > 0"
-                type="button" 
-                @click="clearLogs" 
+                type="button"
+                @click="archiveOldLogs"
+                :disabled="archivingLogs"
+                class="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50"
+                title="Move log entries older than 3 months to the archive table"
+              >
+                <Icon name="lucide:archive" :class="{ 'animate-pulse': archivingLogs }" class="text-xs" />
+                {{ archivingLogs ? 'Archiving...' : 'Archive Logs (3mo+)' }}
+              </button>
+
+              <button
+                v-if="isSuperAdmin && securityLogs.length > 0"
+                type="button"
+                @click="clearLogs"
                 class="px-4 py-2 rounded-full border border-rose-200 hover:bg-rose-50 text-rose-600 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <Icon name="lucide:trash-2" class="text-xs" />
@@ -651,11 +663,14 @@
                     <th class="px-4 py-3.5">IP Address</th>
                     <th class="px-4 py-3.5">Device</th>
                     <th class="px-4 py-3.5">Details</th>
-                    <th v-if="isSuperAdmin" class="px-4 py-3.5 text-right">Quick Action</th>
+                    <th
+                      v-if="isSuperAdmin"
+                      class="px-4 py-3.5 text-right sticky right-0 z-20 bg-slate-50 shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.12)]"
+                    >Quick Action</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-600 font-medium">
-                  <tr v-for="log in filteredLogs" :key="log.id" class="hover:bg-slate-50/80 transition-colors">
+                  <tr v-for="log in filteredLogs" :key="log.id" class="group hover:bg-slate-50/80 transition-colors">
                     <!-- Timestamp -->
                     <td class="px-4 py-3.5 whitespace-nowrap font-mono text-[11px] text-slate-400">
                       {{ formatLogDate(log.timestamp) }}
@@ -708,28 +723,38 @@
                     </td>
 
                     <!-- Quick Action (Block IP if not blocked) -->
-                    <td v-if="isSuperAdmin" class="px-4 py-3.5 whitespace-nowrap text-right">
-                      <button 
+                    <td
+                      v-if="isSuperAdmin"
+                      class="px-4 py-3.5 whitespace-nowrap text-right sticky right-0 z-10 bg-white group-hover:bg-slate-50 shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.08)] transition-colors"
+                    >
+                      <button
                         v-if="canBlockIp(log.ip)"
                         @click="openBlockModal(log.ip, `Blocked from Audit Log: ${log.action}`)"
                         type="button"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-rose-200 hover:bg-rose-50 text-rose-700 text-[11px] font-bold transition-all cursor-pointer"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 hover:border-rose-400 text-rose-700 text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
                         title="Block this IP address"
                       >
-                        <Icon name="lucide:ban" class="text-xs" />
-                        Block IP
+                        <Icon name="lucide:ban" class="text-sm flex-shrink-0" />
+                        <span>Block IP</span>
                       </button>
-                      <button 
+                      <button
                         v-else-if="isIpBlocked(log.ip)"
                         @click="unblockIp(log.ip)"
                         type="button"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-slate-200 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 text-[11px] font-bold transition-all cursor-pointer"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-400 text-emerald-700 text-[11px] font-bold transition-all cursor-pointer shadow-2xs"
                         title="Unblock this IP"
                       >
-                        <Icon name="lucide:unlock" class="text-xs" />
-                        Unblock
+                        <Icon name="lucide:unlock" class="text-sm flex-shrink-0" />
+                        <span>Unblock</span>
                       </button>
-                      <span v-else class="text-slate-300 text-[11px]">-</span>
+                      <span
+                        v-else
+                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-slate-200 bg-slate-100 text-slate-500 text-[11px] font-bold"
+                        :title="!log.ip ? 'No IP address recorded for this event' : 'Loopback/local addresses cannot be blocked to prevent locking yourself out'"
+                      >
+                        <Icon name="lucide:shield-off" class="text-sm flex-shrink-0" />
+                        <span>{{ !log.ip ? 'No IP' : 'Local / Self' }}</span>
+                      </span>
                     </td>
                   </tr>
                 </tbody>
@@ -831,7 +856,11 @@ definePageMeta({
 })
 
 const authUser = useState('authUser')
-const isSuperAdmin = computed(() => authUser.value?.role === 'SuperAdmin')
+const isSuperAdmin = computed(() => {
+  const user = authUser.value
+  if (!user) return false
+  return !!user.is_super_admin || String(user.role || '').toLowerCase().replace(/[\s_-]/g, '') === 'superadmin'
+})
 const adminSession = useAdminSession()
 
 const activeTab = ref('policies')
@@ -1028,6 +1057,30 @@ const clearLogs = async () => {
     }
   } catch (err) {
     useToast().error('Failed to clear logs.')
+  }
+}
+
+const archivingLogs = ref(false)
+const archiveOldLogs = async () => {
+  if (!confirm('Move all log entries older than 3 months to the archive table? They will no longer appear in this live log stream.')) return
+  archivingLogs.value = true
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/security', {
+      method: 'POST',
+      body: { action: 'archive_old_logs' }
+    })
+    if (res?.success) {
+      useToast().success(res.message || 'Old security logs archived successfully.')
+      if (Array.isArray(res.logs)) {
+        securityLogs.value = res.logs
+      } else {
+        fetchSecurityData()
+      }
+    }
+  } catch (err) {
+    useToast().error(err?.data?.statusMessage || 'Failed to archive old logs.')
+  } finally {
+    archivingLogs.value = false
   }
 }
 

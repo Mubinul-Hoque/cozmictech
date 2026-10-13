@@ -267,6 +267,52 @@ export async function clearSecurityAuditLogs(clearedBy: string): Promise<void> {
   });
 }
 
+// Logs older than this are moved to security_logs_archive and removed from the live table
+const ARCHIVE_AFTER_MONTHS = 3;
+
+export async function archiveOldSecurityLogs(archivedBy = 'system'): Promise<{ archived: number }> {
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - ARCHIVE_AFTER_MONTHS);
+
+  const oldLogs = await prisma.security_logs.findMany({
+    where: { created_at: { lt: cutoff } },
+  });
+
+  if (!oldLogs.length) {
+    return { archived: 0 };
+  }
+
+  const ids = oldLogs.map(l => l.id);
+
+  await prisma.$transaction([
+    prisma.security_logs_archive.createMany({
+      data: oldLogs.map(log => ({
+        id: log.id,
+        action: log.action,
+        identifier: log.identifier,
+        user_id: log.user_id,
+        ip_address: log.ip_address,
+        user_agent: log.user_agent,
+        device_type: log.device_type,
+        severity: log.severity,
+        details: log.details,
+        created_at: log.created_at,
+      })),
+      skipDuplicates: true,
+    }),
+    prisma.security_logs.deleteMany({ where: { id: { in: ids } } }),
+  ]);
+
+  await logSecurityAudit({
+    action: 'AUDIT_LOGS_ARCHIVED',
+    identifier: archivedBy,
+    severity: 'info',
+    details: `${oldLogs.length} security log entr${oldLogs.length === 1 ? 'y' : 'ies'} older than ${ARCHIVE_AFTER_MONTHS} months were archived by ${archivedBy}`,
+  });
+
+  return { archived: oldLogs.length };
+}
+
 // ─── IP Blocking Operations ──────────────────────────────────────────────────
 
 export async function blockIpAddress(

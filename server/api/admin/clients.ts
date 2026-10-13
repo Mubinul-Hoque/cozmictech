@@ -1,6 +1,7 @@
 import { prisma } from '../../utils/prisma'
 import { sanitizePlainText } from '../../utils/sanitize'
 import { requirePermission } from '../../utils/rbac'
+import { deleteUploadedImage } from '../../utils/fileCleanup'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
@@ -9,13 +10,22 @@ export default defineEventHandler(async (event) => {
   if (method === 'GET') {
     await requirePermission(event, 'clients', 'view')
     try {
-      const clients = await prisma.clients.findMany({
-        orderBy: { id: 'desc' }
-      })
+      const [clients, categories] = await Promise.all([
+        prisma.clients.findMany({
+          orderBy: { id: 'desc' },
+          include: { categories: { select: { id: true, name: true } } }
+        }),
+        prisma.categories.findMany({
+          where: { type: { not: 'message' } },
+          orderBy: { name: 'asc' },
+          select: { id: true, name: true }
+        })
+      ])
       await clearPublicCache();
       return {
         success: true,
-        data: clients
+        data: clients,
+        categories
       }
     } catch (error) {
       console.error('Error fetching clients:', error)
@@ -34,10 +44,22 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Client name is required' })
       }
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (body.email && !emailRegex.test(String(body.email).trim())) {
+        throw createError({ statusCode: 400, statusMessage: 'Invalid email format' })
+      }
+
+      const categoryId = body.category_id ? parseInt(body.category_id) : null
+
       const newClient = await prisma.clients.create({
         data: {
           client_name: sanitizePlainText(client_name),
-          logo: logo ? sanitizePlainText(logo) : null
+          logo: logo ? sanitizePlainText(logo) : null,
+          country: body.country ? sanitizePlainText(body.country) : null,
+          email: body.email ? sanitizePlainText(body.email).toLowerCase() : null,
+          phone: body.phone ? sanitizePlainText(body.phone) : null,
+          location: body.location ? sanitizePlainText(body.location) : null,
+          category_id: categoryId && !isNaN(categoryId) ? categoryId : null
         }
       })
 
@@ -68,11 +90,23 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Client name is required' })
       }
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (body.email && !emailRegex.test(String(body.email).trim())) {
+        throw createError({ statusCode: 400, statusMessage: 'Invalid email format' })
+      }
+
+      const categoryId = body.category_id ? parseInt(body.category_id) : null
+
       const updatedClient = await prisma.clients.update({
         where: { id: parseInt(id) },
         data: {
           client_name: sanitizePlainText(client_name),
-          logo: logo ? sanitizePlainText(logo) : null
+          logo: logo ? sanitizePlainText(logo) : null,
+          country: body.country ? sanitizePlainText(body.country) : null,
+          email: body.email ? sanitizePlainText(body.email).toLowerCase() : null,
+          phone: body.phone ? sanitizePlainText(body.phone) : null,
+          location: body.location ? sanitizePlainText(body.location) : null,
+          category_id: categoryId && !isNaN(categoryId) ? categoryId : null
         }
       })
 
@@ -99,9 +133,11 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Invalid or missing Client ID' })
       }
 
+      const existing = await prisma.clients.findUnique({ where: { id }, select: { logo: true } })
       await prisma.clients.delete({
         where: { id }
       })
+      await deleteUploadedImage(existing?.logo)
 
       await clearPublicCache();
       return {

@@ -230,16 +230,16 @@
         </div>
 
         <!-- Documentation Card -->
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-7 text-white shadow-sm">
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 text-slate-800 shadow-sm">
           <div class="flex items-center gap-2 text-[#feb900] text-xs font-bold uppercase tracking-wider mb-2">
             <Icon name="lucide:info" />
             <span>Search Behavior Rules</span>
           </div>
-          <h4 class="text-base font-bold text-white mb-2">How Filters Combine</h4>
-          <ul class="space-y-2 text-xs text-slate-300 leading-relaxed list-disc list-inside">
-            <li><strong class="text-white">Preserves Standard Search:</strong> Keyword search across title, location, services, and description continues to work alongside advanced filters.</li>
-            <li><strong class="text-white">Logical AND:</strong> All selected criteria must match together (e.g. Sector: Power Plant AND Year: 2022 AND Status: Completed).</li>
-            <li><strong class="text-white">Instant Updates:</strong> Saving here takes effect immediately on the public website without needing a build or database migration.</li>
+          <h4 class="text-base font-bold text-slate-800 mb-2">How Filters Combine</h4>
+          <ul class="space-y-2 text-xs text-slate-500 leading-relaxed list-disc list-inside">
+            <li><strong class="text-slate-800">Preserves Standard Search:</strong> Keyword search across title, location, services, and description continues to work alongside advanced filters.</li>
+            <li><strong class="text-slate-800">Logical AND:</strong> All selected criteria must match together (e.g. Sector: Power Plant AND Year: 2022 AND Status: Completed).</li>
+            <li><strong class="text-slate-800">Instant Updates:</strong> Saving here takes effect immediately on the public website without needing a build or database migration.</li>
           </ul>
         </div>
       </div>
@@ -314,7 +314,9 @@ const filters = reactive({
   project_value: true
 })
 
-const { data: configData, pending, refresh } = await useFetch('/api/admin/advanced-search-config')
+const { data: configData, pending, refresh } = await useFetch('/api/admin/advanced-search-config', {
+  getCachedData: () => undefined
+})
 
 watch(configData, (val) => {
   if (val?.filters) {
@@ -349,6 +351,9 @@ const saveConfig = async () => {
     })
     if (res?.success) {
       toast.success('Advanced search settings saved successfully!')
+      clearNuxtData('/api/advanced-search-config')
+      clearNuxtData('advanced-search-config')
+      clearNuxtData('/api/projects')
       refresh()
     } else {
       toast.error('Failed to save configuration.')

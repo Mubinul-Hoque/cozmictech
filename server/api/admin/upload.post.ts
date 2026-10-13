@@ -1,8 +1,26 @@
 import { join } from 'path';
 import { randomUUID } from 'crypto';
+import { mkdir } from 'fs/promises';
 import sharp from 'sharp';
+import { getUserRbacProfile, hasPermission } from '../../utils/rbac';
+
+const FOLDER_MODULE_MAP: Record<string, string> = {
+  blog: 'blog',
+  clients: 'clients',
+  projects: 'projects',
+  services: 'services',
+  testimonials: 'testimonials',
+  team: 'team',
+  'hero-carousel': 'global_settings',
+  page_sections: 'pages',
+};
 
 export default defineEventHandler(async (event) => {
+  const user = event.context.user;
+  if (!user || !user.id) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized - Missing or invalid credentials' });
+  }
+
   const formData = await readMultipartFormData(event);
   if (!formData || formData.length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'No file uploaded' });
@@ -27,6 +45,12 @@ export default defineEventHandler(async (event) => {
   let folder = folderData ? folderData.data.toString() : '';
   const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '');
 
+  const profile = await getUserRbacProfile(Number(user.id));
+  const requiredModule = FOLDER_MODULE_MAP[safeFolder] || 'global_settings';
+  if (!profile || !(hasPermission(profile, requiredModule, 'create') || hasPermission(profile, requiredModule, 'edit'))) {
+    throw createError({ statusCode: 403, statusMessage: 'Access Denied - insufficient permissions to upload files' });
+  }
+
   let maxSize = 5 * 1024 * 1024; // Default 5MB
   let maxSizeKb = 5120;
 
@@ -46,9 +70,13 @@ export default defineEventHandler(async (event) => {
   const newName = `${randomUUID()}.webp`;
 
   // Save to public/assets/img/{folder}
-  const uploadPath = join(process.cwd(), 'public', 'assets', 'img', safeFolder, newName);
+  const uploadDir = join(process.cwd(), 'public', 'assets', 'img', safeFolder);
+  const uploadPath = join(uploadDir, newName);
 
   try {
+    // Ensure the destination folder exists (first upload for a given folder name)
+    await mkdir(uploadDir, { recursive: true });
+
     // Process image with sharp: resize (max 1920x1080), compress, and convert to WebP
     await sharp(file.data)
       .resize({ width: 1920, height: 1080, fit: 'inside', withoutEnlargement: true })

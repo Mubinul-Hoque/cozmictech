@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
 
     // Hash password
     const bcrypt = await import('bcrypt');
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = await prisma.users.create({
       data: {

@@ -50,8 +50,64 @@
       </div>
     </div>
 
+    <!-- Display Mode Setting -->
+    <div v-if="!pending" class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
+      <div>
+        <h3 class="text-base font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+          <Icon name="lucide:gallery-horizontal" class="text-[#feb900]" /> Logo Strip Display Mode
+        </h3>
+        <p class="text-xs text-slate-400 mt-1">Choose how the client logo strip behaves on the public website's homepage.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <button
+          type="button"
+          @click="displayMode = 'static'"
+          class="text-left p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer"
+          :class="displayMode === 'static' ? 'border-[#feb900] bg-amber-50/40 shadow-sm' : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'"
+        >
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-sm font-bold text-slate-800">Static</span>
+            <Icon v-if="displayMode === 'static'" name="lucide:check-circle-fill" class="text-[#feb900]" />
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">Logos display in a fixed row (wrapping to new lines if needed) with no scrolling.</p>
+        </button>
+
+        <button
+          type="button"
+          @click="displayMode = 'scrolling'"
+          class="text-left p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer"
+          :class="displayMode === 'scrolling' ? 'border-[#feb900] bg-amber-50/40 shadow-sm' : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'"
+        >
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-sm font-bold text-slate-800">Scrolling</span>
+            <Icon v-if="displayMode === 'scrolling'" name="lucide:check-circle-fill" class="text-[#feb900]" />
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">Logos scroll automatically in a smooth, continuous strip, showing 5 at a time on desktop.</p>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-400">
+        Note: Scrolling mode only activates once more than 5 client logos are configured — with 5 or fewer, logos always display statically so there's nothing awkward to scroll.
+      </p>
+
+      <div class="flex items-center gap-3 pt-1">
+        <button
+          type="button"
+          @click="saveDisplayMode"
+          :disabled="displayModeSaving"
+          class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
+        >
+          <span v-if="displayModeSaving" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent"></span>
+          <Icon v-else name="lucide:check" class="text-sm" />
+          {{ displayModeSaving ? 'Saving...' : 'Save Display Mode' }}
+        </button>
+        <span v-if="displayModeSavedMsg" class="text-xs font-bold text-emerald-600">{{ displayModeSavedMsg }}</span>
+      </div>
+    </div>
+
     <!-- Main Content Grid -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div v-if="!pending" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Left Column (2 Cols): Clients Grid -->
       <div class="lg:col-span-2 space-y-5">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
@@ -91,10 +147,16 @@
               </div>
               
               <!-- Client Name -->
-              <div class="text-center w-full px-1">
+              <div class="text-center w-full px-1 space-y-1">
                 <span class="text-xs font-bold text-slate-800 block truncate" :title="client.client_name">
                   {{ client.client_name }}
                 </span>
+                <span v-if="client.categories?.name" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-800 border border-amber-500/20">
+                  {{ client.categories.name }}
+                </span>
+                <p v-if="client.location || client.country" class="text-[10px] text-slate-400 truncate" :title="[client.location, client.country].filter(Boolean).join(', ')">
+                  <Icon name="lucide:map-pin" class="text-[10px]" /> {{ [client.location, client.country].filter(Boolean).join(', ') }}
+                </p>
               </div>
 
               <!-- Action Bar -->
@@ -168,6 +230,64 @@
               />
             </div>
 
+            <!-- Category -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Category <span class="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <select
+                v-model="clientForm.category_id"
+                class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm transition-colors cursor-pointer"
+              >
+                <option :value="null">No Category</option>
+                <option v-for="cat in categoriesList" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+              </select>
+            </div>
+
+            <!-- Location & Country -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Location</label>
+                <input
+                  type="text"
+                  v-model="clientForm.location"
+                  placeholder="e.g. Dhaka"
+                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm transition-colors"
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Country</label>
+                <input
+                  type="text"
+                  v-model="clientForm.country"
+                  placeholder="e.g. Bangladesh"
+                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm transition-colors"
+                />
+              </div>
+            </div>
+
+            <!-- Contact Email & Phone -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Email</label>
+                <input
+                  type="email"
+                  v-model="clientForm.email"
+                  placeholder="contact@client.com"
+                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm transition-colors"
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Phone</label>
+                <input
+                  type="text"
+                  v-model="clientForm.phone"
+                  placeholder="+880 1XXX-XXXXXX"
+                  class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#feb900] text-sm transition-colors"
+                />
+              </div>
+            </div>
+
             <!-- Logo Upload Slot -->
             <div class="space-y-2">
               <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -233,7 +353,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 
 definePageMeta({
   layout: 'admin',
@@ -252,6 +372,49 @@ const errorMsg = ref('')
 // Client Logos CRUD State & Fetch
 const { data: clientsRes, pending, refresh: refreshClients } = await useFetch('/api/admin/clients')
 const clientsList = computed(() => clientsRes.value?.data || [])
+const categoriesList = computed(() => clientsRes.value?.categories || [])
+
+// Logo Strip Display Mode Setting
+const displayMode = ref('static')
+const displayModeSaving = ref(false)
+const displayModeSavedMsg = ref('')
+
+const loadDisplayMode = async () => {
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/clients-display-mode')
+    if (res?.success && res.mode) {
+      displayMode.value = res.mode
+    }
+  } catch (err) {
+    console.error('Failed to load display mode:', err)
+  }
+}
+
+onMounted(loadDisplayMode)
+
+const saveDisplayMode = async () => {
+  displayModeSaving.value = true
+  displayModeSavedMsg.value = ''
+  errorMsg.value = ''
+
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/clients-display-mode', {
+      method: 'POST',
+      body: { mode: displayMode.value }
+    })
+    if (res?.success) {
+      displayModeSavedMsg.value = 'Saved!'
+      toast?.success?.(res.message || 'Display mode saved successfully.')
+      setTimeout(() => { displayModeSavedMsg.value = '' }, 3000)
+    }
+  } catch (err) {
+    console.error(err)
+    errorMsg.value = err?.data?.statusMessage || 'Failed to save display mode.'
+    toast?.error?.(errorMsg.value)
+  } finally {
+    displayModeSaving.value = false
+  }
+}
 
 const filteredClients = computed(() => {
   if (!searchQuery.value.trim()) return clientsList.value
@@ -262,7 +425,12 @@ const filteredClients = computed(() => {
 const clientForm = reactive({
   id: null,
   client_name: '',
-  logo: ''
+  logo: '',
+  category_id: null,
+  country: '',
+  location: '',
+  email: '',
+  phone: ''
 })
 
 const clientSaving = ref(false)
@@ -340,6 +508,11 @@ const editClient = (client) => {
   clientForm.id = client.id
   clientForm.client_name = client.client_name
   clientForm.logo = client.logo || ''
+  clientForm.category_id = client.category_id || null
+  clientForm.country = client.country || ''
+  clientForm.location = client.location || ''
+  clientForm.email = client.email || ''
+  clientForm.phone = client.phone || ''
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -347,6 +520,11 @@ const resetClientForm = () => {
   clientForm.id = null
   clientForm.client_name = ''
   clientForm.logo = ''
+  clientForm.category_id = null
+  clientForm.country = ''
+  clientForm.location = ''
+  clientForm.email = ''
+  clientForm.phone = ''
 }
 
 const deleteClient = async (id) => {

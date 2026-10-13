@@ -19,12 +19,15 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 404, statusMessage: 'Career opening not found' })
       }
       return {
-        ...career,
-        emp_status: career.employment_status,
-        status: career.is_active ? 'Active' : 'Inactive',
-        published: career.created_at,
-        Edu_Qlty: career.education_quality,
-        other_beninifs: career.other_benefits
+        success: true,
+        data: {
+          ...career,
+          emp_status: career.employment_status,
+          status: career.is_active ? 'Active' : 'Inactive',
+          published: career.created_at,
+          Edu_Qlty: career.education_quality,
+          other_beninifs: career.other_benefits
+        }
       }
     } catch (error: any) {
       console.error('Error fetching career details:', error)

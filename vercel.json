@@ -6,6 +6,12 @@
   "outputDirectory": ".output",
   "cleanUrls": true,
   "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/cron/archive-security-logs",
+      "schedule": "0 3 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

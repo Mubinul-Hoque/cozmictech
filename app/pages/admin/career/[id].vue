@@ -141,18 +141,32 @@
         <!-- Description Areas -->
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Job Description *</label>
-          <LazyRichTextEditor 
-            v-model="form.description" 
-            placeholder="Describe the job vacancy role..." 
-          />
+          <ClientOnly>
+            <RichTextEditor 
+              v-model="form.description" 
+              placeholder="Describe the job vacancy role..." 
+            />
+            <template #fallback>
+              <div class="h-48 border border-slate-200 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 text-xs">
+                Loading editor...
+              </div>
+            </template>
+          </ClientOnly>
         </div>
 
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Job Responsibilities *</label>
-          <LazyRichTextEditor 
-            v-model="form.responsibilities" 
-            placeholder="List primary duties and responsibilities..." 
-          />
+          <ClientOnly>
+            <RichTextEditor 
+              v-model="form.responsibilities" 
+              placeholder="List primary duties and responsibilities..." 
+            />
+            <template #fallback>
+              <div class="h-48 border border-slate-200 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 text-xs">
+                Loading editor...
+              </div>
+            </template>
+          </ClientOnly>
         </div>
 
         <div class="space-y-2">
@@ -168,10 +182,17 @@
 
         <div class="space-y-2">
           <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Other Benefits</label>
-          <LazyRichTextEditor 
-            v-model="form.other_beninifs" 
-            placeholder="e.g. Two festival bonuses, mobile allowance, friendly workspace." 
-          />
+          <ClientOnly>
+            <RichTextEditor 
+              v-model="form.other_beninifs" 
+              placeholder="e.g. Two festival bonuses, mobile allowance, friendly workspace." 
+            />
+            <template #fallback>
+              <div class="h-48 border border-slate-200 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 text-xs">
+                Loading editor...
+              </div>
+            </template>
+          </ClientOnly>
         </div>
 
         <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">

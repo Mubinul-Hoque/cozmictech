@@ -1,194 +1,373 @@
 <template>
-  <div>
-    <!-- ======= Breadcrumbs ======= -->
-    <div class="breadcrumbs flex items-center" style="background-image: url('/assets/img/breadcrumbs-bg.jpg');">
-      <div class="container mx-auto px-4 md:px-8 relative text-center" data-aos="fade">
-        <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">About Us</h2>
-        <ol class="flex justify-center gap-2 text-sm text-[#feb900] font-semibold">
-          <li><NuxtLink to="/" class="text-white/80 hover:text-white">Home</NuxtLink></li>
-          <li>About</li>
-        </ol>
-      </div>
-    </div>
+  <div class="bg-white min-h-screen text-[#090402]">
 
-    <!-- ======= About Section ======= -->
-    <section id="about" class="py-20 bg-white">
-      <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 relative">
-          
-      <div class="lg:col-span-6 bg-cover bg-center rounded-lg min-h-[400px] shadow-lg" style="background-image: url('/assets/img/about.jpg');"></div>
-
-          <div class="lg:col-span-6 space-y-6">
-            <h2 class="text-3xl font-bold text-[#2e3135]">
+    <!-- ======= Studio / Intro Hero (No breadcrumbs, clean minimal editorial top) ======= -->
+    <section class="pt-32 sm:pt-36 lg:pt-40 pb-16 lg:pb-24">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12">
+        
+        <!-- Eyebrow + Two-column header -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+          <div class="lg:col-span-5" data-aos="fade-up">
+            <span class="inline-block text-[11px] sm:text-xs font-medium tracking-[0.25em] text-neutral-400 uppercase mb-4">
+              {{ data?.aboutUs?.hero_eyebrow || 'Studio — Cozmic Technology' }}
+            </span>
+            <h1 class="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-light text-[#090402] leading-[1.15] tracking-tight">
               {{ data?.aboutUs?.story_title || 'Together to Build a Better Future.' }}
-            </h2>
-            <div class="w-16 h-1 bg-[#feb900]"></div>
-            
-            <div class="space-y-4">
-              <h4 class="text-sm font-bold text-[#feb900] uppercase tracking-wider">Est {{ data?.aboutUs?.est || '2020' }}</h4>
-              <p class="text-gray-600 text-justify leading-relaxed whitespace-pre-line">
-                {{ data?.aboutUs?.story_body || 'Cozmic Technology is a Bangladeshi Incorporated engineering firm. We specialize in Geotechnical Investigation, Engineering Consultancy, Architecture, Construction and Construction Project management services.\n\nWe design a wide range of building types that each excels at their function, provide a high-quality environment for people, and strengthen their client’s brands and identities.' }}
-              </p>
-              
-              <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-medium text-gray-700">
-                <li v-for="service in data?.services || []" :key="service.id" class="flex items-center gap-2">
-                  <Icon name="lucide:check-circle-2" class="text-[#feb900]" /> <span v-html="service.name"></span>
-                </li>
-              </ul>
-
-              <p class="text-gray-600 text-justify leading-relaxed mt-4">
-                {{ data?.aboutUs?.story_body2 || 'We work closely with our clients to interpret their dreams/visions accurately in drawings and bring them to the desired reality through construction solutions to meet their needs.' }}
-              </p>
-            </div>
+            </h1>
           </div>
 
-        </div>
-      </div>
-    </section>
-
-    <!-- ======= Stats Counter Section ======= -->
-    <section class="py-16 bg-gray-50 border-t border-b border-gray-100">
-      <div class="container mx-auto px-4 md:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
-          <!-- Stat 1 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
-            <div class="w-14 h-14 bg-blue-50 text-blue-600 flex items-center justify-center text-3xl rounded-full">
-              <Icon :name="data?.aboutUs?.happy_icon?.startsWith('bi') ? 'lucide:smile' : (data?.aboutUs?.happy_icon || 'lucide:smile')" />
-            </div>
-            <div>
-              <span class="block text-3xl font-extrabold text-[#0f172a]">
-                <Counter :target="data?.aboutUs?.happy_client || 23" />
-              </span>
-              <p class="text-gray-500 text-xs font-semibold uppercase mt-1">Happy Clients</p>
-            </div>
-          </div>
-
-          <!-- Stat 2 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
-            <div class="w-14 h-14 bg-amber-50 text-amber-600 flex items-center justify-center text-3xl rounded-full">
-              <Icon :name="data?.aboutUs?.projects_icon?.startsWith('bi') ? 'lucide:briefcase' : (data?.aboutUs?.projects_icon || 'lucide:briefcase')" />
-            </div>
-            <div>
-              <span class="block text-3xl font-extrabold text-[#0f172a]">
-                <Counter :target="data?.aboutUs?.project_nos || 29" />
-              </span>
-              <p class="text-gray-500 text-xs font-semibold uppercase mt-1">Projects Completed</p>
-            </div>
-          </div>
-
-          <!-- Stat 3 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
-            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl rounded-full">
-              <Icon :name="data?.aboutUs?.support_icon?.startsWith('bi') ? 'lucide:headset' : (data?.aboutUs?.support_icon || 'lucide:headset')" />
-            </div>
-            <div>
-              <span class="block text-3xl font-extrabold text-[#0f172a]">
-                <Counter :target="data?.aboutUs?.hrs_support || 1740" />
-              </span>
-              <p class="text-gray-500 text-xs font-semibold uppercase mt-1">Hours of Support</p>
-            </div>
-          </div>
-
-          <!-- Stat 4 -->
-          <div class="bg-white p-6 rounded-lg border border-gray-100 flex items-center gap-6 shadow-sm" data-aos="fade-up">
-            <div class="w-14 h-14 bg-rose-50 text-rose-600 flex items-center justify-center text-3xl rounded-full">
-              <Icon :name="data?.aboutUs?.emp_icon?.startsWith('bi') ? 'lucide:hard-hat' : (data?.aboutUs?.emp_icon || 'lucide:hard-hat')" />
-            </div>
-            <div>
-              <span class="block text-3xl font-extrabold text-[#0f172a]">
-                <Counter :target="data?.aboutUs?.emp_nos || 35" />
-              </span>
-              <p class="text-gray-500 text-xs font-semibold uppercase mt-1">Hard Workers</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ======= Alt Services Section 1 ======= -->
-    <section class="py-20 bg-white">
-      <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-          <div class="relative overflow-hidden rounded-lg shadow-lg" data-aos="zoom-in">
-            <img src="/assets/img/alt-services.jpg" alt="Services Detail" width="600" height="450" loading="lazy" class="w-full h-[450px] object-cover" />
-          </div>
-
-          <div class="space-y-6">
-            <h3 class="text-2xl font-bold text-[#2e3135]">
-              {{ data?.aboutUs?.mission_title || 'OUR MISSION' }}
-            </h3>
-            <p class="text-gray-600 leading-relaxed text-justify">
-              {{ data?.aboutUs?.mission_body || 'Our mission is to establish Cozmic Technology as a trusted, reliable and top-tier provider of engineering consultancy and geotechnical investigation services in the region. We strive to help our clients execute their projects safely and efficiently.' }}
+          <div class="lg:col-span-7 space-y-4 lg:pt-8" data-aos="fade-up" data-aos-delay="100">
+            <p class="text-neutral-600 text-base sm:text-lg leading-relaxed whitespace-pre-line font-normal">
+              {{ data?.aboutUs?.story_body || 'Cozmic Technology is a Bangladeshi Incorporated engineering firm. We specialize in Geotechnical Investigation, Engineering Consultancy, Architecture, Construction and Construction Project management services.\n\nWe design a wide range of building types that each excels at their function, provide a high-quality environment for people, and strengthen their client’s brands and identities.' }}
             </p>
-            <div class="border-l-4 border-[#feb900] pl-6 py-2 italic text-gray-500 text-sm">
-              "{{ data?.aboutUs?.tagline || 'Providing solutions that are secure, stable, and economically sound.' }}"
+          </div>
+        </div>
+
+        <!-- Full-bleed / Wide Hero Photograph (Clean, no overlays, architectural) -->
+        <div class="mt-16 sm:mt-20 lg:mt-24 xl:mt-28 overflow-hidden rounded-sm bg-neutral-100" data-aos="fade-up">
+          <img
+            :src="data?.aboutUs?.story_image || '/assets/img/about.jpg'"
+            alt="Cozmic Technology Studio and Architecture"
+            class="w-full h-auto max-h-[640px] object-cover object-center"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======= Editorial Statement Section (.stmt) ======= -->
+    <section class="py-16 md:py-24 border-y border-neutral-150 bg-neutral-50/60">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12">
+        <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
+          <p class="font-display text-2xl sm:text-3xl md:text-4xl font-light text-[#090402] leading-[1.35] tracking-tight">
+            &ldquo;{{ data?.aboutUs?.story_body2 || 'We work closely with our clients to interpret their dreams/visions accurately in drawings and bring them to the desired reality through construction solutions to meet their needs.' }}&rdquo;
+          </p>
+          <div class="mt-6 flex items-center justify-center gap-3 text-xs tracking-[0.2em] uppercase text-neutral-400 font-medium">
+            <span>Established {{ data?.aboutUs?.est || '2020' }}</span>
+            <span>&bull;</span>
+            <span>{{ data?.aboutUs?.location_text || 'Dhaka, Bangladesh' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= Purpose & Core Capabilities (.sd-values) ======= -->
+    <section v-if="data?.aboutUs?.mission_is_active !== false" class="py-20 lg:py-28">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          <!-- Sticky Visual on Left -->
+          <div class="lg:col-span-6 lg:sticky lg:top-28" data-aos="fade-up">
+            <div class="overflow-hidden rounded-sm bg-neutral-100 aspect-[4/3] lg:aspect-square">
+              <img
+                :src="data?.aboutUs?.mission_image || '/assets/img/alt-services.jpg'"
+                alt="Engineering Capabilities"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
+          </div>
+
+          <!-- Content List on Right -->
+          <div class="lg:col-span-6 space-y-10" data-aos="fade-up" data-aos-delay="100">
+            <div>
+              <span class="inline-block text-[11px] sm:text-xs font-medium tracking-[0.25em] text-neutral-400 uppercase mb-3">
+                {{ data?.aboutUs?.mission_eyebrow || 'Mission & Focus' }}
+              </span>
+              <h2 class="font-display text-3xl sm:text-4xl font-light text-[#090402] leading-tight">
+                {{ data?.aboutUs?.mission_title || 'OUR MISSION' }}
+              </h2>
+            </div>
+
+            <!-- Value item 1: Mission -->
+            <div class="border-t border-neutral-200 pt-6">
+              <h3 class="text-sm font-semibold tracking-wide uppercase text-[#090402] mb-3">
+                {{ data?.aboutUs?.mission_label || 'Committed to Precision' }}
+              </h3>
+              <p class="text-neutral-600 text-sm sm:text-base leading-relaxed">
+                {{ data?.aboutUs?.mission_body || 'Our mission is to establish Cozmic Technology as a trusted, reliable and top-tier provider of engineering consultancy and geotechnical investigation services in the region. We strive to help our clients execute their projects safely and efficiently.' }}
+              </p>
+            </div>
+
+            <!-- Value item 2: Philosophy Tagline -->
+            <div class="border-t border-neutral-200 pt-6">
+              <h3 class="text-sm font-semibold tracking-wide uppercase text-[#090402] mb-3">
+                {{ data?.aboutUs?.guarantee_label || 'Our Guarantee' }}
+              </h3>
+              <p class="text-neutral-600 text-sm sm:text-base leading-relaxed italic">
+                &ldquo;{{ data?.aboutUs?.tagline || 'Providing solutions that are secure, stable, and economically sound.' }}&rdquo;
+              </p>
+            </div>
+
+            <!-- Value item 3: Capabilities list -->
+            <div class="border-t border-neutral-200 pt-6">
+              <h3 class="text-sm font-semibold tracking-wide uppercase text-[#090402] mb-4">
+                {{ data?.aboutUs?.disciplines_label || 'Core Disciplines' }}
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-neutral-700">
+                <div
+                  v-for="service in data?.services || []"
+                  :key="service.id"
+                  class="flex items-center gap-2.5 py-1"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#090402]"></span>
+                  <span v-html="service.name" class="font-normal text-neutral-800"></span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- ======= Alt Services Section 2 ======= -->
-    <section class="py-20 bg-gray-50 border-t border-b border-gray-100">
-      <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-          <div class="space-y-6 order-2 lg:order-1">
-            <h3 class="text-2xl font-bold text-[#2e3135]">
+    <!-- ======= Vision & Approach (.sd-approach) ======= -->
+    <section v-if="data?.aboutUs?.vision_is_active !== false" class="py-20 lg:py-24 bg-neutral-50/70 border-t border-neutral-200/70">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12">
+        
+        <!-- Two-column header -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start" data-aos="fade-up">
+          <div class="lg:col-span-5">
+            <span class="inline-block text-[11px] sm:text-xs font-medium tracking-[0.25em] text-neutral-400 uppercase mb-3">
+              {{ data?.aboutUs?.vision_eyebrow || 'Looking Forward' }}
+            </span>
+            <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-light text-[#090402] leading-tight">
               {{ data?.aboutUs?.vision_title || 'OUR VISION' }}
-            </h3>
-            <p class="text-gray-600 leading-relaxed text-justify whitespace-pre-line">
+            </h2>
+          </div>
+          <div class="lg:col-span-7 lg:pt-6">
+            <p class="text-neutral-600 text-base sm:text-lg leading-relaxed whitespace-pre-line font-normal">
               {{ data?.aboutUs?.vision_body || 'To be the most reliable and premium engineering consulting firm, leading with innovation and sustainable designs. We envision transforming construction environments and empowering clients with top-of-the-line structural, civil, and environmental engineering solutions.' }}
             </p>
           </div>
+        </div>
 
-          <div class="relative overflow-hidden rounded-lg shadow-lg order-1 lg:order-2" data-aos="zoom-in">
-            <img src="/assets/img/alt-services-2.jpg" alt="Services Detail" width="600" height="450" loading="lazy" class="w-full h-[450px] object-cover" />
+        <!-- Wide Banner Image -->
+        <div class="mt-12 lg:mt-16 overflow-hidden rounded-sm bg-neutral-100" data-aos="fade-up">
+          <img
+            :src="data?.aboutUs?.vision_image || '/assets/img/alt-services-2.jpg'"
+            alt="Architectural Planning and Construction Excellence"
+            class="w-full aspect-[21/9] sm:aspect-[24/9] object-cover"
+            loading="lazy"
+          />
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======= Stats Counter Section (.sd-stats) ======= -->
+    <section class="py-16 md:py-20 border-b border-neutral-200">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12" data-aos="fade-up">
+          
+          <!-- Stat 1 -->
+          <div class="border-l border-neutral-200 pl-6 sm:pl-8">
+            <Icon :name="data?.aboutUs?.happy_icon || 'lucide:smile'" class="text-2xl text-neutral-400 mb-2" />
+            <div class="font-sans text-3xl sm:text-4xl lg:text-5xl font-normal text-[#090402] tracking-tight tabular-nums">
+              <Counter :target="data?.aboutUs?.happy_client || 23" />
+            </div>
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500 font-medium mt-2">
+              {{ data?.aboutUs?.happy_label || 'Happy Clients' }}
+            </p>
+          </div>
+
+          <!-- Stat 2 -->
+          <div class="border-l border-neutral-200 pl-6 sm:pl-8">
+            <Icon :name="data?.aboutUs?.projects_icon || 'lucide:briefcase'" class="text-2xl text-neutral-400 mb-2" />
+            <div class="font-sans text-3xl sm:text-4xl lg:text-5xl font-normal text-[#090402] tracking-tight tabular-nums">
+              <Counter :target="data?.aboutUs?.project_nos || 29" />
+            </div>
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500 font-medium mt-2">
+              {{ data?.aboutUs?.project_label || 'Projects Completed' }}
+            </p>
+          </div>
+
+          <!-- Stat 3 -->
+          <div class="border-l border-neutral-200 pl-6 sm:pl-8">
+            <Icon :name="data?.aboutUs?.support_icon || 'lucide:headset'" class="text-2xl text-neutral-400 mb-2" />
+            <div class="font-sans text-3xl sm:text-4xl lg:text-5xl font-normal text-[#090402] tracking-tight tabular-nums">
+              <Counter :target="data?.aboutUs?.hrs_support || 1740" />
+            </div>
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500 font-medium mt-2">
+              {{ data?.aboutUs?.support_label || 'Hours of Support' }}
+            </p>
+          </div>
+
+          <!-- Stat 4 -->
+          <div class="border-l border-neutral-200 pl-6 sm:pl-8">
+            <Icon :name="data?.aboutUs?.emp_icon || 'lucide:hard-hat'" class="text-2xl text-neutral-400 mb-2" />
+            <div class="font-sans text-3xl sm:text-4xl lg:text-5xl font-normal text-[#090402] tracking-tight tabular-nums">
+              <Counter :target="data?.aboutUs?.emp_nos || 35" />
+            </div>
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500 font-medium mt-2">
+              {{ data?.aboutUs?.emp_label || 'Hard Workers' }}
+            </p>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- ======= Our Team Section ======= -->
-    <section id="team" class="py-20 bg-white">
-      <div class="container mx-auto px-4 md:px-8" data-aos="fade-up">
+    <!-- ======= The Team Section (.sd-team) ======= -->
+    <section id="team" class="py-20 lg:py-28">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12">
         
-        <div class="text-center max-w-3xl mx-auto mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-[#2e3135] mb-4">
-            {{ data?.aboutUs?.team_title || 'Our Team' }}
-          </h2>
-          <div class="w-16 h-1 bg-[#feb900] mx-auto mb-4"></div>
-          <p class="text-gray-600">
-            {{ data?.aboutUs?.team_description || 'We have a strong team of professional engineers, geotechnical experts, and architects working together to deliver high-quality consultancy.' }}
-          </p>
+        <!-- Team Header: 2-column layout matching reference -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start mb-16 lg:mb-20" data-aos="fade-up">
+          <div class="lg:col-span-5">
+            <span class="inline-block text-[11px] sm:text-xs font-medium tracking-[0.25em] text-neutral-400 uppercase mb-3">
+              {{ data?.aboutUs?.team_eyebrow || 'The Team' }}
+            </span>
+            <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-light text-[#090402] leading-tight">
+              {{ data?.aboutUs?.team_title || 'Meet the people behind the designs' }}
+            </h2>
+          </div>
+          <div class="lg:col-span-7 space-y-4 lg:pt-6">
+            <p
+              v-for="(para, idx) in teamDescriptionParagraphs"
+              :key="idx"
+              class="text-neutral-600 text-sm sm:text-base leading-relaxed"
+            >
+              {{ para }}
+            </p>
+          </div>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-8 md:gap-12">
-          <div v-for="(member, index) in data?.team || []" :key="member.id" v-memo="[member.id]" class="team-member group w-full max-w-[280px]" data-aos="fade-up" :data-aos-delay="100 * (index + 1)">
-            <div class="member-img relative overflow-hidden w-64 h-64 rounded-full mx-auto shadow-md border-4 border-slate-100">
-              <!-- P10 — lazy load team photos; explicit dimensions prevent CLS -->
-              <img :src="member.image ? '/assets/img/team/' + member.image : '/assets/img/team/team-1.jpg'" :alt="member.name" width="256" height="256" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div class="social absolute inset-x-0 bottom-[-40px] h-10 bg-black/60 flex items-center justify-center gap-4 transition-all duration-300 opacity-0 group-hover:bottom-0 group-hover:opacity-100">
-                <a :href="member.fb || '#'" target="_blank"><Icon name="lucide:facebook" /></a>
-                <a :href="member.insta || '#'" target="_blank"><Icon name="lucide:instagram" /></a>
-                <a :href="member.linkedin || '#'" target="_blank"><Icon name="lucide:linkedin" /></a>
-              </div>
+        <!-- 4-Column Team Member Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8" data-aos="fade-up">
+          <div
+            v-for="member in data?.team || []"
+            :key="member.id"
+            class="group cursor-pointer"
+            @click="toggleCV(member.id)"
+          >
+            <!-- Portrait Image: Grayscale by default, full color on hover with smooth transition -->
+            <div class="relative overflow-hidden aspect-[4/5] bg-neutral-100 rounded-sm">
+              <img
+                :src="member.image ? (member.image.startsWith('/') ? member.image : '/assets/img/team/' + member.image) : '/assets/img/team/team-1.jpg'"
+                :alt="member.name"
+                class="w-full h-full object-cover object-top filter grayscale group-hover:grayscale-0 transition-all duration-500 ease-in-out group-hover:scale-105"
+                loading="lazy"
+              />
             </div>
-            <div class="p-6 text-center">
-              <h4 class="font-bold text-lg text-[#2e3135]">{{ member.name }}</h4>
-              <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold block mt-1">{{ member.designation }}</span>
-              <p class="text-gray-600 text-xs mt-3 leading-relaxed" v-if="member.message">
-                "{{ member.message }}"
+
+            <!-- Name, designation, More trigger -->
+            <div class="mt-3.5 space-y-1">
+              <h4 class="text-sm sm:text-[15px] font-medium text-[#090402] leading-snug">
+                {{ member.name }}
+              </h4>
+              <p class="text-xs text-neutral-500 leading-normal">
+                {{ member.designation }}
               </p>
+              <button
+                type="button"
+                @click.stop="toggleCV(member.id)"
+                class="text-xs font-semibold text-[#090402] underline underline-offset-4 hover:text-[#feb900] transition-colors pt-1 block cursor-pointer"
+              >
+                {{ openCvId === member.id ? 'Close' : 'More' }}
+              </button>
             </div>
           </div>
         </div>
 
+        <!-- Short CV Dropdown / Drawer Panel (Matching media_1790774449394.png) -->
+        <Transition name="cv-panel">
+          <div
+            v-if="openCvMember"
+            :key="openCvMember.id"
+            ref="cvPanelRef"
+            class="mt-12 pt-10 border-t border-neutral-200 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 relative bg-white"
+          >
+            <!-- Close 'x' icon top right -->
+            <button
+              type="button"
+              @click="openCvId = null"
+              class="absolute top-8 right-0 text-neutral-400 hover:text-[#090402] transition-colors p-2 text-2xl leading-none cursor-pointer"
+              aria-label="Close CV"
+            >
+              &times;
+            </button>
+
+            <!-- Left: Large Color Portrait -->
+            <div class="md:col-span-4 lg:col-span-4">
+              <div class="overflow-hidden aspect-[4/5] bg-neutral-100 rounded-sm">
+                <img
+                  :src="openCvMember.image ? (openCvMember.image.startsWith('/') ? openCvMember.image : '/assets/img/team/' + openCvMember.image) : '/assets/img/team/team-1.jpg'"
+                  :alt="openCvMember.name"
+                  class="w-full h-full object-cover object-top"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            <!-- Right: Detailed Short CV / Bio -->
+            <div class="md:col-span-8 lg:col-span-8 space-y-5 pr-8">
+              <div>
+                <span class="block text-[11px] font-medium tracking-[0.2em] uppercase text-neutral-400 mb-1">
+                  {{ openCvMember.designation }}
+                </span>
+                <h3 class="font-display text-3xl sm:text-4xl font-light text-[#090402] leading-tight">
+                  {{ openCvMember.name }}
+                </h3>
+              </div>
+
+              <!-- Hairline separator -->
+              <div class="w-full h-px bg-neutral-200"></div>
+
+              <!-- Bio text / message -->
+              <div class="text-neutral-600 text-sm sm:text-base leading-relaxed space-y-4 whitespace-pre-line font-normal">
+                <p>
+                  {{ openCvMember.message || `${openCvMember.name} serves as ${openCvMember.designation} at Cozmic Technology, bringing technical depth, dedication, and precision to our engineering and architectural endeavors. With a proven commitment to project excellence, client satisfaction, and innovative problem solving, they help lead multidisciplinary initiatives across geotechnical, structural, and architectural domains.` }}
+                </p>
+              </div>
+
+              <!-- Hairline separator + Footer meta -->
+              <div class="pt-6 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold tracking-wider uppercase text-neutral-500">
+                <span>{{ data?.aboutUs?.company_title || 'Cozmic Technology' }}, {{ data?.aboutUs?.location_text || 'Dhaka, Bangladesh' }}</span>
+                <NuxtLink
+                  to="/contact"
+                  class="text-[#090402] underline underline-offset-4 hover:text-[#feb900] transition-colors"
+                >
+                  Get In Touch &rarr;
+                </NuxtLink>
+              </div>
+            </div>
+
+          </div>
+        </Transition>
+
+      </div>
+    </section>
+
+    <!-- ======= Good People, Good Design Feature Banner ======= -->
+    <section class="py-20 lg:py-24 bg-[#f4f4f5] border-t border-neutral-200/80 text-[#090402]">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-12 text-center" data-aos="fade-up">
+        <span class="inline-block text-[11px] sm:text-xs font-medium tracking-[0.25em] text-neutral-500 uppercase mb-4">
+          {{ data?.aboutUs?.cta_eyebrow || 'Collaboration • Excellence' }}
+        </span>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-light text-[#090402] mb-6 tracking-tight">
+          {{ data?.aboutUs?.cta_heading || 'Good People. Good Engineering.' }}
+        </h2>
+        <p class="text-neutral-600 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-8">
+          {{ data?.aboutUs?.cta_body || 'Ready to turn your ambitious engineering, geotechnical, or architectural vision into enduring reality? Our team is here to collaborate with you.' }}
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <NuxtLink
+            to="/contact"
+            class="px-8 py-3.5 bg-[#090402] text-white text-xs font-semibold uppercase tracking-[0.18em] rounded-sm hover:bg-[#feb900] hover:text-[#090402] transition-colors shadow-sm"
+          >
+            Get In Touch
+          </NuxtLink>
+          <NuxtLink
+            to="/career"
+            class="px-8 py-3.5 border border-[#090402]/30 text-[#090402] text-xs font-semibold uppercase tracking-[0.18em] rounded-sm hover:border-[#090402] hover:bg-[#090402]/5 transition-colors"
+          >
+            Join Our Team
+          </NuxtLink>
+        </div>
       </div>
     </section>
 
@@ -196,9 +375,10 @@
 </template>
 
 <script setup>
-// P15 — Page-specific SEO meta for About page
+import { ref, computed, nextTick } from 'vue'
+
 useHead({
-  title: 'About Us | Cozmic Technology - Engineering Consultancy',
+  title: 'About Us | Cozmic Technology - Multidisciplinary Engineering Consultancy',
   meta: [
     { name: 'description', content: 'Learn about Cozmic Technology — our story, mission, vision, and the expert team behind Bangladesh\'s trusted geotechnical and engineering consultancy firm.' },
     { property: 'og:title', content: 'About Cozmic Technology' },
@@ -207,4 +387,46 @@ useHead({
 })
 
 const { data } = await useFetch('/api/about', { deep: false })
+
+// Team intro body is stored as a single DB field; blank lines separate paragraphs
+const teamDescriptionParagraphs = computed(() => {
+  const text = data.value?.aboutUs?.team_description || ''
+  return text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+})
+
+// Interactive Short CV state
+const openCvId = ref(null)
+const cvPanelRef = ref(null)
+
+const openCvMember = computed(() => {
+  if (!openCvId.value) return null
+  return (data.value?.team || []).find(m => m.id === openCvId.value) || null
+})
+
+const toggleCV = (id) => {
+  if (openCvId.value === id) {
+    openCvId.value = null
+  } else {
+    openCvId.value = id
+    nextTick(() => {
+      if (cvPanelRef.value) {
+        cvPanelRef.value.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }
+    })
+  }
+}
 </script>
+
+<style scoped>
+/* Smooth transition for the CV Dropdown Drawer */
+.cv-panel-enter-active,
+.cv-panel-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cv-panel-enter-from,
+.cv-panel-leave-to {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+</style>

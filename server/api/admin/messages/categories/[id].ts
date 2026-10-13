@@ -1,4 +1,5 @@
 import { prisma } from '../../../../utils/prisma'
+import { requirePermission } from '../../../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
@@ -6,12 +7,12 @@ export default defineEventHandler(async (event) => {
   if (!id) throw createError({ statusCode: 400, statusMessage: 'Invalid ID' })
 
   if (method === 'PUT') {
+    await requirePermission(event, 'contact', 'edit');
     try {
       const body = await readBody(event)
       const updateData: any = {}
       if (body.name !== undefined) {
         updateData.name = body.name
-        updateData.slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
       }
 
       const updated = await prisma.categories.update({
@@ -27,6 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === 'DELETE') {
+    await requirePermission(event, 'contact', 'delete');
     try {
       await prisma.categories.delete({
         where: { id }

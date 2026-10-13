@@ -3,6 +3,7 @@ import { prisma } from '../../utils/prisma'
 export default defineEventHandler(async (event) => {
   const id = parseInt(event.context.params?.id || '0')
   try {
+    setResponseHeader(event, 'cache-control', 'public, max-age=180, stale-while-revalidate=300')
     const post = await prisma.posts.findUnique({
       where: { id },
       include: { categories: true }
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
         }
       }),
       prisma.categories.findMany({
-        where: { type: 'post' },
+        where: { posts: { some: {} } },
         select: {
           id: true,
           name: true
@@ -54,8 +55,9 @@ export default defineEventHandler(async (event) => {
       recentPosts: mappedRecentPosts,
       allCategories
     }
-  } catch (error) {
+  } catch (error: any) {
+    if (error.statusCode) throw error
     console.error('Error fetching blog post details:', error)
-    return null
+    throw createError({ statusCode: 500, statusMessage: 'Failed to fetch blog post details' })
   }
 })

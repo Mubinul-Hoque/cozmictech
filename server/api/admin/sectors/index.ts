@@ -8,13 +8,23 @@ export default defineEventHandler(async (event) => {
     await requirePermission(event, 'sectors', 'view');
     try {
       const sectors = await prisma.sectors.findMany({
-        orderBy: { id: 'asc' }
+        orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              projects: true
+            }
+          }
+        }
       })
       const mappedSectors = sectors.map(s => ({
-        ...s,
-        sector: s.name // Map 'name' to 'sector' for frontend compatibility
+        id: s.id,
+        name: s.name,
+        sector: s.name, // Map 'name' to 'sector' for frontend compatibility
+        created_at: s.created_at,
+        updated_at: s.updated_at,
+        project_count: s._count?.projects || 0
       }))
-      await clearPublicCache();
       return { success: true, data: mappedSectors }
     } catch (error: any) {
       console.error('Error fetching sectors:', error)

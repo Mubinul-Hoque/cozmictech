@@ -1,4 +1,5 @@
 import { prisma } from '../utils/prisma'
+import { getAdvancedSearchConfig } from '../utils/searchConfig'
 
 let metadataCache: {
   categories: any[];
@@ -7,8 +8,29 @@ let metadataCache: {
   expiresAt: number;
 } | null = null;
 
+type AdvConfig = Awaited<ReturnType<typeof getAdvancedSearchConfig>>;
+let settingsCache: { advConfig: AdvConfig; layout: 'grid' | 'list'; expiresAt: number } | null = null;
+
 export function invalidateProjectsMetadataCache() {
   metadataCache = null;
+  settingsCache = null;
+}
+
+// Adv-search filter config + default layout change rarely; avoid 2 queries per request.
+async function getProjectsPageSettings() {
+  const now = Date.now();
+  if (settingsCache && settingsCache.expiresAt > now) return settingsCache;
+
+  const [advConfig, layoutSetting] = await Promise.all([
+    getAdvancedSearchConfig(),
+    prisma.settings.findUnique({ where: { setting_key: 'projects_page_layout' } })
+  ]);
+  settingsCache = {
+    advConfig,
+    layout: layoutSetting?.setting_value === 'list' ? 'list' : 'grid',
+    expiresAt: now + 60 * 1000
+  };
+  return settingsCache;
 }
 
 async function getProjectsFilterMetadata() {
@@ -77,26 +99,50 @@ async function getProjectsFilterMetadata() {
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const page = parseInt(query.page as string) || 1
-  const limit = parseInt(query.limit as string) || 12
+  const page = Math.max(1, parseInt(query.page as string) || 1)
+
+  // Advanced search filter config + default layout (memory-cached, see getProjectsPageSettings)
+  const { advConfig, layout: defaultLayout } = await getProjectsPageSettings()
+
+  // Detect layout to set appropriate pagination limit (10 for list view, 12 for grid view)
+  const requestedLayout = typeof query.layout === 'string' ? query.layout.toLowerCase() : null
+  const projectsPageLayout = (requestedLayout === 'grid' || requestedLayout === 'list')
+    ? requestedLayout
+    : defaultLayout
+  const defaultLimit = projectsPageLayout === 'list' ? 10 : 12
+  // Clamp client-supplied limit to protect DB/memory
+  const limit = Math.min(100, Math.max(1, query.limit ? (parseInt(query.limit as string) || defaultLimit) : defaultLimit))
   const search = ((query.search as string) || '').trim()
-  const sectorId = query.sectorId && query.sectorId !== 'all' ? parseInt(query.sectorId as string) : null
+
+  // Filter values are strictly ignored if disabled in database advanced search settings
+  const sectorId = (advConfig.sector && query.sectorId && query.sectorId !== 'all') ? parseInt(query.sectorId as string) : null
+  
   // Category filter: supports single categoryId or multi-select categoryIds (array or comma-separated string)
-  const rawCat = query.categoryIds || query.categoryId
   let categoryIds: number[] = []
-  if (Array.isArray(rawCat)) {
-    categoryIds = rawCat.map(c => parseInt(c as string)).filter(c => !isNaN(c) && c > 0)
-  } else if (typeof rawCat === 'string' && rawCat !== 'all' && rawCat.trim() !== '') {
-    categoryIds = rawCat.split(',').map(c => parseInt(c.trim())).filter(c => !isNaN(c) && c > 0)
+  if (advConfig.category) {
+    const rawCat = query.categoryIds || query.categoryId
+    if (Array.isArray(rawCat)) {
+      categoryIds = rawCat.map(c => parseInt(c as string)).filter(c => !isNaN(c) && c > 0)
+    } else if (typeof rawCat === 'string' && rawCat !== 'all' && rawCat.trim() !== '') {
+      categoryIds = rawCat.split(',').map(c => parseInt(c.trim())).filter(c => !isNaN(c) && c > 0)
+    }
   }
 
-  const status = (query.status as string) || null
-  const year = query.year && query.year !== 'all' ? query.year as string : null
+  const status = (advConfig.status && query.status) ? (query.status as string) : null
+  const year = (advConfig.year && query.year && query.year !== 'all') ? (query.year as string) : null
 
-  const minContract = query.minContractValue !== undefined && query.minContractValue !== '' ? parseFloat(query.minContractValue as string) : null
-  const maxContract = query.maxContractValue !== undefined && query.maxContractValue !== '' ? parseFloat(query.maxContractValue as string) : null
-  const minProject = query.minProjectValue !== undefined && query.minProjectValue !== '' ? parseFloat(query.minProjectValue as string) : null
-  const maxProject = query.maxProjectValue !== undefined && query.maxProjectValue !== '' ? parseFloat(query.maxProjectValue as string) : null
+  const minContract = (advConfig.contract_value && query.minContractValue !== undefined && query.minContractValue !== '') 
+    ? parseFloat(query.minContractValue as string) 
+    : null
+  const maxContract = (advConfig.contract_value && query.maxContractValue !== undefined && query.maxContractValue !== '') 
+    ? parseFloat(query.maxContractValue as string) 
+    : null
+  const minProject = (advConfig.project_value && query.minProjectValue !== undefined && query.minProjectValue !== '') 
+    ? parseFloat(query.minProjectValue as string) 
+    : null
+  const maxProject = (advConfig.project_value && query.maxProjectValue !== undefined && query.maxProjectValue !== '') 
+    ? parseFloat(query.maxProjectValue as string) 
+    : null
 
   const skip = (page - 1) * limit
 
@@ -193,7 +239,7 @@ export default defineEventHandler(async (event) => {
   // Fetch metadata (categories, sectors, availableYears) from memory cache or DB
   const metadataPromise = getProjectsFilterMetadata();
 
-  const [projects, totalProjects, sectorGroups, metadata] = await Promise.all([
+  const [projects, totalProjects, sectorGroups, metadata, headerSection] = await Promise.all([
     // Paginated projects
     prisma.projects.findMany({
       where: whereClause,
@@ -226,7 +272,13 @@ export default defineEventHandler(async (event) => {
       where: whereWithoutSector,
       _count: { id: true }
     }),
-    metadataPromise
+    metadataPromise,
+    prisma.page_sections.findFirst({
+      where: {
+        page_slug: 'projects',
+        section_key: 'header'
+      }
+    })
   ])
 
   const mappedProjects = projects.map(p => ({
@@ -255,6 +307,16 @@ export default defineEventHandler(async (event) => {
     totalProjects: allTotal,
     filteredTotal: totalProjects,
     totalPages: Math.ceil(totalProjects / limit),
-    page
+    page,
+    projects_page_layout: projectsPageLayout,
+    filtersConfig: advConfig,
+    header: {
+      title: headerSection?.title || 'Our projects',
+      content: (headerSection?.content !== null && headerSection?.content !== undefined) 
+        ? headerSection.content 
+        : 'Since 2009, REINCARNATION has shaped spaces across Bangladesh — from large-scale industrial and RMG facilities to corporate interiors, hospitality, mixed-use landmarks and private residences. Each project pairs architectural rigour with a careful eye for how people actually use a space.',
+      subtitle: headerSection?.subtitle_or_tag || '',
+      is_active: headerSection?.is_active ?? true
+    }
   }
 })

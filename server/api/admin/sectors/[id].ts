@@ -39,12 +39,21 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     await requirePermission(event, 'sectors', 'delete');
     try {
+      const projectCount = await prisma.projects.count({ where: { sector_id: id } })
+      if (projectCount > 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Cannot delete sector: it is still used by ${projectCount} project${projectCount === 1 ? '' : 's'}`
+        })
+      }
+
       await prisma.sectors.delete({
         where: { id }
       })
       await clearPublicCache();
       return { success: true, message: 'Sector deleted successfully' }
     } catch (error: any) {
+      if (error.statusCode) throw error
       console.error('Error deleting sector:', error)
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete sector' })
     }

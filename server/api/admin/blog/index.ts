@@ -99,10 +99,16 @@ export default defineEventHandler(async (event) => {
       const sdate = String(body.sdate || new Date().toLocaleDateString('en-GB')).trim();
       const image = String(body.image || '').trim();
 
+      const categoryId = parseInt(body.post_catid);
+      const categoryExists = await prisma.categories.findUnique({ where: { id: categoryId } });
+      if (!categoryExists) {
+        throw createError({ statusCode: 400, statusMessage: 'Selected category does not exist' });
+      }
+
       const post = await prisma.posts.create({
         data: {
           title: sanitizePlainText(title),
-          category_id: parseInt(body.post_catid),
+          category_id: categoryId,
           content: sanitizeHtmlContent(body.content),
           image: sanitizePlainText(image),
           author_name: sanitizePlainText(author),

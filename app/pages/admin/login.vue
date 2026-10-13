@@ -71,7 +71,12 @@
 
             <!-- Password -->
             <div>
-              <label for="password" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+              <div class="flex items-center justify-between mb-2">
+                <label for="password" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Password</label>
+                <NuxtLink to="/admin/forgot-password" class="text-[11px] font-bold text-[#feb900] hover:text-amber-400 transition-colors uppercase tracking-wider">
+                  Forgot password?
+                </NuxtLink>
+              </div>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                   <Icon name="lucide:lock" class="text-slate-500 text-base" />

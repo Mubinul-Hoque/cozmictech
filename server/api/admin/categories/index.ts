@@ -8,10 +8,24 @@ export default defineEventHandler(async (event) => {
     await requirePermission(event, 'categories', 'view');
     try {
       const categories = await prisma.categories.findMany({
-        orderBy: { id: 'asc' }
+        orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              project_categories_link: true
+            }
+          }
+        }
       })
-      await clearPublicCache();
-      return { success: true, data: categories }
+      const mapped = categories.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        type: cat.type,
+        created_at: cat.created_at,
+        updated_at: cat.updated_at,
+        project_count: cat._count?.project_categories_link || 0
+      }))
+      return { success: true, data: mapped }
     } catch (error: any) {
       console.error('Error fetching categories:', error)
       throw createError({ statusCode: 500, statusMessage: 'Failed to fetch categories' })

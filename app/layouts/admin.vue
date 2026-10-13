@@ -28,7 +28,7 @@
             <Icon name="lucide:shield-check" class="text-[#364d59] text-lg" />
           </div>
           <span class="text-xl font-bold tracking-tight text-white group-hover:text-[#feb900] transition-colors duration-200">
-            Cozmic<span class="text-[#feb900]">.</span>Admin
+            {{ companyName }}
           </span>
         </NuxtLink>
         
@@ -92,8 +92,19 @@
               <div v-show="pagesOpen" class="mt-1 pl-4 pr-1">
                 <ul class="border-l-2 border-white/10 pl-2 space-y-1 py-1">
                   <li v-if="can('pages')">
-                    <NuxtLink 
-                      to="/admin/about" 
+                    <NuxtLink
+                      to="/admin/home"
+                      class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200"
+                      active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10"
+                      @click="sidebarOpen = false"
+                    >
+                      <Icon name="lucide:house" class="mr-3 text-base group-hover:scale-110 transition-transform duration-200" />
+                      Home
+                    </NuxtLink>
+                  </li>
+                  <li v-if="can('pages')">
+                    <NuxtLink
+                      to="/admin/about"
                       class="group flex items-center px-3.5 py-2 rounded-full text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200" 
                       active-class="bg-[#feb900] text-slate-900 font-bold shadow-md shadow-amber-500/10" 
                       @click="sidebarOpen = false"
@@ -315,6 +326,7 @@ const hasAccessSection = computed(() => {
 const isPagesActive = computed(() => {
   const p = route.path;
   return (
+    p.startsWith('/admin/home') ||
     p.startsWith('/admin/about') ||
     p.startsWith('/admin/services') ||
     p.startsWith('/admin/blog') ||
@@ -340,7 +352,8 @@ onUnmounted(() => {
   adminSession.cleanupSessionWatcher();
 });
 
-const { data: commonData } = await useFetch('/api/common')
+const { data: commonData } = await useFetch('/api/common', { key: 'site-common-data' })
+const companyName = computed(() => commonData.value?.homepage?.company_title || 'Cozmic Technology')
 useHead({
   link: [
     {

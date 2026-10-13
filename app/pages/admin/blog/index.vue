@@ -23,6 +23,85 @@
         <span class="font-bold text-slate-700">{{ successMsg }}</span>
       </div>
     </div>
+    <div v-if="pageContentError" class="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-4 text-rose-800 text-sm mb-6">
+      <div class="flex items-center gap-3">
+        <Icon name="lucide:exclamation-triangle-fill" class="text-rose-500 text-lg" />
+        <span class="font-bold text-slate-700">{{ pageContentError }}</span>
+      </div>
+    </div>
+
+    <!-- Blog Page Header Content -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm mb-6">
+      <button
+        type="button"
+        @click="contentOpen = !contentOpen"
+        class="w-full flex items-center justify-between p-6 cursor-pointer select-none"
+      >
+        <div>
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+            <Icon name="lucide:layout-template" class="text-[#feb900]" /> Blog Page Header
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">Hero eyebrow, heading &amp; intro paragraph for the public /blog page</p>
+        </div>
+        <Icon name="lucide:chevron-down" class="text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': contentOpen }" />
+      </button>
+
+      <div v-show="contentOpen" class="px-6 pb-8 space-y-5 border-t border-slate-100 pt-6">
+        <div v-if="contentPending" class="flex justify-center py-6">
+          <div class="animate-spin rounded-full h-8 w-8 border-4 border-slate-100 border-t-[#feb900]"></div>
+        </div>
+        <template v-else>
+          <!-- Public /blog Page Header -->
+          <div class="space-y-4">
+            <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Public /blog Page Header</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Eyebrow Label</label>
+                <input type="text" v-model="pageContent.hero_eyebrow" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Heading</label>
+                <input type="text" v-model="pageContent.hero_heading" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Intro Paragraph</label>
+              <textarea rows="3" v-model="pageContent.hero_body" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm"></textarea>
+            </div>
+          </div>
+
+          <!-- Homepage News & Insights Section Header -->
+          <div class="space-y-4 border-t border-slate-100 pt-6">
+            <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+              <Icon name="lucide:book-open-text" class="text-amber-500" /> Homepage News &amp; Insights Section Header
+            </h4>
+            <p class="text-xs text-slate-400">Controls the title and tagline displayed above the recent articles section on the homepage.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Section Title</label>
+                <input type="text" v-model="pageContent.home_section_title" placeholder="Recent News & Perspectives" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Tagline / Short Description</label>
+                <input type="text" v-model="pageContent.home_section_tag" placeholder="Discourse, field studies, and infrastructure progress..." class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end pt-1">
+            <button
+              type="button"
+              @click="savePageContent"
+              :disabled="savingContent"
+              class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 px-6 py-3 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer"
+            >
+              <span v-if="savingContent" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent mr-1"></span>
+              <Icon v-else name="lucide:check" class="text-sm" />
+              {{ savingContent ? 'Saving...' : 'Save Page Header' }}
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
 
     <!-- Search and Filter Bar -->
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
@@ -39,15 +118,12 @@
       </div>
       <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
         <!-- Category Filter -->
-        <select 
-          v-model="selectedCategory" 
+        <select
+          v-model="selectedCategory"
           class="px-4 py-2 bg-white border border-slate-350 rounded-full text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm focus:outline-none"
         >
           <option value="">All Categories</option>
-          <option value="1">Events</option>
-          <option value="2">Engineering</option>
-          <option value="3">Research</option>
-          <option value="4">Insights</option>
+          <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">{{ cat.name }}</option>
         </select>
       </div>
     </div>
@@ -151,7 +227,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, reactive, watch, computed, onMounted } from 'vue';
 
 definePageMeta({
   layout: 'admin',
@@ -178,6 +254,63 @@ const { data: postsData, pending, refresh } = useFetch('/api/admin/blog', {
   watch: [currentPage, debouncedSearch, selectedCategory]
 });
 
+// Fetch real categories from the DB for the filter dropdown and labels
+const { data: categoriesData } = await useFetch('/api/admin/categories', { key: 'admin-blog-categories' });
+const categories = computed(() => categoriesData.value?.data || []);
+
+// ─── Blog Page Header Content ────────────────────────────────────────────
+const contentOpen = ref(false);
+const contentPending = ref(true);
+const savingContent = ref(false);
+const pageContentError = ref('');
+
+const pageContent = reactive({
+  hero_eyebrow: '',
+  hero_heading: '',
+  hero_body: '',
+  home_section_title: '',
+  home_section_tag: ''
+});
+
+const loadPageContent = async () => {
+  contentPending.value = true;
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/blog/page-content');
+    if (res.success && res.content) {
+      Object.assign(pageContent, res.content);
+    }
+  } catch (err) {
+    console.error(err);
+    pageContentError.value = 'Failed to load blog page header content.';
+  } finally {
+    contentPending.value = false;
+  }
+};
+
+onMounted(loadPageContent);
+
+const savePageContent = async () => {
+  savingContent.value = true;
+  pageContentError.value = '';
+  successMsg.value = '';
+
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/blog/page-content', {
+      method: 'POST',
+      body: pageContent
+    });
+    if (res.success) {
+      successMsg.value = 'Blog page header saved successfully.';
+      setTimeout(() => { successMsg.value = ''; }, 4000);
+    }
+  } catch (err) {
+    console.error(err);
+    pageContentError.value = err?.data?.statusMessage || 'Failed to save blog page header.';
+  } finally {
+    savingContent.value = false;
+  }
+};
+
 // Debounce search query updates
 let searchTimeout = null;
 watch(searchQuery, (newVal) => {
@@ -194,13 +327,7 @@ watch(selectedCategory, () => {
 });
 
 const getCategoryLabel = (catId) => {
-  const categories = {
-    1: 'Events',
-    2: 'Engineering',
-    3: 'Research',
-    4: 'Insights'
-  };
-  return categories[catId] || 'News';
+  return categories.value.find(c => c.id === catId)?.name || 'Uncategorized';
 };
 
 const confirmDelete = async (id) => {

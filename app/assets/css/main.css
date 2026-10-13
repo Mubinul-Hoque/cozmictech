@@ -14,9 +14,12 @@
 --------------------------------------------------------------*/
 /* Fonts */
 :root {
-  --font-default: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-primary: "Roboto", sans-serif;
-  --font-secondary: "Work Sans", sans-serif;
+  /* DM Sans — clean, geometric, minimal for body/UI text */
+  --font-default: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* DM Sans also for primary UI elements (nav, labels, buttons) */
+  --font-primary: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Cormorant Garamond — elegant serif for large editorial display headings */
+  --font-secondary: "Cormorant Garamond", "Georgia", serif;
 }
 
 /* Colors */
@@ -36,8 +39,14 @@
 --------------------------------------------------------------*/
 body {
   font-family: var(--font-default);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
   color: var(--color-default);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -50,13 +59,21 @@ a:hover {
   text-decoration: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Base heading styles — DM Sans for most headings */
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-primary);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+}
+
+/* Large display/editorial headings use Cormorant Garamond for elegance */
+.font-display,
+.display-heading {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  letter-spacing: -0.01em;
 }
 
 /*--------------------------------------------------------------
@@ -78,9 +95,10 @@ section {
 
 .section-header h2 {
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 500;
   position: relative;
   color: #2e3135;
+  letter-spacing: -0.025em;
 }
 
 .section-header h2:before,
@@ -132,10 +150,12 @@ section {
 }
 
 .breadcrumbs h2 {
-  font-size: 56px;
-  font-weight: 500;
+  font-size: 52px;
+  font-weight: 300;
   color: #fff;
   font-family: var(--font-secondary);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 .breadcrumbs ol {
@@ -295,6 +315,74 @@ section {
 
 .header .logo h1 span {
   color: var(--color-primary);
+}
+
+/* Light ash header state (Navbar with clean, visible light ash background) */
+.header.header-light {
+  background-color: #f0f1f3;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  padding: 16px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 997;
+  transition: all 0.3s ease;
+}
+
+.header.header-light .logo h1 {
+  color: #0f172a;
+}
+
+.header.header-light .navbar a,
+.header.header-light .navbar a:focus {
+  color: #334155;
+  font-weight: 500;
+}
+
+.header.header-light .navbar a:hover,
+.header.header-light .navbar .active,
+.header.header-light .navbar .active:focus,
+.header.header-light .navbar li:hover>a {
+  color: #090402;
+}
+
+.header.header-light .navbar a:hover:before,
+.header.header-light .navbar .active:before {
+  background-color: var(--color-primary);
+  visibility: visible;
+  width: 100%;
+}
+
+.header.header-light .mobile-nav-toggle {
+  color: #0f172a;
+}
+
+@media (max-width: 1279px) {
+  .header.header-light .navbar ul,
+  .header.sticked .navbar ul {
+    background: #f0f1f3;
+    border-left: 1px solid #e2e8f0;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .header.header-light .navbar a,
+  .header.sticked .navbar a {
+    color: #334155;
+  }
+
+  .header.header-light .navbar a:hover,
+  .header.header-light .navbar .active,
+  .header.sticked .navbar a:hover,
+  .header.sticked .navbar .active {
+    color: #090402;
+  }
+
+  .header.header-light .mobile-nav-hide,
+  .header.sticked .mobile-nav-hide {
+    color: #090402;
+  }
 }
 
 /*--------------------------------------------------------------
@@ -2594,119 +2682,12 @@ section {
 }
 
 /*--------------------------------------------------------------
-# Footer
+# Footer (Modern Minimal Baseline)
 --------------------------------------------------------------*/
 .footer {
   color: #fff;
-  background: url("/assets/img/footer-bg.jpg") top center no-repeat;
-  background-size: cover;
-  font-size: 14px;
-  padding: 80px 0 60px 0;
+  background-color: #090402;
   position: relative;
-}
-
-.footer:before {
-  content: "";
-  background: rgba(0, 0, 0, 0.8);
-  position: absolute;
-  inset: 0;
-}
-
-.footer .footer-content .footer-info {
-  margin-bottom: 30px;
-}
-
-.footer .footer-content .footer-info h3 {
-  font-size: 28px;
-  margin: 0 0 20px 0;
-  padding: 2px 0 2px 0;
-  line-height: 1;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.footer .footer-content .footer-info h3 span {
-  color: var(--color-primary);
-}
-
-.footer .footer-content .footer-info p {
-  font-size: 14px;
-  line-height: 24px;
-  margin-bottom: 0;
-  font-family: var(--font-primary);
-  color: #fff;
-}
-
-.footer .footer-content .social-links a {
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  line-height: 0;
-  margin-right: 8px;
-  border-radius: 4px;
-  width: 36px;
-  height: 36px;
-  transition: 0.3s;
-}
-
-.footer .footer-content .social-links a:hover {
-  background: var(--color-primary);
-  text-decoration: none;
-}
-
-.footer .footer-content h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  position: relative;
-  padding-bottom: 12px;
-}
-
-.footer .footer-content .footer-links {
-  margin-bottom: 30px;
-}
-
-.footer .footer-content .footer-links ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer .footer-content .footer-links ul li {
-  padding: 8px 0;
-}
-
-.footer .footer-content .footer-links ul li:first-child {
-  padding-top: 0;
-}
-
-.footer .footer-content .footer-links ul a {
-  color: rgba(255, 255, 255, 0.6);
-  transition: 0.3s;
-  display: inline-block;
-  line-height: 1;
-}
-
-.footer .footer-content .footer-links ul a:hover {
-  color: #fff;
-}
-
-.footer .footer-legal .copyright {
-  padding-top: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.footer .footer-legal .credits {
-  padding-top: 4px;
-  font-size: 13px;
-  color: #fff;
-}
-
-.footer .footer-legal .credits a {
-  color: var(--color-primary);
 }
 
 /*--------------------------------------------------------------

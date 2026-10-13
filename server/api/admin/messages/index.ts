@@ -38,10 +38,10 @@ export default defineEventHandler(async (event) => {
     // Map fields back to what the frontend expects
     const mappedMessages = messages.map(m => ({
       ...m,
-      status: m.is_read ? 'Read' : 'Unread',
+      status: m.is_read ? 1 : 0,
       date: m.created_at,
       message_cat_id: m.category_id,
-      category: m.categories ? { title: m.categories.name } : null
+      category: m.categories ? { name: m.categories.name, active: true } : null
     }));
 
     return mappedMessages;

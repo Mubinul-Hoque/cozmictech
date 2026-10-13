@@ -39,12 +39,27 @@ export default defineEventHandler(async (event) => {
   if (method === 'DELETE') {
     await requirePermission(event, 'categories', 'delete');
     try {
+      const [projectCount, postCount, messageCount, clientCount] = await Promise.all([
+        prisma.project_categories_link.count({ where: { category_id: id } }),
+        prisma.posts.count({ where: { category_id: id } }),
+        prisma.messages.count({ where: { category_id: id } }),
+        prisma.clients.count({ where: { category_id: id } })
+      ])
+      const usageCount = projectCount + postCount + messageCount + clientCount
+      if (usageCount > 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Cannot delete category: it is still used by ${usageCount} record${usageCount === 1 ? '' : 's'} (projects, posts, messages, or clients)`
+        })
+      }
+
       await prisma.categories.delete({
         where: { id }
       })
       await clearPublicCache();
       return { success: true, message: 'Category deleted successfully' }
     } catch (error: any) {
+      if (error.statusCode) throw error
       console.error('Error deleting category:', error)
       throw createError({ statusCode: 500, statusMessage: 'Failed to delete category' })
     }

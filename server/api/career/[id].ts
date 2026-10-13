@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const id = parseInt(idStr)
 
   try {
+    setResponseHeader(event, 'cache-control', 'public, max-age=180, stale-while-revalidate=300')
     const [career, contactSettings] = await Promise.all([
       prisma.careers.findUnique({
         where: { id }
@@ -34,6 +35,7 @@ export default defineEventHandler(async (event) => {
       contactEmail: contactSettings?.setting_value || 'career@cozmictech.com'
     }
   } catch (error: any) {
+    if (error.statusCode) throw error
     console.error('Error fetching public career detail:', error)
     throw createError({ statusCode: 500, statusMessage: 'Failed to fetch job details' })
   }

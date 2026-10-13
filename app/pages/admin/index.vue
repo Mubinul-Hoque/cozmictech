@@ -135,21 +135,6 @@
           </div>
         </NuxtLink>
       </div>
-
-      <!-- Quick Setup / Information -->
-      <div class="bg-gradient-to-br from-slate-900 via-[#1e293b] to-slate-950 p-8 rounded-3xl border border-white/10 text-white relative overflow-hidden shadow-lg">
-        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-[#feb900]/5 rounded-full blur-[80px] pointer-events-none"></div>
-        
-        <div class="max-w-xl relative z-10 space-y-4">
-          <span class="inline-flex items-center gap-1.5 bg-[#feb900]/10 border border-[#feb900]/25 text-[#feb900] text-[10px] font-bold tracking-wider uppercase px-3 py-1 rounded-full">
-            <Icon name="lucide:info" /> Content Management System
-          </span>
-          <h3 class="text-xl sm:text-2xl font-bold tracking-tight">Operational Guide</h3>
-          <p class="text-slate-400 text-sm leading-relaxed text-justify">
-            Welcome to the CozmicTech Admin Suite. From this control center, you can edit core brand assets, modify projects, update staff directories, draft articles, configure active services, and correspond with new inbox prospects.
-          </p>
-        </div>
-      </div>
     </div>
   </div>
 </template>

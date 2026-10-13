@@ -34,6 +34,53 @@
       </div>
     </div>
 
+    <!-- Testimonials Section Header Content -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm">
+      <button
+        type="button"
+        @click="headerOpen = !headerOpen"
+        class="w-full flex items-center justify-between p-6 cursor-pointer select-none"
+      >
+        <div>
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+            <Icon name="lucide:layout-template" class="text-[#feb900]" /> Testimonials Section Header
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">Title &amp; tagline displayed above the testimonials endorsements slider on the homepage</p>
+        </div>
+        <Icon name="lucide:chevron-down" class="text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': headerOpen }" />
+      </button>
+
+      <div v-show="headerOpen" class="px-6 pb-8 space-y-5 border-t border-slate-100 pt-6">
+        <div v-if="headerPending" class="flex justify-center py-6">
+          <div class="animate-spin rounded-full h-8 w-8 border-4 border-slate-100 border-t-[#feb900]"></div>
+        </div>
+        <template v-else>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Title</label>
+              <input type="text" v-model="headerForm.title" placeholder="Client Endorsements" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Tagline / Short Description</label>
+              <input type="text" v-model="headerForm.tagline" placeholder="What industry partners and project developers say..." class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-[#feb900] text-sm" />
+            </div>
+          </div>
+          <div class="flex justify-end pt-1">
+            <button
+              type="button"
+              @click="saveHeader"
+              :disabled="savingHeader"
+              class="inline-flex items-center gap-2 bg-[#feb900] hover:bg-amber-500 disabled:opacity-50 text-slate-950 px-6 py-3 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-200 shadow-sm hover:shadow active:scale-95 cursor-pointer"
+            >
+              <span v-if="savingHeader" class="animate-spin rounded-full h-3 w-3 border-2 border-slate-950 border-t-transparent mr-1"></span>
+              <Icon v-else name="lucide:check" class="text-sm" />
+              {{ savingHeader ? 'Saving...' : 'Save Section Header' }}
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <!-- Loader -->
     <div v-if="pending" class="flex justify-center py-20">
       <div class="animate-spin rounded-full h-8 w-8 border-4 border-slate-100 border-t-[#feb900]"></div>
@@ -138,6 +185,50 @@ definePageMeta({
 
 const successMsg = ref('');
 const { data: testimonials, pending, refresh } = useFetch('/api/admin/testimonials', { key: 'admin-testimonials-list' });
+
+const headerOpen = ref(false);
+const headerPending = ref(true);
+const savingHeader = ref(false);
+const headerForm = reactive({
+  title: '',
+  tagline: ''
+});
+
+const loadHeader = async () => {
+  headerPending.value = true;
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/testimonials/header');
+    if (res?.success && res?.header) {
+      headerForm.title = res.header.title || '';
+      headerForm.tagline = res.header.tagline || '';
+    }
+  } catch (err) {
+    console.error('Failed to load testimonials header:', err);
+  } finally {
+    headerPending.value = false;
+  }
+};
+
+onMounted(loadHeader);
+
+const saveHeader = async () => {
+  savingHeader.value = true;
+  try {
+    const res = await useNuxtApp().$fetch('/api/admin/testimonials/header', {
+      method: 'POST',
+      body: headerForm
+    });
+    if (res?.success) {
+      successMsg.value = 'Testimonials section header saved successfully.';
+      setTimeout(() => { successMsg.value = ''; }, 4000);
+    }
+  } catch (err) {
+    console.error(err);
+    useToast().error(err?.data?.statusMessage || 'Failed to save testimonials header.');
+  } finally {
+    savingHeader.value = false;
+  }
+};
 
 const confirmDelete = async (id) => {
   if (confirm('Are you sure you want to delete this testimonial?')) {
